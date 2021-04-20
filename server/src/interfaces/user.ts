@@ -3,15 +3,15 @@ interface IUser {
   username: String,
   nickname?: String,
   email: String,
-  bike_details: {
+  bike_details: [{
     make: String,
     model: String,
     year?: String,
     size: String,
     license_number?: String,
-  },
+  }],
   license_level: "Learner" | "Restricted" | "Full",
-  preferred_pace: "Relaxed" | "Restricted" | "Sprinted",
+  preferred_pace: "Relaxed" | "Mixed" | "Sprinted",
 }
 
 export {

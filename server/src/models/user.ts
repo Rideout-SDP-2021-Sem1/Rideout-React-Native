@@ -1,8 +1,8 @@
 import { rideOut } from '../instances/mongoose'
-import mongoose from 'mongoose'
-const Schema = mongoose.Schema
+import mongoose, { Document, Model, Schema } from 'mongoose'
+import { IUser } from '../interfaces'
 
-const userSchema = new Schema({
+const userSchemaFields: Record<keyof IUser, any> = {
   uid: {
     type: String,
     index: true,
@@ -15,15 +15,14 @@ const userSchema = new Schema({
   },
   nickname: {
     type: String,
-    index: true,
-    required: true
+    index: true
   },
   email: {
     type: String,
     index: true,
     required: true
   },
-  bike_details: {
+  bike_details: [{
     make: {
       type: String,
       required: true
@@ -41,19 +40,30 @@ const userSchema = new Schema({
     },
     license_number: {
       type: String
+    },
+    test: {
+      type: String
     }
-  },
+  }],
   license_level: {
     type: String,
-    index: true
+    index: true,
+    required: true
   },
   preferred_pace: {
     type: String,
-    index: true
+    index: true,
+    required: true
   }
-})
+}
 
-const User = rideOut.model("User", userSchema)
+const userSchema: Schema = new Schema(userSchemaFields)
+
+interface IUserDocument extends IUser, Document {
+
+}
+
+const User = rideOut.model<IUserDocument>("User", userSchema)
 
 export {
   User
