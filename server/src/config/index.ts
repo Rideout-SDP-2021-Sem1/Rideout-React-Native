@@ -14,5 +14,10 @@ export default {
   /**
    * Connection string for MongoDB
    */
-  MONGODB_URI: process.env.MONGODB_URI || ""
+  MONGODB_URI: process.env.MONGODB_URI || "",
+
+  /**
+   * Node environment
+   */
+  NODE_ENV: process.env.NODE_ENV || "development"
 }

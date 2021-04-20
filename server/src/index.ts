@@ -1,26 +1,18 @@
 import express from 'express'
 import config from './config'
-import { User } from './models/user'
-import { IUser } from './interfaces/user'
-
-const run = async () => {
-  try {
-    const newUser = new User({
-      username: "bob",
-      nickname: "Bob"
-    })
-    await newUser.save()
-  } catch (err) {
-    console.error("Document saving error", err)
-  }
-}
-
-// run()
+import morgan from 'morgan'
+import { userRoute } from './routes'
 
 const PORT = config.port || 5000
 
 const app = express()
 app.use(express.json())
+
+if (config.NODE_ENV !== "production") {
+  app.use(morgan('dev'))
+}
+
+app.use("", userRoute)
 
 app.listen(PORT, () => {
   console.log(`Rideout Server is running on port ${PORT}`)
