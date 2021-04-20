@@ -1,6 +1,7 @@
 import express from 'express'
 import config from './config'
 import { User } from './models/user'
+import { IUser } from './interfaces/user'
 
 const run = async () => {
   try {
