@@ -8,6 +8,6 @@ rideOut.once('open', function () {
   console.log("Rideout MongoDB database connection established successfully")
 })
 
-export default {
+export {
   rideOut
 }
