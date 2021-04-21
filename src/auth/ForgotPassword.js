@@ -52,7 +52,7 @@ export default ({ navigation }) => {
     return (
       <View style={styles.container}>
         <ImageOverlay
-        source={require ('./Bike.jpg')}
+        source={require ('./Road.jpeg')}
         style={{
             width: 500,
             height: 210
@@ -61,14 +61,14 @@ export default ({ navigation }) => {
           <Text 
           category='h1'
            status='control'>
-            RIDE OUT
+            UH OH!
           </Text>  
 
           <Text
             style={styles.signInLabel}
             category='s1'
             status='control'>
-             An app by Khaled
+             Don't worry, we just need your email :)
           </Text>
 
         </ImageOverlay>
@@ -104,28 +104,14 @@ export default ({ navigation }) => {
             value={email}
             onChangeText={setEmail}
           />
-          <Input
-            style={styles.passwordInput}
-            placeholder='Password'
-            value={password}
-            secureTextEntry={!passwordVisible}
-            onChangeText={setPassword}
-          />
-          <View style={styles.forgotPasswordContainer}>
-            <Button
-              style={styles.forgotPasswordButton}
-              appearance='ghost'
-              status='basic'
-              onPress={onForgotPasswordButtonPress}>
-              Forgot your password?
-            </Button>
-          </View>
+          
+         
         </Layout>
         <Button
           style={styles.signInButton}
           size='giant'
           onPress = {signInHandler}>
-          SIGN IN
+          SEND EMAIL
         </Button>
         <Button
           style={styles.signUpButton}
@@ -165,6 +151,7 @@ export default ({ navigation }) => {
     signUpButton: {
       marginVertical: 12,
       marginHorizontal: 16,
+      flex: 1
     },
     forgotPasswordContainer: {
       flexDirection: 'row',
