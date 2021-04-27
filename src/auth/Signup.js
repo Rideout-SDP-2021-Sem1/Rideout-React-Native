@@ -177,8 +177,15 @@ export default ({ navigation }) => {
           placeholder='Select License Type'
           value={displayLValue}
           selectedIndex={selectedLIndex}
-          onSelect={index => setSelectedLIndex(index)}>
-          {Ldata.map(renderOption)}
+          onSelect={index => setSelectedLIndex(index)}
+        >
+          {
+            Ldata.map((license) => {
+              return (
+                <SelectItem key={license} title={license} />
+              )
+            })
+          }
         </Select>
         <Text
           style='s1'
@@ -191,8 +198,15 @@ export default ({ navigation }) => {
           placeholder='Select License Type'
           value={displayPValue}
           selectedIndex={selectedPIndex}
-          onSelect={index => setSelectedPIndex(index)}>
-          {Pdata.map(renderOption)}
+          onSelect={index => setSelectedPIndex(index)}
+        >
+          {
+            Pdata.map((pace) => {
+              return (
+                <SelectItem key={pace} title={pace} />
+              )
+            })
+          }
         </Select>
         <Text
           style={styles.bottomSpace}
