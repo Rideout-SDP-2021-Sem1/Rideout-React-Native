@@ -190,7 +190,6 @@ export default ({ navigation }) => {
         <Text
           style='s1'
         >
-
           Preferred Pace
         </Text>
         <Select

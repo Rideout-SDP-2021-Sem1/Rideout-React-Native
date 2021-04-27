@@ -1,9 +1,9 @@
-import LoginTest from './LoginTest'
+import Login from './Login'
 import Signup from './Signup'
 import ForgotPassword from './ForgotPassword'
 
 export {
-  LoginTest,
+  Login,
   Signup,
   ForgotPassword
 }
