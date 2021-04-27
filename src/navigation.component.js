@@ -27,7 +27,6 @@ const HomeNavigator = () => {
 
   return (
     <AuthContext.Provider value={user}>
-
       <NavigationContainer ref={navigationRef}>
         {
           user === null

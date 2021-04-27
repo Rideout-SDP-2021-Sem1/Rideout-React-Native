@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { StyleSheet } from 'react-native';
+import { StyleSheet, View, SafeAreaView } from 'react-native';
 import { BottomNavigation, BottomNavigationTab, Icon } from '@ui-kitten/components';
 
 const MapIcon = (props) => (
@@ -23,13 +23,22 @@ const MainLayout = (props) => {
   console.log("props MainLayout\n", JSON.stringify(props, null, 4))
   const topState = useBottomNavigationState()
 
+  const children = props.children || null
+
   return (
     <>
-      <BottomNavigation style={styles.bottomNavigation} {...topState}>
-        <BottomNavigationTab title='MAP' icon={MapIcon} />
-        <BottomNavigationTab title='EVENT' icon={EventIcon} />
-        <BottomNavigationTab title='PROFILE' icon={ProfileIcon} />
-      </BottomNavigation>
+      <SafeAreaView style={styles.safeArea}>
+        <View style={styles.mainArea}>
+          {children}
+        </View>
+        <View style={styles.bottomNavigationView}>
+          <BottomNavigation style={styles.bottomNavigation} {...topState}>
+            <BottomNavigationTab title='MAP' icon={MapIcon} />
+            <BottomNavigationTab title='EVENT' icon={EventIcon} />
+            <BottomNavigationTab title='PROFILE' icon={ProfileIcon} />
+          </BottomNavigation>
+        </View>
+      </SafeAreaView>
     </>
   );
 };
@@ -37,7 +46,19 @@ const MainLayout = (props) => {
 export default MainLayout
 
 const styles = StyleSheet.create({
-  bottomNavigation: {
-    marginVertical: 8,
+  safeArea: {
+    display: "flex",
+    flex: 1,
+    flexDirection: "column"
   },
+  mainArea: {
+    display: "flex",
+    flex: 1,
+    flexGrow: 1,
+    backgroundColor: "#27afe2"
+  },
+  bottomNavigationView: {
+    display: "flex",
+    justifyContent: "flex-end"
+  }
 });
