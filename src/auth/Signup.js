@@ -3,6 +3,7 @@ import { View, TouchableWithoutFeedback, Alert, ScrollView } from 'react-native'
 import { IndexPath, Button, Input, Layout, StyleService, Text, useStyleSheet, Icon, Select, SelectItem } from '@ui-kitten/components';
 import ImageOverlay from "react-native-image-overlay";
 import { signIn } from '../helper/auth';
+import { serverInstance } from '../instances'
 
 export default ({ navigation }) => {
 
@@ -26,13 +27,13 @@ export default ({ navigation }) => {
     'Spirited',
   ];
 
-  const [email, setEmail] = React.useState();
-  const [make, setMake] = React.useState();
-  const [model, setModel] = React.useState();
-  const [size, setSize] = React.useState();
+  const [email, setEmail] = React.useState("");
+  const [make, setMake] = React.useState("");
+  const [model, setModel] = React.useState("");
+  const [size, setSize] = React.useState("0");
 
-  const [username, setUsername] = React.useState();
-  const [password, setPassword] = React.useState();
+  const [username, setUsername] = React.useState("");
+  const [password, setPassword] = React.useState("");
   const [passwordVisible, setPasswordVisible] = React.useState(false);
   const [selectedLIndex, setSelectedLIndex] = React.useState(new IndexPath(0));
   const [selectedPIndex, setSelectedPIndex] = React.useState(new IndexPath(0));
@@ -63,28 +64,39 @@ export default ({ navigation }) => {
     </TouchableWithoutFeedback>
   );
 
-  const signInHandler = async () => {
+  const signUpHandler = async () => {
     try {
-      if (username === '') {
-        Alert.alert('Error', 'Invalid Username.');
-        return;
-      }
-      if (username.includes(' ') || username.includes('@')) {
-        Alert.alert('Error', 'Username cannot contain a space or "@"');
-        return;
-      }
-      if (email === '') {
-        Alert.alert('Error', 'No email entered.');
-        return;
-      }
-      if (password.trim() === '') {
-        Alert.alert('Error', 'No password entered.');
-        return;
-      }
-      const result = await signIn(email, password);
-      Alert.alert(`Success`, `Logged with the ${result.email} email`);
+      // if (username === '') {
+      //   Alert.alert('Error', 'Invalid Username.');
+      //   return;
+      // }
+      // if (username.includes(' ') || username.includes('@')) {
+      //   Alert.alert('Error', 'Username cannot contain a space or "@"');
+      //   return;
+      // }
+      // if (email === '') {
+      //   Alert.alert('Error', 'No email entered.');
+      //   return;
+      // }
+      // if (password.trim() === '') {
+      //   Alert.alert('Error', 'No password entered.');
+      //   return;
+      // }
+
+      // const result = await signIn(email, password);
+      const result = await serverInstance.get("/user", {
+        params: {
+          username: "bob"
+        },
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json; charset=utf-8'
+        }
+      })
+      console.log("result", result.data)
     } catch (err) {
-      Alert.alert(`Error`, `Incorrect login details.`);
+      console.error("err", err)
+      // Alert.alert(`Error`, `Incorrect login details.`);
     }
   };
 
@@ -249,7 +261,7 @@ export default ({ navigation }) => {
             marginBottom: 50
           }]}
           size='giant'
-          onPress={signInHandler}>
+          onPress={signUpHandler}>
           SIGN UP
         </Button>
 

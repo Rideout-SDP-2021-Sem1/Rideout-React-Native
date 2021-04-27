@@ -9,12 +9,11 @@ import { MainLayout } from './pages'
 const { Navigator, Screen } = createStackNavigator();
 
 const HomeNavigator = () => {
-  const [user, setUser] = useState({
-    some_text: "ok"
-  })
+  const [user, setUser] = useState(null)
   const navigationRef = useRef(null)
 
   useEffect(() => {
+    setUser(firebase.auth().currentUser)
     const unsubscribe = firebase.auth().onAuthStateChanged((user) => {
       setUser(user)
       if (user === null) {
@@ -29,19 +28,19 @@ const HomeNavigator = () => {
     <AuthContext.Provider value={user}>
       <NavigationContainer ref={navigationRef}>
         {
-          user === null
+          user !== null
             ?
+            <>
+              <Navigator headerMode='none'>
+                <Screen name='Home' component={MainLayout} />
+              </Navigator>
+            </>
+            :
             <>
               <Navigator headerMode='none' initialRouteName="Login">
                 <Screen name='Login' component={Login} />
                 <Screen name='Signup' component={Signup} />
                 <Screen name='ForgotPassword' component={ForgotPassword} />
-              </Navigator>
-            </>
-            :
-            <>
-              <Navigator headerMode='none'>
-                <Screen name='Home' component={MainLayout} />
               </Navigator>
             </>
         }
