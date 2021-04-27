@@ -1,5 +1,6 @@
 import React from 'react'
 import { View, StyleSheet } from 'react-native'
+import { MapScreen } from './map'
 import { LoginScreen } from './auth'
 
 
@@ -12,9 +13,10 @@ const styles = StyleSheet.create({
 
 const App = () => {
   return (
-    <View style={styles.container}>
+    /*<View style={styles.container}>
       <LoginScreen />
-    </View>
+    </View>*/
+    <MapScreen />
   )
 }
 
