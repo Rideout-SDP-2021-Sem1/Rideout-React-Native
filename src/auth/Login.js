@@ -1,16 +1,17 @@
-import React, { ReactElement } from 'react';
+import React, { useContext } from 'react';
 import { View, TouchableWithoutFeedback, Alert } from 'react-native';
-import { Button, Input, Layout, StyleService, Text, useStyleSheet, Icon } from '@ui-kitten/components';
-import ImageOverlay from "react-native-image-overlay"; // npm install --save react-native-image-overlay 
+import { Button, Input, Layout, StyleService, Text, useStyleSheet, Icon, Modal, Spinner } from '@ui-kitten/components';
+import ImageOverlay from "react-native-image-overlay";
 import { signIn } from '../helper/auth';
-// import { PersonIcon } from './extra/icons';
-// import { KeyboardAvoidingView } from './extra/3rd-party';
+import { AuthContext } from '../context/AuthContext'
 
 export default ({ navigation }) => {
 
   const [email, setEmail] = React.useState();
   const [password, setPassword] = React.useState();
-  const [passwordVisible, setPasswordVisible] = React.useState(false);
+  const [passwordVisible, setPasswordVisible] = React.useState(false)
+  const userObj = useContext(AuthContext)
+  const [waiting, setWaiting] = React.useState(false)
 
   const styles = useStyleSheet(themedStyles);
 
@@ -34,108 +35,96 @@ export default ({ navigation }) => {
 
   const signInHandler = async () => {
     try {
-      if (email === '') {
+      if (String(email).trim() === '') {
         Alert.alert('Error', 'No email entered.');
         return;
       }
-      if (password.trim() === '') {
+      if (String(password).trim() === '') {
         Alert.alert('Error', 'No password entered.');
         return;
       }
-      const result = await signIn(email, password);
-      Alert.alert(`Success`, `Logged with the ${result.email} email`);
+      setWaiting(true)
+      await signIn(email, password);
     } catch (err) {
       Alert.alert(`Error`, `Incorrect login details.`);
+    } finally {
+      setWaiting(false)
     }
   };
 
   return (
-    <View style={styles.container}>
-      <ImageOverlay
-        source={require('./Bike.jpg')}
-        style={{
-          width: 500,
-          height: 210
+    <>
+      <Modal
+        visible={waiting}
+        backdropStyle={{
+          backgroundColor: "rgba(0, 0, 0, 0.5)"
         }}
       >
-        <>
-          <Text
-            category='h1'
-            status='control'>
-            RIDE OUT
+        <Spinner size="giant" />
+      </Modal>
+      <View style={styles.container}>
+        <ImageOverlay
+          source={require('./Bike.jpg')}
+          style={{
+            width: 500,
+            height: 210
+          }}
+        >
+          <>
+            <Text
+              category='h1'
+              status='control'>
+              RIDE OUT
           </Text>
 
-          <Text
-            style={styles.signInLabel}
-            category='s1'
-            status='control'>
-            An app by Khaled
+            <Text
+              style={styles.signInLabel}
+              category='s1'
+              status='control'>
+              An app by Khaled for Khaled
           </Text>
-        </>
-      </ImageOverlay>
-      {/* <View style={styles.headerContainer}>
-        <Text
-            
-            category='h1'
-            status='control'
-            >
-            RIDE OUT
-        </Text>   
-            <ImageBackground
-            source={require ('./Road.jpeg')}
-            style={{
-                width: 500,
-                height: 210
-            }}
-            >
-            </ImageBackground>
-
-          <Text
-            style={styles.signInLabel}
-            category='s1'
-            status='control'>
-            AUT's Only Biker Social Media
-          </Text>
-        </View> */}
-      <Layout
-        style={styles.formContainer}
-        level='1'>
-        <Input
-          placeholder='Email'
-          value={email}
-          onChangeText={setEmail}
-        />
-        <Input
-          style={styles.passwordInput}
-          placeholder='Password'
-          value={password}
-          secureTextEntry={!passwordVisible}
-          onChangeText={setPassword}
-        />
-        <View style={styles.forgotPasswordContainer}>
-          <Button
-            style={styles.forgotPasswordButton}
-            appearance='ghost'
-            status='basic'
-            onPress={onForgotPasswordButtonPress}>
-            Forgot your password?
+          </>
+        </ImageOverlay>
+        <Layout
+          style={styles.formContainer}
+          level='1'>
+          <Input
+            placeholder='Email'
+            value={email}
+            onChangeText={setEmail}
+          />
+          <Input
+            style={styles.passwordInput}
+            placeholder='Password'
+            value={password}
+            secureTextEntry={!passwordVisible}
+            onChangeText={setPassword}
+          />
+          <View style={styles.forgotPasswordContainer}>
+            <Button
+              style={styles.forgotPasswordButton}
+              appearance='ghost'
+              status='basic'
+              onPress={onForgotPasswordButtonPress}>
+              Forgot your password?
             </Button>
-        </View>
-      </Layout>
-      <Button
-        style={styles.signInButton}
-        size='giant'
-        onPress={signInHandler}>
-        SIGN IN
+          </View>
+        </Layout>
+        <Button
+          style={styles.signInButton}
+          size='giant'
+          onPress={signInHandler}>
+          SIGN IN
         </Button>
-      <Button
-        style={styles.signUpButton}
-        appearance='ghost'
-        status='basic'
-        onPress={() => navigation.push("Signup")}>
-        Don't have an account? Create
+        <Button
+          style={styles.signUpButton}
+          appearance='ghost'
+          status='basic'
+          onPress={() => navigation.push("Signup")}>
+          Don't have an account? Create
         </Button>
-    </View>
+      </View>
+    </>
   );
 };
 
