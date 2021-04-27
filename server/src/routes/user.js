@@ -1,11 +1,10 @@
-import { Router, Request, Response } from 'express'
+import { Router } from 'express'
 import { User } from '../models/index'
-import { IUser } from '../interfaces'
 
 const userRoute = Router()
 
 userRoute.route("/user")
-  .get(async (req: Request, res: Response) => {
+  .get(async (req, res) => {
     const uid = String(req.headers.uid)
     const username = String(req.query.username)
 
@@ -16,8 +15,8 @@ userRoute.route("/user")
       return res.status(500).json(err)
     }
   })
-  .post(async (req: Request, res: Response) => {
-    const data: IUser = req.body.data
+  .post(async (req, res) => {
+    const data = req.body.data
 
     try {
       const newUser = new User({
