@@ -32,7 +32,7 @@ export default ({ navigation }) => {
     </TouchableWithoutFeedback>
   );
 
-  const signInHandler = async () => {
+  const resetPasswordHandler = async () => {
     try {
       if (email === '') {
         Alert.alert('Error', 'No email entered.');
@@ -72,30 +72,6 @@ export default ({ navigation }) => {
           </Text>
         </>
       </ImageOverlay>
-      {/* <View style={styles.headerContainer}>
-        <Text
-            
-            category='h1'
-            status='control'
-            >
-            RIDE OUT
-        </Text>   
-            <ImageBackground
-            source={require ('./Road.jpeg')}
-            style={{
-                width: 500,
-                height: 210
-            }}
-            >
-            </ImageBackground>
-
-          <Text
-            style={styles.signInLabel}
-            category='s1'
-            status='control'>
-            AUT's Only Biker Social Media
-          </Text>
-        </View> */}
       <Layout
         style={styles.formContainer}
         level='1'>
@@ -104,13 +80,11 @@ export default ({ navigation }) => {
           value={email}
           onChangeText={setEmail}
         />
-
-
       </Layout>
       <Button
         style={styles.signInButton}
         size='giant'
-        onPress={signInHandler}>
+        onPress={resetPasswordHandler}>
         SEND EMAIL
         </Button>
       <Button

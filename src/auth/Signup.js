@@ -1,11 +1,8 @@
 import React, { ReactElement } from 'react';
 import { View, TouchableWithoutFeedback, Alert, ScrollView } from 'react-native';
 import { IndexPath, Button, Input, Layout, StyleService, Text, useStyleSheet, Icon, Select, SelectItem } from '@ui-kitten/components';
-import ImageOverlay from "react-native-image-overlay"; // npm install --save react-native-image-overlay 
+import ImageOverlay from "react-native-image-overlay";
 import { signIn } from '../helper/auth';
-// import { PersonIcon } from './extra/icons';
-// import { KeyboardAvoidingView } from './extra/3rd-party';
-
 
 export default ({ navigation }) => {
 
@@ -41,8 +38,6 @@ export default ({ navigation }) => {
   const [selectedPIndex, setSelectedPIndex] = React.useState(new IndexPath(0));
   const displayLValue = Ldata[selectedLIndex.row];
   const displayPValue = Pdata[selectedPIndex.row];
-
-
 
   const styles = useStyleSheet(themedStyles);
 
@@ -250,14 +245,15 @@ export default ({ navigation }) => {
           onChangeText={(text) => checkSize(text)}
         />
         <Button
-          style={[styles.signUpButton, styles.bottomSpace]}
+          style={[styles.signUpButton, styles.bottomSpace, {
+            marginBottom: 50
+          }]}
           size='giant'
           onPress={signInHandler}>
           SIGN UP
         </Button>
 
       </ScrollView>
-
     </View>
   );
 };
@@ -279,8 +275,7 @@ const themedStyles = StyleService.create({
     flex: 1,
     paddingTop: 25,
     paddingHorizontal: 16,
-    minHeight: 150,
-    marginBottom: 30
+    minHeight: 150
   },
   signInLabel: {
     marginTop: 16,
