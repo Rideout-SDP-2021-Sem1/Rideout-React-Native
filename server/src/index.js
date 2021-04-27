@@ -1,7 +1,7 @@
-import express from 'express'
-import config from './config'
-import morgan from 'morgan'
-import { userRoute } from './routes'
+const express = require('express')
+const config = require('./config')
+const morgan = require('morgan')
+const { userRoute } = require('./routes')
 
 const PORT = config.port || 5000
 

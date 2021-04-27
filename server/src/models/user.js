@@ -1,5 +1,5 @@
-import { rideOut } from '../instances/mongoose'
-import { Schema } from 'mongoose'
+const { rideOut } = require('../instances/mongoose')
+const { Schema } = require('mongoose')
 
 const userSchema = new Schema({
   uid: {
@@ -58,6 +58,6 @@ const userSchema = new Schema({
 
 const User = rideOut.model("User", userSchema)
 
-export {
+module.exports = {
   User
 }

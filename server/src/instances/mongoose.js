@@ -1,5 +1,5 @@
-import mongoose from 'mongoose'
-import config from '../config'
+const mongoose = require('mongoose')
+const config = require('../config')
 mongoose.set('useCreateIndex', true)
 mongoose.set('useFindAndModify', false)
 
@@ -8,6 +8,6 @@ rideOut.once('open', function () {
   console.log("Rideout MongoDB database connection established successfully")
 })
 
-export {
+module.exports = {
   rideOut
 }

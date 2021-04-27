@@ -1,5 +1,5 @@
-import { userRoute } from './user'
+const { userRoute } = require('./user')
 
-export {
+module.exports = {
   userRoute
 }

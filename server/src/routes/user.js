@@ -1,5 +1,5 @@
-import { Router } from 'express'
-import { User } from '../models/index'
+const { Router } = require('express')
+const { User } = require('../models/index')
 
 const userRoute = Router()
 
@@ -36,6 +36,6 @@ userRoute.route("/user")
     }
   })
 
-export {
+module.exports = {
   userRoute
 }

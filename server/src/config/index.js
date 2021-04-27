@@ -1,11 +1,11 @@
-import dotenv from 'dotenv';
+const dotenv = require('dotenv');
 
 const envFound = dotenv.config();
 if (envFound.error) {
   throw new Error("⚠️  Couldn't find .env file  ⚠️");
 }
 
-export default {
+module.exports = {
   /**
    * The default port for the server to run on.
    */
