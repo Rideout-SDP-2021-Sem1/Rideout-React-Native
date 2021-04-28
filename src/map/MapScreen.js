@@ -15,10 +15,10 @@ const styles = StyleSheet.create({
 
 const Map = () => {
     const DUMMY_RIDER_LOCATIONS = [
-        {id: 0, latitude: -36.80, longitude: 174.60, nickname: 'rider 1'},
-        {id: 1, latitude: -36.60, longitude: 174.70, nickname: 'rider 2'},
-        {id: 2, latitude: -36.60, longitude: 174.30, nickname: 'rider 3'},
-        {id: 3, latitude: -36.85, longitude: 174.76, nickname: 'rider 4'}
+        {id: 0, latitude: -36.1, longitude: 174.4, nickname: 'rider1'},
+        {id: 1, latitude: -36.3, longitude: 174.3, nickname: 'rider2'},
+        {id: 2, latitude: -36.2, longitude: 174.5, nickname: 'rider3'},
+        {id: 3, latitude: -36.0, longitude: 174.1, nickname: 'rider4'}
     ]
 
     return (
@@ -49,9 +49,9 @@ const Map = () => {
                         >
                             <Image 
                                 source={require('./rider_marker_solid.png')}
-                                style={{width: 28, height: 30}}
-                                resizeMode="contain"
+                                style={{width: 36, height: 36}}
                                 resizeMethod="resize"
+                                resizeMode="contain"
                             />
                         </Marker>})}
             </MapView>
