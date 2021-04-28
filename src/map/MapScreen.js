@@ -19,10 +19,10 @@ const Map = () => {
                 provider={PROVIDER_GOOGLE}
                 style={styles.map}
                 region={{
-                    latitude: 37.78825,
-                    longitude: -122.4324,
-                    latitudeDelta: 0.015,
-                    longitudeDelta: 0.0121,
+                    latitude: -36.85087,
+                    longitude: 174.7645,
+                    latitudeDelta: 0.030,
+                    longitudeDelta: 0.0242,
                 }}
                 >
             </MapView>
