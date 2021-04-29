@@ -3,14 +3,14 @@ import { View, TouchableWithoutFeedback, Alert } from 'react-native';
 import { Button, Input, Layout, StyleService, Text, useStyleSheet, Icon, Modal, Spinner } from '@ui-kitten/components';
 import ImageOverlay from "react-native-image-overlay";
 import { signIn } from '../helper/auth';
-import { AuthContext } from '../context'
+import { NavigationContext } from '../context'
 
 export default ({ navigation }) => {
 
   const [email, setEmail] = React.useState();
   const [password, setPassword] = React.useState();
   const [passwordVisible, setPasswordVisible] = React.useState(false)
-  const userObj = useContext(AuthContext)
+  const navigationContext = useContext(NavigationContext)
   const [waiting, setWaiting] = React.useState(false)
 
   const styles = useStyleSheet(themedStyles);
@@ -44,7 +44,8 @@ export default ({ navigation }) => {
         return;
       }
       setWaiting(true)
-      await signIn(email, password);
+      await signIn(email, password)
+      navigationContext.setIndex(0)
     } catch (err) {
       Alert.alert(`Error`, `Incorrect login details.`);
     } finally {

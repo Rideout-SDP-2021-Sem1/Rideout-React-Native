@@ -73,13 +73,13 @@ const styles = StyleSheet.create({
     display: "flex",
     flex: 1,
     flexDirection: "column",
-    backgroundColor: "white" 
+    backgroundColor: "white"
   },
   mainArea: {
     display: "flex",
     flex: 1,
     flexGrow: 1,
-    backgroundColor: "#27afe2"
+    backgroundColor: "white" || "#27afe2"
   },
   bottomNavigationView: {
     display: "flex",

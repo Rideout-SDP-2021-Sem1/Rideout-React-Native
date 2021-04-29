@@ -183,7 +183,7 @@ export default ({ navigation }) => {
         />
 
         <Text
-          style='s1'
+          category='s1'
         >
           License Type
         </Text>
@@ -203,7 +203,7 @@ export default ({ navigation }) => {
           }
         </Select>
         <Text
-          style='s1'
+          category='s1'
         >
           Preferred Pace
         </Text>
@@ -223,13 +223,12 @@ export default ({ navigation }) => {
           }
         </Select>
         <Text
-          style={styles.bottomSpace}
           category='s1'
         >
           BIKE DETAILS
         </Text>
         <Text
-          category='S1'
+          category='s1'
 
         >
           Make
