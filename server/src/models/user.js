@@ -52,6 +52,10 @@ const userSchema = new Schema({
     type: String,
     index: true,
     required: true
+  },
+  role: {
+    type: String,
+    index: true
   }
 })
 

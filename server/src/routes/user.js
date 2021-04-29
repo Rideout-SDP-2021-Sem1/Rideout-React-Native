@@ -28,7 +28,8 @@ userRoute.route("/user")
         email: data.email,
         bike_details: data.bike_details,
         license_level: data.license_level,
-        preferred_pace: data.preferred_pace
+        preferred_pace: data.preferred_pace,
+        role: "user"
       }, { upsert: true, new: true }).select("").lean().exec()
 
       return res.status(200).json(newUser["_id"])
