@@ -21,7 +21,7 @@ userRoute.route("/user")
     }
 
     try {
-      const result = await User.findOne({ username: uidSearchUp }).lean().exec()
+      const result = await User.findOne({ uid: uidSearchUp }).lean().exec()
       if (result === null) {
         return res.status(200).json({})
       }
@@ -58,6 +58,33 @@ userRoute.route("/user")
       return res.status(200).json(newUser["_id"])
     } catch (err) {
       console.error("POST user error", err)
+      return res.status(500).json(err)
+    }
+  })
+
+userRoute.route("/update-profile")
+  .post(async (req, res) => {
+    const headerUid = req.header.uid
+
+    if (headerUid === "") {
+      return res.status(400).send("Bad request.")
+    }
+
+    const data = req.body
+
+    try {
+      const newUser = await User.findOneAndUpdate({
+        uid: headerUid,
+      }, {
+        nickname: data.nickname,
+        bike_details: data.bike_details,
+        license_level: data.license_level,
+        preferred_pace: data.preferred_pace
+      }, { new: true }).select("").lean().exec()
+
+      return res.status(200).json({})
+    } catch (err) {
+      console.error("POST update-profile error", err)
       return res.status(500).json(err)
     }
   })
