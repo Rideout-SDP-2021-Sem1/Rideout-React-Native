@@ -4,8 +4,12 @@ import { createStackNavigator } from '@react-navigation/stack'
 import { Login, Signup, ForgotPassword } from './auth/index'
 import { AuthContext, NavigationContext } from './context'
 import { firebase } from '@react-native-firebase/auth'
-import UserProfile from './pages/UserProfile/UserProfile'
-import { MainLayout, TestProfile, EmptyPage } from './pages'
+import {
+  MainLayout,
+  TestProfile,
+  EmptyPage,
+  UserProfile
+} from './pages'
 
 const { Navigator, Screen } = createStackNavigator();
 
@@ -18,9 +22,9 @@ const HomeNavigator = () => {
     setUser(firebase.auth().currentUser)
     const unsubscribe = firebase.auth().onAuthStateChanged((user) => {
       setUser(user)
-      if (user === null) {
-        navigationRef?.current?.navigate("Login")
-      }
+      // if (user === null) {
+      //   navigationRef?.current?.navigate("Login")
+      // }
     })
     return unsubscribe
   }, [])
@@ -37,10 +41,10 @@ const HomeNavigator = () => {
             user !== null
               ?
               <>
-                <Navigator headerMode='none'>
+                <Navigator headerMode='none' initialRouteName="Map">
                   <Screen name='Map' component={EmptyPage} />
                   <Screen name='List' component={EmptyPage} />
-                  <Screen name='Profile' component={TestProfile} />
+                  <Screen name='Profile' component={UserProfile} />
                 </Navigator>
               </>
               :
