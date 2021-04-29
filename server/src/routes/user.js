@@ -43,6 +43,12 @@ userRoute.route("/user")
     const data = req.body.data
 
     try {
+      const check = await User.findOne({
+        uid: data.uid
+      }).select("").lean().exec()
+      if (check !== null) {
+        return res.status(200).send("ok")
+      }
       const newUser = await User.findOneAndUpdate({
         uid: data.uid,
       }, {

@@ -2,8 +2,11 @@ import React, { useContext, useState } from 'react';
 import { View, Alert } from 'react-native';
 import { Button, Input, Layout, StyleService, Text, useStyleSheet, Icon, Modal, Spinner } from '@ui-kitten/components';
 import ImageOverlay from "react-native-image-overlay";
-import { signIn } from '../helper/auth';
+import { signIn, googleSignIn } from '../helper/auth';
 import { NavigationContext } from '../context'
+import {
+  GoogleSigninButton
+} from '@react-native-google-signin/google-signin'
 
 export default ({ navigation }) => {
 
@@ -39,6 +42,15 @@ export default ({ navigation }) => {
       setWaiting(false)
     }
   };
+
+  const googleSignInHandler = async () => {
+    try {
+      await googleSignIn()
+    } catch (err) {
+      console.error("sign in error", err)
+      Alert.alert(`Error`, err.message);
+    }
+  }
 
   return (
     <>
@@ -98,6 +110,21 @@ export default ({ navigation }) => {
             </Button>
           </View>
         </Layout>
+        <View>
+
+        </View>
+        <GoogleSigninButton
+          size={GoogleSigninButton.Size.Wide}
+          onPress={googleSignInHandler}
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            alignSelf: "center",
+            marginBottom: 20,
+            width: "93%",
+            height: 60
+          }}
+        />
         <Button
           style={styles.signInButton}
           size='giant'
