@@ -1,6 +1,6 @@
 import React from 'react';
-import { View, Image, StyleSheet } from 'react-native';
-import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
+import { View, Image, Text, StyleSheet } from 'react-native';
+import MapView, { Marker, Callout, PROVIDER_GOOGLE } from 'react-native-maps';
 
 const styles = StyleSheet.create({
     container: {
@@ -270,7 +270,6 @@ const Map = () => {
                             latitude: DUMMY_GROUP_LOCATIONS.latitude,
                             longitude: DUMMY_GROUP_LOCATIONS.longitude
                         }}
-                        title = {DUMMY_GROUP_LOCATIONS.nickname}
                         >
                             <Image 
                                 source={require('./group_marker_solid.png')}
@@ -278,6 +277,10 @@ const Map = () => {
                                 resizeMethod="resize"
                                 resizeMode="contain"
                             />
+                            <Callout style={{ "width": 250, "height": 50 }}>
+                                <Text>{DUMMY_GROUP_LOCATIONS.nickname}</Text>
+                                <Text>text placeholder</Text>
+                            </Callout>
                         </Marker>})}
             </MapView>
         </View>
