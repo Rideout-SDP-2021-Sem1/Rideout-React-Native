@@ -1,9 +1,13 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { View, TouchableWithoutFeedback, Alert, ScrollView } from 'react-native';
-import { IndexPath, Button, Input, Layout, StyleService, Text, useStyleSheet, Icon, Select, SelectItem } from '@ui-kitten/components';
+import {
+  IndexPath, Button, Input, Layout, StyleService, Text, useStyleSheet,
+  Icon, Select, SelectItem, Modal, Spinner
+} from '@ui-kitten/components';
 import ImageOverlay from "react-native-image-overlay";
 import { auth } from '../helper';
 import { serverInstance } from '../instances'
+import { NavigationContext } from '../context'
 
 export default ({ navigation }) => {
 
@@ -26,6 +30,8 @@ export default ({ navigation }) => {
     'Spirited',
   ];
 
+  const navigationContext = useContext(NavigationContext)
+
   const [email, setEmail] = useState("");
   const [make, setMake] = useState("");
   const [model, setModel] = useState("");
@@ -39,6 +45,8 @@ export default ({ navigation }) => {
   const [selectedPaceIndex, setSelectedPaceIndex] = useState(new IndexPath(0));
   const displayLValue = licenseList[selectedLicenseIndex.row];
   const displayPValue = preferredPaceList[selectedPaceIndex.row];
+
+  const [waiting, setWaiting] = useState(false)
 
   const styles = useStyleSheet(themedStyles)
 
@@ -58,8 +66,14 @@ export default ({ navigation }) => {
         return;
       }
 
+      // Sign up the user with the authentication provider
+      setWaiting(true)
+      const { user } = await auth.signUp(email, password)
+      navigationContext.setIndex(0)
+      console.log("userObj\n", JSON.stringify(user, null, 4))
+
       const signUpPayload = {
-        uid: "abc",
+        uid: user.uid,
         nickname: nickname,
         email: email,
         bike_details: {
@@ -77,11 +91,12 @@ export default ({ navigation }) => {
       const result = await serverInstance.post("/user", {
         data: signUpPayload
       })
-      Alert.alert("Success", "Sign up successful")
       console.log("result", result.data)
     } catch (err) {
       console.error("err", err)
-      Alert.alert(`Error`, JSON.stringify(err));
+      Alert.alert(`Error`, err?.message);
+    } finally {
+      setWaiting(false)
     }
   };
 
@@ -97,177 +112,187 @@ export default ({ navigation }) => {
   }
 
   return (
-    <View style={styles.container}>
-      <ImageOverlay
-        source={require('./Bike.jpg')}
-        style={{
-          width: 500,
-          height: 210
+    <>
+      <Modal
+        visible={waiting}
+        backdropStyle={{
+          backgroundColor: "rgba(0, 0, 0, 0.5)"
         }}
       >
-        <>
-          <Text
-            category='h1'
-            status='control'>
-            Sign Up
-          </Text>
-          <Text
-            style={styles.signInLabel}
-            category='s1'
-            status='control'>
-            Let's get you signed up to RIDE OUT!
-          </Text>
-        </>
-      </ImageOverlay>
-
-      <ScrollView
-        style={styles.formContainer}
-        level='1'
-      >
-        <Text
-          category='s1'
-        >
-          Nickname
-        </Text>
-        <Input
-          style={styles.bottomSpace}
-          placeholder='Nickname'
-          value={nickname}
-          onChangeText={setNickname}
-        />
-        <Text
-          category='s1'
-        >
-          Email
-        </Text>
-        <Input
-          style={styles.bottomSpace}
-          placeholder='Email'
-          value={email}
-          onChangeText={setEmail}
-        />
-        <Text
-          category='s1'
-        >
-          Password
-        </Text>
-        <Input
-          style={styles.bottomSpace}
-          placeholder='Password'
-          value={password}
-          secureTextEntry={!passwordVisible}
-          onChangeText={setPassword}
-        />
-        <Text
-          category='s1'
-        >
-          Re-Enter Password
-        </Text>
-        <Input
-          style={styles.bottomSpace}
-          placeholder='Password'
-          value={rePassword}
-          secureTextEntry={!passwordVisible}
-          onChangeText={setRePassword}
-        />
-
-        <Text
-          category='s1'
-        >
-          License Type
-        </Text>
-        <Select
-          style={styles.bottomSpace}
-          placeholder='Select License Type'
-          value={displayLValue}
-          selectedIndex={selectedLicenseIndex}
-          onSelect={index => setSelectedLicenseIndex(index)}
-        >
-          {
-            licenseList.map((license) => {
-              return (
-                <SelectItem key={license} title={license} />
-              )
-            })
-          }
-        </Select>
-        <Text
-          category='s1'
-        >
-          Preferred Pace
-        </Text>
-        <Select
-          style={styles.bottomSpace}
-          placeholder='Select License Type'
-          value={displayPValue}
-          selectedIndex={selectedPaceIndex}
-          onSelect={index => setSelectedPaceIndex(index)}
-        >
-          {
-            preferredPaceList.map((pace) => {
-              return (
-                <SelectItem key={pace} title={pace} />
-              )
-            })
-          }
-        </Select>
-        <Text
-          category='s1'
-        >
-          BIKE DETAILS
-        </Text>
-        <View
+        <Spinner size="giant" />
+      </Modal>
+      <View style={styles.container}>
+        <ImageOverlay
+          source={require('./Bike.jpg')}
           style={{
-            marginTop: 20
+            width: 500,
+            height: 210
           }}
         >
+          <>
+            <Text
+              category='h1'
+              status='control'>
+              Sign Up
+          </Text>
+            <Text
+              style={styles.signInLabel}
+              category='s1'
+              status='control'>
+              Let's get you signed up to RIDE OUT!
+          </Text>
+          </>
+        </ImageOverlay>
+
+        <ScrollView
+          style={styles.formContainer}
+          level='1'
+        >
           <Text
             category='s1'
           >
-            Make
-          </Text>
+            Nickname
+        </Text>
           <Input
             style={styles.bottomSpace}
-            placeholder='Make'
-            value={make}
-            onChangeText={setMake}
+            placeholder='Nickname'
+            value={nickname}
+            onChangeText={setNickname}
+          />
+          <Text
+            category='s1'
+          >
+            Email
+        </Text>
+          <Input
+            style={styles.bottomSpace}
+            placeholder='Email'
+            value={email}
+            onChangeText={setEmail}
+          />
+          <Text
+            category='s1'
+          >
+            Password
+        </Text>
+          <Input
+            style={styles.bottomSpace}
+            placeholder='Password'
+            value={password}
+            secureTextEntry={!passwordVisible}
+            onChangeText={setPassword}
+          />
+          <Text
+            category='s1'
+          >
+            Re-Enter Password
+        </Text>
+          <Input
+            style={styles.bottomSpace}
+            placeholder='Password'
+            value={rePassword}
+            secureTextEntry={!passwordVisible}
+            onChangeText={setRePassword}
           />
 
           <Text
             category='s1'
           >
-            Model
-          </Text>
-          <Input
+            License Type
+        </Text>
+          <Select
             style={styles.bottomSpace}
-            placeholder='Model'
-            value={model}
-            onChangeText={setModel}
-          />
-
+            placeholder='Select License Type'
+            value={displayLValue}
+            selectedIndex={selectedLicenseIndex}
+            onSelect={index => setSelectedLicenseIndex(index)}
+          >
+            {
+              licenseList.map((license) => {
+                return (
+                  <SelectItem key={license} title={license} />
+                )
+              })
+            }
+          </Select>
           <Text
             category='s1'
           >
-            Size
-          </Text>
-          <Input
+            Preferred Pace
+        </Text>
+          <Select
             style={styles.bottomSpace}
-            placeholder='Size'
-            value={size}
-            onChangeText={(text) => checkSize(text)}
-          />
-        </View>
-        <Button
-          style={[styles.signUpButton, styles.bottomSpace, {
-            marginBottom: 50
-          }]}
-          size='giant'
-          onPress={signUpHandler}>
-          SIGN UP
+            placeholder='Select License Type'
+            value={displayPValue}
+            selectedIndex={selectedPaceIndex}
+            onSelect={index => setSelectedPaceIndex(index)}
+          >
+            {
+              preferredPaceList.map((pace) => {
+                return (
+                  <SelectItem key={pace} title={pace} />
+                )
+              })
+            }
+          </Select>
+          <Text
+            category='s1'
+          >
+            BIKE DETAILS
+        </Text>
+          <View
+            style={{
+              marginTop: 20
+            }}
+          >
+            <Text
+              category='s1'
+            >
+              Make
+          </Text>
+            <Input
+              style={styles.bottomSpace}
+              placeholder='Make'
+              value={make}
+              onChangeText={setMake}
+            />
+
+            <Text
+              category='s1'
+            >
+              Model
+          </Text>
+            <Input
+              style={styles.bottomSpace}
+              placeholder='Model'
+              value={model}
+              onChangeText={setModel}
+            />
+
+            <Text
+              category='s1'
+            >
+              Size
+          </Text>
+            <Input
+              style={styles.bottomSpace}
+              placeholder='Size'
+              value={size}
+              onChangeText={(text) => checkSize(text)}
+            />
+          </View>
+          <Button
+            style={[styles.signUpButton, styles.bottomSpace, {
+              marginBottom: 50
+            }]}
+            size='giant'
+            onPress={signUpHandler}>
+            SIGN UP
         </Button>
 
-      </ScrollView>
-    </View>
+        </ScrollView>
+      </View>
+    </>
   );
 };
 
