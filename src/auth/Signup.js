@@ -68,9 +68,8 @@ export default ({ navigation }) => {
 
       // Sign up the user with the authentication provider
       setWaiting(true)
-      const { user } = await auth.signUp(email, password)
       navigationContext.setIndex(0)
-      console.log("userObj\n", JSON.stringify(user, null, 4))
+      const { user } = await auth.signUp(email, password)
 
       const signUpPayload = {
         uid: user.uid,
@@ -85,17 +84,13 @@ export default ({ navigation }) => {
         preferred_pace: preferredPaceList[selectedPaceIndex.row]
       }
 
-      console.log("signUpPayload\n", JSON.stringify(signUpPayload, null, 4))
-
-      // const result = await signIn(email, password);
-      const result = await serverInstance.post("/user", {
+      await serverInstance.post("/user", {
         data: signUpPayload
       })
-      console.log("result", result.data)
+      setWaiting(false)
     } catch (err) {
       console.error("err", err)
       Alert.alert(`Error`, err?.message);
-    } finally {
       setWaiting(false)
     }
   };
