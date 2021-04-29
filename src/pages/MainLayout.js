@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { StyleSheet, View, SafeAreaView } from 'react-native';
 import { BottomNavigation, BottomNavigationTab, Icon } from '@ui-kitten/components';
+import { NavigationContext } from '../context'
 
 const MapIcon = (props) => (
   <Icon {...props} name='map-outline' />
@@ -14,14 +15,32 @@ const ProfileIcon = (props) => (
   <Icon {...props} name='person-outline' />
 );
 
-const useBottomNavigationState = (initialState = 0) => {
-  const [selectedIndex, setSelectedIndex] = useState(initialState);
-  return { selectedIndex, onSelect: setSelectedIndex };
-}
-
 const MainLayout = (props) => {
-  console.log("props MainLayout\n", JSON.stringify(props, null, 4))
-  const topState = useBottomNavigationState()
+  const { index, setIndex } = useContext(NavigationContext)
+  const navigation = props.navigation
+
+  const handleNavigateToPage = (pageName) => {
+    navigation && navigation.push(pageName);
+  }
+
+  const handleSelectChange = (index) => {
+    setIndex(index)
+    switch (index) {
+      case 0:
+        // Navigate to map screen
+        handleNavigateToPage("Map")
+        break
+      case 1:
+        // Navigate to list screen
+        handleNavigateToPage("List")
+        break
+      case 2:
+        handleNavigateToPage("Profile")
+        break;
+      default:
+        break
+    }
+  }
 
   const children = props.children || null
 
@@ -32,7 +51,11 @@ const MainLayout = (props) => {
           {children}
         </View>
         <View style={styles.bottomNavigationView}>
-          <BottomNavigation style={styles.bottomNavigation} {...topState}>
+          <BottomNavigation
+            style={styles.bottomNavigation}
+            selectedIndex={index}
+            onSelect={(index) => handleSelectChange(index)}
+          >
             <BottomNavigationTab title='MAP' icon={MapIcon} />
             <BottomNavigationTab title='EVENT' icon={EventIcon} />
             <BottomNavigationTab title='PROFILE' icon={ProfileIcon} />

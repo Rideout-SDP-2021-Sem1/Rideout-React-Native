@@ -3,7 +3,7 @@ import { View, TouchableWithoutFeedback, Alert } from 'react-native';
 import { Button, Input, Layout, StyleService, Text, useStyleSheet, Icon, Modal, Spinner } from '@ui-kitten/components';
 import ImageOverlay from "react-native-image-overlay";
 import { signIn } from '../helper/auth';
-import { AuthContext } from '../context/AuthContext'
+import { AuthContext } from '../context'
 
 export default ({ navigation }) => {
 
