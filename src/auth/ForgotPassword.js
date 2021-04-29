@@ -1,114 +1,100 @@
-import React, { ReactElement } from 'react';
+import React, { useState } from 'react';
 import { View, TouchableWithoutFeedback, Alert } from 'react-native';
-import { Button, Input, Layout, StyleService, Text, useStyleSheet, Icon } from '@ui-kitten/components';
+import { Button, Input, Layout, StyleService, Text, useStyleSheet, Modal, Spinner } from '@ui-kitten/components';
 import ImageOverlay from "react-native-image-overlay"; // npm install --save react-native-image-overlay 
-import { signIn } from '../helper/auth';
-// import { PersonIcon } from './extra/icons';
-// import { KeyboardAvoidingView } from './extra/3rd-party';
+import { resetPassword } from '../helper/auth';
 
 export default ({ navigation }) => {
 
-  const [email, setEmail] = React.useState();
-  const [password, setPassword] = React.useState();
-  const [passwordVisible, setPasswordVisible] = React.useState(false);
+  const [email, setEmail] = useState("")
+  const [waiting, setWaiting] = useState(false)
 
   const styles = useStyleSheet(themedStyles);
 
-  const onSignUpButtonPress = () => {
-    navigation && navigation.navigate('SignUp2');
-  };
-
-  const onForgotPasswordButtonPress = () => {
-    navigation && navigation.navigate('ForgotPassword');
-  };
-
-  const onPasswordIconPress = () => {
-    setPasswordVisible(!passwordVisible);
-  };
-
-  const renderPasswordIcon = (props) => (
-    <TouchableWithoutFeedback onPress={onPasswordIconPress}>
-      <Icon {...props} name={passwordVisible ? 'eye-off' : 'eye'} />
-    </TouchableWithoutFeedback>
-  );
-
   const resetPasswordHandler = async () => {
     try {
-      if (email === '') {
+      if (String(email).trim() === '') {
         Alert.alert('Error', 'No email entered.');
         return;
       }
-      if (password.trim() === '') {
-        Alert.alert('Error', 'No password entered.');
-        return;
-      }
-      const result = await signIn(email, password);
-      Alert.alert(`Success`, `Logged with the ${result.email} email`);
+      setWaiting(true)
+
+      await resetPassword(email)
+      Alert.alert(`Success`, `Reset password email sent.`);
     } catch (err) {
-      Alert.alert(`Error`, `Incorrect login details.`);
+      Alert.alert(`Error`, err.message);
+    } finally {
+      setWaiting(false)
     }
   };
 
   return (
-    <View style={styles.container}>
-      <ImageOverlay
-        source={require('./Road.jpeg')}
-        style={{
-          width: 500,
-          height: 210
+    <>
+      <Modal
+        visible={waiting}
+        backdropStyle={{
+          backgroundColor: "rgba(0, 0, 0, 0.5)"
         }}
       >
-        <>
-          <Text
-            category='h1'
-            status='control'>
-            UH OH!
+        <Spinner size="giant" />
+      </Modal>
+      <View style={styles.container}>
+        <ImageOverlay
+          source={require('./Road.jpeg')}
+          style={{
+            width: 500,
+            height: 210
+          }}
+        >
+          <>
+            <Text
+              category='h1'
+              status='control'>
+              UH OH!
           </Text>
-          <Text
-            style={styles.signInLabel}
-            category='s1'
-            status='control'>
-            Don't worry, we just need your email :)
+            <Text
+              style={styles.signInLabel}
+              category='s1'
+              status='control'>
+              Don't worry, we just need your email :)
           </Text>
-        </>
-      </ImageOverlay>
-      <Layout
-        style={styles.formContainer}
-        level='1'>
-        <Input
-          placeholder='Email'
-          value={email}
-          onChangeText={setEmail}
-        />
-      </Layout>
-      <Button
-        style={styles.signInButton}
-        size='giant'
-        onPress={resetPasswordHandler}>
-        SEND EMAIL
+          </>
+        </ImageOverlay>
+        <Layout
+          style={styles.formContainer}
+          level='1'>
+          <Input
+            placeholder='Email'
+            value={email}
+            onChangeText={(text) => setEmail(text)}
+          />
+        </Layout>
+        <Button
+          style={styles.signInButton}
+          size='giant'
+          onPress={resetPasswordHandler}>
+          SEND EMAIL
         </Button>
-      <Button
-        style={styles.signUpButton}
-        appearance='ghost'
-        status='basic'
-        onPress={() => navigation.push("Signup")}>
-        Don't have an account? Create
+        <Button
+          style={styles.signUpButton}
+          appearance='ghost'
+          status='basic'
+          onPress={() => navigation.push("Signup")}>
+          Don't have an account? Create
         </Button>
-    </View>
+      </View>
+    </>
   );
 };
 
 const themedStyles = StyleService.create({
   container: {
-    // backgroundColor: 'royalblue',
     flex: 1,
   },
   headerContainer: {
     justifyContent: 'center',
     alignItems: 'center',
     minHeight: 216,
-
-    //   backgroundColor: 'color-primary-default',
   },
   formContainer: {
     flex: 1,
