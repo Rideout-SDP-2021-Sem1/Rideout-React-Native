@@ -1,5 +1,4 @@
 import axios from 'axios'
-import { SERVER_URL } from '@env'
 import { firebase } from '@react-native-firebase/auth'
 
 const serverInstance = axios.create({

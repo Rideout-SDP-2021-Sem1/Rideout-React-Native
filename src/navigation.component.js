@@ -4,6 +4,7 @@ import { createStackNavigator } from '@react-navigation/stack'
 import { Login, Signup, ForgotPassword } from './auth/index'
 import { AuthContext, NavigationContext } from './context'
 import { firebase } from '@react-native-firebase/auth'
+import UserProfile from './pages/UserProfile/UserProfile'
 import { MainLayout, TestProfile, EmptyPage } from './pages'
 
 const { Navigator, Screen } = createStackNavigator();

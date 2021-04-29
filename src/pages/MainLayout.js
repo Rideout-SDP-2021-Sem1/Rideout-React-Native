@@ -46,11 +46,11 @@ const MainLayout = (props) => {
 
   return (
     <>
-      <SafeAreaView style={styles.safeArea}>
+      <View style={styles.safeArea}>
         <View style={styles.mainArea}>
           {children}
         </View>
-        <View style={styles.bottomNavigationView}>
+        <SafeAreaView style={styles.bottomNavigationSafeAreaView}>
           <BottomNavigation
             style={styles.bottomNavigation}
             selectedIndex={index}
@@ -60,8 +60,8 @@ const MainLayout = (props) => {
             <BottomNavigationTab title='EVENT' icon={EventIcon} />
             <BottomNavigationTab title='PROFILE' icon={ProfileIcon} />
           </BottomNavigation>
-        </View>
-      </SafeAreaView>
+        </SafeAreaView>
+      </View>
     </>
   );
 };
@@ -72,7 +72,8 @@ const styles = StyleSheet.create({
   safeArea: {
     display: "flex",
     flex: 1,
-    flexDirection: "column"
+    flexDirection: "column",
+    backgroundColor: "white" 
   },
   mainArea: {
     display: "flex",
