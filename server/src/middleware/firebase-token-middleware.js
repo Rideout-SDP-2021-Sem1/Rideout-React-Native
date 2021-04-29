@@ -13,14 +13,14 @@ const checkFirebaseToken = async (req, res, next) => {
     tokenData = await admin.auth().verifyIdToken(_firebaseToken)
     const uid = tokenData.uid || ""
 
-    req.header("uid", uid)
+    req.header["uid"] = uid
 
     const userData = await db.User.findOne({ uid: uid }).lean().exec()
     let role = ""
     if (userData !== null) {
       role = userData.role || "user"
     }
-    req.header("role", role)
+    req.header["role"] = role
 
     return next()
   } catch (err) {
