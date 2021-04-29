@@ -2,17 +2,16 @@ import React, { useState, useEffect, useRef } from 'react'
 import { NavigationContainer } from '@react-navigation/native'
 import { createStackNavigator } from '@react-navigation/stack'
 import { Login, Signup, ForgotPassword } from './auth/index'
-import { AuthContext } from './context/AuthContext'
+import { AuthContext, NavigationContext } from './context'
 import { firebase } from '@react-native-firebase/auth'
-import { MainLayout } from './pages'
 import UserProfile from './pages/UserProfile/UserProfile'
-// import Signup from './auth/signup'
-
+import { MainLayout, TestProfile, EmptyPage } from './pages'
 
 const { Navigator, Screen } = createStackNavigator();
 
 const HomeNavigator = () => {
   const [user, setUser] = useState(null)
+  const [selectedNavigationIndex, setSelectedNavigationIndex] = useState(0)
   const navigationRef = useRef(null)
 
   useEffect(() => {
@@ -29,25 +28,32 @@ const HomeNavigator = () => {
 
   return (
     <AuthContext.Provider value={user}>
-      <NavigationContainer ref={navigationRef}>
-        {
-          user !== null
-            ?
-            <>
-              <Navigator headerMode='none'>
-                <Screen name='Home' component={UserProfile} />
-              </Navigator>
-            </>
-            :
-            <>
-              <Navigator headerMode='none' initialRouteName="Login">
-                <Screen name='Login' component={Login} />
-                <Screen name='Signup' component={Signup} />
-                <Screen name='ForgotPassword' component={ForgotPassword} />
-              </Navigator>
-            </>
-        }
-      </NavigationContainer>
+      <NavigationContext.Provider value={{
+        index: selectedNavigationIndex,
+        setIndex: setSelectedNavigationIndex
+      }}>
+        <NavigationContainer ref={navigationRef}>
+          {
+            user !== null
+              ?
+              <>
+                <Navigator headerMode='none'>
+                  <Screen name='Map' component={EmptyPage} />
+                  <Screen name='List' component={EmptyPage} />
+                  <Screen name='Profile' component={TestProfile} />
+                </Navigator>
+              </>
+              :
+              <>
+                <Navigator headerMode='none' initialRouteName="Login">
+                  <Screen name='Login' component={Login} />
+                  <Screen name='Signup' component={Signup} />
+                  <Screen name='ForgotPassword' component={ForgotPassword} />
+                </Navigator>
+              </>
+          }
+        </NavigationContainer>
+      </NavigationContext.Provider>
     </AuthContext.Provider>
   )
 
