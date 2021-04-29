@@ -9,8 +9,7 @@ const userSchema = new Schema({
   },
   username: {
     type: String,
-    index: true,
-    required: true
+    index: true
   },
   nickname: {
     type: String,
@@ -24,10 +23,12 @@ const userSchema = new Schema({
   bike_details: [{
     make: {
       type: String,
+      index: true,
       required: true
     },
     model: {
       type: String,
+      index: true,
       required: true
     },
     year: {
@@ -35,12 +36,10 @@ const userSchema = new Schema({
     },
     size: {
       type: String,
+      index: true,
       required: true
     },
     license_number: {
-      type: String
-    },
-    test: {
       type: String
     }
   }],
