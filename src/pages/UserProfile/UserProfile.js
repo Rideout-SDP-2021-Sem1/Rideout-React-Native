@@ -222,6 +222,7 @@ const UserProfile = (props) => {
         backdropStyle={{
           backgroundColor: "rgba(0, 0, 0, 0.5)"
         }}
+        onBackdropPress={() => setShowDialog(false)}
       >
         <Card>
           <View
