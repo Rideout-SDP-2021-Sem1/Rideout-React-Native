@@ -219,15 +219,15 @@ const rideoutMapStyle = [
 
 const Map = () => {
     const DUMMY_RIDER_LOCATIONS = [
-        {id: 0, latitude: -36.1, longitude: 174.4, nickname: 'rider1'},
-        {id: 1, latitude: -36.3, longitude: 174.3, nickname: 'rider2'},
-        {id: 2, latitude: -36.2, longitude: 174.5, nickname: 'rider3'},
-        {id: 3, latitude: -36.0, longitude: 174.1, nickname: 'rider4'}
+        {userID: 9, latitude: -36.1, longitude: 174.4, nickname: 'Khaled', pace: "Mixed", license: "Learner", make: "Honda", model: "CB400", year: 2009, size: 400},
+        {userID: 1, latitude: -36.1, longitude: 174.4, nickname: 'Bob', pace: "Relaxed", license: "Full", make: "Suzuki", model: "DRZ400", year: 2014, size: 400},
+        {userID: 2, latitude: -36.1, longitude: 174.4, nickname: 'Praj', pace: "Spirited", license: "Learner", make: "BMW", model: "GS310", year: 2020, size: 310},
+        {userID: 3, latitude: -36.1, longitude: 174.4, nickname: 'Ranish', pace: "Mixed", license: "Restricted", make: "Honda", model: "VFR400", year: 1998, size: 400}
     ]
 
     const DUMMY_GROUP_LOCATIONS = [
-        {id: 4, latitude: -37.5, longitude: 175.4, nickname: 'group1'},
-        {id: 5, latitude: -37.0, longitude: 175.8, nickname: 'group2'},
+        {userID: 4, latitude: -37.5, longitude: 175.4, title: 'Learner Group Meetup'},
+        {userID: 5, latitude: -37.0, longitude: 175.8, title: 'Track Day Meetup'},
     ]
 
     return (
