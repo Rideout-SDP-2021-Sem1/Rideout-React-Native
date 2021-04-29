@@ -30,11 +30,12 @@ export default ({ navigation }) => {
         return;
       }
       setWaiting(true)
-      await signIn(email, password)
       navigationContext.setIndex(0)
+      await signIn(email, password)
+      setWaiting(false)
     } catch (err) {
+      console.error("sign in error", err)
       Alert.alert(`Error`, `Incorrect login details.`);
-    } finally {
       setWaiting(false)
     }
   };
