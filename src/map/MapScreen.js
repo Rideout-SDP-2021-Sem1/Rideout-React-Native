@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Image, Text, StyleSheet } from 'react-native';
+import { View, Image, Text, StyleSheet, Button } from 'react-native';
 import MapView, { Marker, Callout, PROVIDER_GOOGLE } from 'react-native-maps';
 
 const styles = StyleSheet.create({
@@ -222,8 +222,8 @@ const Map = () => {
         {
           markerID: 0, //Unique marker ID
           userID: 90, //Unique user ID
-          latitude: -36.1, //Current latitude of user
-          longitude: 174.4, //Current longitude of user
+          latitude: -36.85565, //Current latitude of user
+          longitude: 174.76521, //Current longitude of user
           nickname: 'Khaled', //Nickname of the user
           pace: "Mixed", //Preferred pace of the user
           license: "Learner", //License level of the user
@@ -232,17 +232,17 @@ const Map = () => {
           year: 2009, //User's bike model year
           size: 400 //User's bike engine size in cc
         },
-        {markerID: 1, userID: 15, latitude: -36.3, longitude: 174.6, nickname: 'Bob', pace: "Relaxed", license: "Full", make: "Suzuki", model: "DRZ400", year: 2014, size: 400},
-        {markerID: 2, userID: 21, latitude: -36.6, longitude: 174.8, nickname: 'Praj', pace: "Spirited", license: "Learner", make: "BMW", model: "GS310", year: 2020, size: 310},
-        {markerID: 3, userID: 37, latitude: -36.2, longitude: 174.1, nickname: 'Ranish', pace: "Mixed", license: "Restricted", make: "Honda", model: "VFR400", year: 1998, size: 400}
+        {markerID: 1, userID: 15, latitude: -36.8509, longitude: 174.8106, nickname: 'Bob', pace: "Relaxed", license: "Full", make: "Suzuki", model: "DRZ400", year: 2014, size: 400},
+        {markerID: 2, userID: 21, latitude: -36.8317, longitude: 174.79709, nickname: 'Praj', pace: "Spirited", license: "Learner", make: "BMW", model: "GS310", year: 2020, size: 310},
+        {markerID: 3, userID: 37, latitude: -36.8496, longitude: 174.8184, nickname: 'Ranish', pace: "Mixed", license: "Restricted", make: "Honda", model: "VFR400", year: 1998, size: 400}
     ]
 
     const DUMMY_GROUP_LOCATIONS = [
         {
           markerID: 4, //Unique marker ID
           groupID: 85, //Unique group ID
-          latitude: -37.5, //Latitude of meetup location
-          longitude: 175.4, //Latitude of meetup location
+          latitude: -36.84475, //Latitude of meetup location
+          longitude: 174.77304, //Latitude of meetup location
           createTime: 1619696388, //Unix time of when this meetup was created
           meetupTime: 1619697400, //Unix time of when the meetup will start
           maxMembers: 10, //Maximum number of members allowed
@@ -289,6 +289,18 @@ const Map = () => {
                                 resizeMethod="resize"
                                 resizeMode="contain"
                             />
+                            <Callout style={{ width: 250, height: 250}}>
+                              <View>
+                                <Text style={{ fontSize: 20, fontWeight: 'bold'}}>{DUMMY_RIDER_LOCATIONS.nickname}</Text>
+                                <Text>License Level: {DUMMY_RIDER_LOCATIONS.license}</Text>
+                                <Text>Preferred Pace: {DUMMY_RIDER_LOCATIONS.pace}</Text>
+                                <Text />
+                                <Text style={{ fontSize: 15, fontWeight: 'bold'}}>Bike detail: </Text>
+                                <Text>{DUMMY_RIDER_LOCATIONS.year} {DUMMY_RIDER_LOCATIONS.make} {DUMMY_RIDER_LOCATIONS.model}</Text>
+                                <Text>Engine size: {DUMMY_RIDER_LOCATIONS.size}cc</Text>
+                                <Button title="Request Rideout"/>
+                              </View>
+                            </Callout>
                         </Marker>})}
                         {DUMMY_GROUP_LOCATIONS.map(DUMMY_GROUP_LOCATIONS => {return <Marker
                         key = {DUMMY_GROUP_LOCATIONS.id}
@@ -303,8 +315,20 @@ const Map = () => {
                                 resizeMethod="resize"
                                 resizeMode="contain"
                             />
-                            <Callout style={{ "width": 250, "height": 50 }}>
-                                <Text>Praj save me please.</Text>
+                            <Callout style={{ width: 250, height: 250}}>
+                              <View>
+                                <Text style={{ fontSize: 20, fontWeight: 'bold'}}>{DUMMY_GROUP_LOCATIONS.title}</Text>
+                                <Text style={{ fontSize: 10, color: '#808080'}}>Meetup Date: {DUMMY_GROUP_LOCATIONS.meetupTime}</Text>
+                                <Text>{DUMMY_GROUP_LOCATIONS.description}</Text>
+                                <Text />
+                                <Text style={{ fontSize: 15, fontWeight: 'bold'}}>Meetup Details:</Text>
+                                <Text>Minimum License Level: {DUMMY_GROUP_LOCATIONS.minimumLicense}</Text>
+                                <Text>Preferred Pace: {DUMMY_GROUP_LOCATIONS.minimumPace}</Text>
+                                <Text>{DUMMY_GROUP_LOCATIONS.currentMembers}/{DUMMY_GROUP_LOCATIONS.maxMembers} Riders RSVP'D</Text>
+                                <Button title="RSVP a Slot"/>
+                                <Text style={{textAlign: 'center', fontSize: 10, color: '#808080'}}>Meetup in:</Text>
+                                <Text style={{textAlign: 'center', fontSize: 15, fontWeight: 'bold'}}>02:04:59</Text>
+                              </View>
                             </Callout>
                         </Marker>})}
             </MapView>
