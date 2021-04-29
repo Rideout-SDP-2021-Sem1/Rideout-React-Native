@@ -21,6 +21,11 @@ const Map = () => {
         {id: 3, latitude: -36.0, longitude: 174.1, nickname: 'rider4'}
     ]
 
+    const DUMMY_GROUP_LOCATIONS = [
+        {id: 4, latitude: -37.5, longitude: 175.4, nickname: 'group1'},
+        {id: 5, latitude: -37.0, longitude: 175.8, nickname: 'group2'},
+    ]
+
     return (
         <View style={styles.container}>
             <MapView
@@ -49,6 +54,21 @@ const Map = () => {
                         >
                             <Image 
                                 source={require('./rider_marker_solid.png')}
+                                style={{width: 36, height: 36}}
+                                resizeMethod="resize"
+                                resizeMode="contain"
+                            />
+                        </Marker>})}
+                        {DUMMY_GROUP_LOCATIONS.map(DUMMY_GROUP_LOCATIONS => {return <Marker
+                        key = {DUMMY_GROUP_LOCATIONS.id}
+                        coordinate={{
+                            latitude: DUMMY_GROUP_LOCATIONS.latitude,
+                            longitude: DUMMY_GROUP_LOCATIONS.longitude
+                        }}
+                        title = {DUMMY_GROUP_LOCATIONS.nickname}
+                        >
+                            <Image 
+                                source={require('./group_marker_solid.png')}
                                 style={{width: 36, height: 36}}
                                 resizeMethod="resize"
                                 resizeMode="contain"
