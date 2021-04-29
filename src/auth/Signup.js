@@ -1,12 +1,11 @@
-import React, { ReactElement } from 'react';
+import React, { useState } from 'react';
 import { View, TouchableWithoutFeedback, Alert, ScrollView } from 'react-native';
 import { IndexPath, Button, Input, Layout, StyleService, Text, useStyleSheet, Icon, Select, SelectItem } from '@ui-kitten/components';
 import ImageOverlay from "react-native-image-overlay";
-import { signIn } from '../helper/auth';
+import { auth } from '../helper';
 import { serverInstance } from '../instances'
 
 export default ({ navigation }) => {
-
 
   const HeartIcon = (props) => (
     <Icon {...props} name='heart' />
@@ -16,83 +15,73 @@ export default ({ navigation }) => {
     <Icon {...props} name='star' />
   );
 
-  const Ldata = [
+  const licenseList = [
     'Learners',
     'Restricted',
     'Full',
   ];
-  const Pdata = [
+  const preferredPaceList = [
     'Relaxed',
     'Mixed',
     'Spirited',
   ];
 
-  const [email, setEmail] = React.useState("");
-  const [make, setMake] = React.useState("");
-  const [model, setModel] = React.useState("");
-  const [size, setSize] = React.useState("0");
+  const [email, setEmail] = useState("");
+  const [make, setMake] = useState("");
+  const [model, setModel] = useState("");
+  const [size, setSize] = useState("0");
 
-  const [username, setUsername] = React.useState("");
-  const [password, setPassword] = React.useState("");
-  const [passwordVisible, setPasswordVisible] = React.useState(false);
-  const [selectedLIndex, setSelectedLIndex] = React.useState(new IndexPath(0));
-  const [selectedPIndex, setSelectedPIndex] = React.useState(new IndexPath(0));
-  const displayLValue = Ldata[selectedLIndex.row];
-  const displayPValue = Pdata[selectedPIndex.row];
+  const [nickname, setNickname] = useState("");
+  const [password, setPassword] = useState("");
+  const [rePassword, setRePassword] = useState("")
+  const [passwordVisible, setPasswordVisible] = useState(false);
+  const [selectedLicenseIndex, setSelectedLicenseIndex] = useState(new IndexPath(0));
+  const [selectedPaceIndex, setSelectedPaceIndex] = useState(new IndexPath(0));
+  const displayLValue = licenseList[selectedLicenseIndex.row];
+  const displayPValue = preferredPaceList[selectedPaceIndex.row];
 
-  const styles = useStyleSheet(themedStyles);
-
-  const onSignUpButtonPress = () => {
-    navigation && navigation.navigate('SignUp2');
-  };
-
-  const onForgotPasswordButtonPress = () => {
-    navigation && navigation.navigate('ForgotPassword');
-  };
-
-  const renderOption = (title) => (
-    <SelectItem title={title} />
-  );
-
-  const onPasswordIconPress = () => {
-    setPasswordVisible(!passwordVisible);
-  };
-
-  const renderPasswordIcon = (props) => (
-    <TouchableWithoutFeedback onPress={onPasswordIconPress}>
-      <Icon {...props} name={passwordVisible ? 'eye-off' : 'eye'} />
-    </TouchableWithoutFeedback>
-  );
+  const styles = useStyleSheet(themedStyles)
 
   const signUpHandler = async () => {
     try {
-      // if (username === '') {
-      //   Alert.alert('Error', 'Invalid Username.');
-      //   return;
-      // }
-      // if (username.includes(' ') || username.includes('@')) {
-      //   Alert.alert('Error', 'Username cannot contain a space or "@"');
-      //   return;
-      // }
-      // if (email === '') {
-      //   Alert.alert('Error', 'No email entered.');
-      //   return;
-      // }
-      // if (password.trim() === '') {
-      //   Alert.alert('Error', 'No password entered.');
-      //   return;
-      // }
+      if (email === '') {
+        Alert.alert('Error', 'No email entered.');
+        return;
+      }
+      if (password.trim() === '') {
+        Alert.alert('Error', 'No password entered.');
+        return;
+      }
+
+      if (password !== rePassword) {
+        Alert.alert('Error', 'The password does not match.');
+        return;
+      }
+
+      const signUpPayload = {
+        uid: "abc",
+        nickname: nickname,
+        email: email,
+        bike_details: {
+          make: make,
+          model: model,
+          size: size
+        },
+        license_level: licenseList[selectedLicenseIndex.row],
+        preferred_pace: preferredPaceList[selectedPaceIndex.row]
+      }
+
+      console.log("signUpPayload\n", JSON.stringify(signUpPayload, null, 4))
 
       // const result = await signIn(email, password);
-      const result = await serverInstance.get("/user", {
-        params: {
-          username: "bob"
-        }
+      const result = await serverInstance.post("/user", {
+        data: signUpPayload
       })
+      Alert.alert("Success", "Sign up successful")
       console.log("result", result.data)
     } catch (err) {
       console.error("err", err)
-      // Alert.alert(`Error`, `Incorrect login details.`);
+      Alert.alert(`Error`, JSON.stringify(err));
     }
   };
 
@@ -142,9 +131,9 @@ export default ({ navigation }) => {
         </Text>
         <Input
           style={styles.bottomSpace}
-          placeholder='Username'
-          value={username}
-          onChangeText={setUsername}
+          placeholder='Nickname'
+          value={nickname}
+          onChangeText={setNickname}
         />
         <Text
           category='s1'
@@ -177,9 +166,9 @@ export default ({ navigation }) => {
         <Input
           style={styles.bottomSpace}
           placeholder='Password'
-          value={password}
+          value={rePassword}
           secureTextEntry={!passwordVisible}
-          onChangeText={setPassword}
+          onChangeText={setRePassword}
         />
 
         <Text
@@ -191,11 +180,11 @@ export default ({ navigation }) => {
           style={styles.bottomSpace}
           placeholder='Select License Type'
           value={displayLValue}
-          selectedIndex={selectedLIndex}
-          onSelect={index => setSelectedLIndex(index)}
+          selectedIndex={selectedLicenseIndex}
+          onSelect={index => setSelectedLicenseIndex(index)}
         >
           {
-            Ldata.map((license) => {
+            licenseList.map((license) => {
               return (
                 <SelectItem key={license} title={license} />
               )
@@ -211,11 +200,11 @@ export default ({ navigation }) => {
           style={styles.bottomSpace}
           placeholder='Select License Type'
           value={displayPValue}
-          selectedIndex={selectedPIndex}
-          onSelect={index => setSelectedPIndex(index)}
+          selectedIndex={selectedPaceIndex}
+          onSelect={index => setSelectedPaceIndex(index)}
         >
           {
-            Pdata.map((pace) => {
+            preferredPaceList.map((pace) => {
               return (
                 <SelectItem key={pace} title={pace} />
               )
@@ -227,42 +216,47 @@ export default ({ navigation }) => {
         >
           BIKE DETAILS
         </Text>
-        <Text
-          category='s1'
-
+        <View
+          style={{
+            marginTop: 20
+          }}
         >
-          Make
-        </Text>
-        <Input
-          style={styles.bottomSpace}
-          placeholder='Make'
-          value={make}
-          onChangeText={setMake}
-        />
+          <Text
+            category='s1'
+          >
+            Make
+          </Text>
+          <Input
+            style={styles.bottomSpace}
+            placeholder='Make'
+            value={make}
+            onChangeText={setMake}
+          />
 
-        <Text
-          category='s1'
-        >
-          Model
-        </Text>
-        <Input
-          style={styles.bottomSpace}
-          placeholder='Model'
-          value={model}
-          onChangeText={setModel}
-        />
+          <Text
+            category='s1'
+          >
+            Model
+          </Text>
+          <Input
+            style={styles.bottomSpace}
+            placeholder='Model'
+            value={model}
+            onChangeText={setModel}
+          />
 
-        <Text
-          category='s1'
-        >
-          Size
-        </Text>
-        <Input
-          style={styles.bottomSpace}
-          placeholder='Size'
-          value={size}
-          onChangeText={(text) => checkSize(text)}
-        />
+          <Text
+            category='s1'
+          >
+            Size
+          </Text>
+          <Input
+            style={styles.bottomSpace}
+            placeholder='Size'
+            value={size}
+            onChangeText={(text) => checkSize(text)}
+          />
+        </View>
         <Button
           style={[styles.signUpButton, styles.bottomSpace, {
             marginBottom: 50
