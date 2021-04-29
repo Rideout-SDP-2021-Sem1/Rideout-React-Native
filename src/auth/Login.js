@@ -1,5 +1,5 @@
-import React, { useContext } from 'react';
-import { View, TouchableWithoutFeedback, Alert } from 'react-native';
+import React, { useContext, useState } from 'react';
+import { View, Alert } from 'react-native';
 import { Button, Input, Layout, StyleService, Text, useStyleSheet, Icon, Modal, Spinner } from '@ui-kitten/components';
 import ImageOverlay from "react-native-image-overlay";
 import { signIn } from '../helper/auth';
@@ -7,31 +7,17 @@ import { NavigationContext } from '../context'
 
 export default ({ navigation }) => {
 
-  const [email, setEmail] = React.useState();
-  const [password, setPassword] = React.useState();
-  const [passwordVisible, setPasswordVisible] = React.useState(false)
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [passwordVisible, setPasswordVisible] = useState(false)
   const navigationContext = useContext(NavigationContext)
-  const [waiting, setWaiting] = React.useState(false)
+  const [waiting, setWaiting] = useState(false)
 
   const styles = useStyleSheet(themedStyles);
 
-  const onSignUpButtonPress = () => {
-    navigation && navigation.navigate('SignUp2');
-  };
-
   const onForgotPasswordButtonPress = () => {
     navigation && navigation.navigate('ForgotPassword');
-  };
-
-  const onPasswordIconPress = () => {
-    setPasswordVisible(!passwordVisible);
-  };
-
-  const renderPasswordIcon = (props) => (
-    <TouchableWithoutFeedback onPress={onPasswordIconPress}>
-      <Icon {...props} name={passwordVisible ? 'eye-off' : 'eye'} />
-    </TouchableWithoutFeedback>
-  );
+  }
 
   const signInHandler = async () => {
     try {
@@ -131,7 +117,6 @@ export default ({ navigation }) => {
 
 const themedStyles = StyleService.create({
   container: {
-    // backgroundColor: 'royalblue',
     flex: 1,
   },
   headerContainer: {
