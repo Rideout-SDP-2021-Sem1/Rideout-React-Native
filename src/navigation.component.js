@@ -5,6 +5,9 @@ import { Login, Signup, ForgotPassword } from './auth/index'
 import { AuthContext } from './context/AuthContext'
 import { firebase } from '@react-native-firebase/auth'
 import { MainLayout } from './pages'
+import UserProfile from './pages/UserProfile/UserProfile'
+// import Signup from './auth/signup'
+
 
 const { Navigator, Screen } = createStackNavigator();
 
@@ -32,7 +35,7 @@ const HomeNavigator = () => {
             ?
             <>
               <Navigator headerMode='none'>
-                <Screen name='Home' component={MainLayout} />
+                <Screen name='Home' component={UserProfile} />
               </Navigator>
             </>
             :

@@ -1,11 +1,8 @@
 import axios from 'axios'
-import { SERVER_URL } from '@env'
 import { firebase } from '@react-native-firebase/auth'
 
-console.log("SERVER_URL", SERVER_URL)
-
 const serverInstance = axios.create({
-  baseURL: SERVER_URL || "http://191.168.1.3:5000"
+  baseURL: "http://191.168.1.3:5000"
 })
 
 serverInstance.interceptors.request.use(

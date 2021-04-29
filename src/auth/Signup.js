@@ -140,9 +140,9 @@ export default ({ navigation }) => {
         level='1'
       >
         <Text
-          style='s1'
+          category='s1'
         >
-          Username
+          Nickname
         </Text>
         <Input
           style={styles.bottomSpace}
@@ -151,7 +151,7 @@ export default ({ navigation }) => {
           onChangeText={setUsername}
         />
         <Text
-          style='s1'
+          category='s1'
         >
           Email
         </Text>
@@ -162,9 +162,21 @@ export default ({ navigation }) => {
           onChangeText={setEmail}
         />
         <Text
-          style='s1'
+          category='s1'
         >
           Password
+        </Text>
+        <Input
+          style={styles.bottomSpace}
+          placeholder='Password'
+          value={password}
+          secureTextEntry={!passwordVisible}
+          onChangeText={setPassword}
+        />
+        <Text
+          category='s1'
+        >
+          Re-Enter Password
         </Text>
         <Input
           style={styles.bottomSpace}
@@ -221,7 +233,7 @@ export default ({ navigation }) => {
           BIKE DETAILS
         </Text>
         <Text
-          style='S1'
+          category='S1'
 
         >
           Make
@@ -234,7 +246,7 @@ export default ({ navigation }) => {
         />
 
         <Text
-          style='h1'
+          category='s1'
         >
           Model
         </Text>
@@ -246,7 +258,7 @@ export default ({ navigation }) => {
         />
 
         <Text
-          style='h1'
+          category='s1'
         >
           Size
         </Text>
