@@ -87,10 +87,6 @@ export default ({ navigation }) => {
       const result = await serverInstance.get("/user", {
         params: {
           username: "bob"
-        },
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json; charset=utf-8'
         }
       })
       console.log("result", result.data)
