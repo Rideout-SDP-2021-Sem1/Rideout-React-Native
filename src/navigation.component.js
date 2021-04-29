@@ -22,9 +22,9 @@ const HomeNavigator = () => {
     setUser(firebase.auth().currentUser)
     const unsubscribe = firebase.auth().onAuthStateChanged((user) => {
       setUser(user)
-      if (user === null) {
-        navigationRef?.current?.navigate("Login")
-      }
+      // if (user === null) {
+      //   navigationRef?.current?.navigate("Login")
+      // }
     })
     return unsubscribe
   }, [])
