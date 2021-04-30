@@ -1,5 +1,9 @@
-import LoginScreen from './LoginScreen'
+import Login from './Login'
+import Signup from './Signup'
+import ForgotPassword from './ForgotPassword'
 
 export {
-  LoginScreen
+  Login,
+  Signup,
+  ForgotPassword
 }

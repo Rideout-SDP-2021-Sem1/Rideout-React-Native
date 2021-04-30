@@ -359,6 +359,7 @@ const Map = () => {
                               </View>
                             </Callout>
                         </Marker>})}
+            >
             </MapView>
         </View>
     )
