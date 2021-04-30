@@ -3,6 +3,8 @@ import { View, Image, Text, StyleSheet, Button } from 'react-native';
 import MapView, { Marker, Callout, PROVIDER_GOOGLE } from 'react-native-maps'
 import Geolocation from '@react-native-community/geolocation'
 import { serverInstance } from '../instances'
+import { rideoutMapStyle } from './rideoutMapStyle'
+import moment from 'moment'
 
 //Map style
 const styles = StyleSheet.create({
@@ -15,211 +17,6 @@ const styles = StyleSheet.create({
     ...StyleSheet.absoluteFillObject,
   },
 });
-
-//Map visual style
-const rideoutMapStyle = [
-  {
-    "elementType": "geometry",
-    "stylers": [
-      {
-        "color": "#f5f5f5"
-      }
-    ]
-  },
-  {
-    "elementType": "labels.icon",
-    "stylers": [
-      {
-        "visibility": "off"
-      }
-    ]
-  },
-  {
-    "elementType": "labels.text.fill",
-    "stylers": [
-      {
-        "color": "#616161"
-      }
-    ]
-  },
-  {
-    "elementType": "labels.text.stroke",
-    "stylers": [
-      {
-        "color": "#f5f5f5"
-      }
-    ]
-  },
-  {
-    "featureType": "administrative",
-    "elementType": "geometry",
-    "stylers": [
-      {
-        "visibility": "off"
-      }
-    ]
-  },
-  {
-    "featureType": "administrative.land_parcel",
-    "elementType": "labels.text.fill",
-    "stylers": [
-      {
-        "color": "#bdbdbd"
-      }
-    ]
-  },
-  {
-    "featureType": "landscape",
-    "elementType": "geometry.fill",
-    "stylers": [
-      {
-        "color": "#dedede"
-      }
-    ]
-  },
-  {
-    "featureType": "poi",
-    "stylers": [
-      {
-        "visibility": "off"
-      }
-    ]
-  },
-  {
-    "featureType": "poi",
-    "elementType": "geometry",
-    "stylers": [
-      {
-        "color": "#eeeeee"
-      }
-    ]
-  },
-  {
-    "featureType": "poi",
-    "elementType": "labels.text.fill",
-    "stylers": [
-      {
-        "color": "#757575"
-      }
-    ]
-  },
-  {
-    "featureType": "poi.park",
-    "elementType": "geometry",
-    "stylers": [
-      {
-        "color": "#e5e5e5"
-      }
-    ]
-  },
-  {
-    "featureType": "poi.park",
-    "elementType": "labels.text.fill",
-    "stylers": [
-      {
-        "color": "#9e9e9e"
-      }
-    ]
-  },
-  {
-    "featureType": "road",
-    "elementType": "geometry",
-    "stylers": [
-      {
-        "color": "#ffffff"
-      }
-    ]
-  },
-  {
-    "featureType": "road",
-    "elementType": "labels.icon",
-    "stylers": [
-      {
-        "visibility": "off"
-      }
-    ]
-  },
-  {
-    "featureType": "road.arterial",
-    "elementType": "labels.text.fill",
-    "stylers": [
-      {
-        "color": "#757575"
-      }
-    ]
-  },
-  {
-    "featureType": "road.highway",
-    "elementType": "geometry",
-    "stylers": [
-      {
-        "color": "#ffffff"
-      }
-    ]
-  },
-  {
-    "featureType": "road.highway",
-    "elementType": "labels.text.fill",
-    "stylers": [
-      {
-        "color": "#616161"
-      }
-    ]
-  },
-  {
-    "featureType": "road.local",
-    "elementType": "labels.text.fill",
-    "stylers": [
-      {
-        "color": "#9e9e9e"
-      }
-    ]
-  },
-  {
-    "featureType": "transit",
-    "stylers": [
-      {
-        "visibility": "off"
-      }
-    ]
-  },
-  {
-    "featureType": "transit.line",
-    "elementType": "geometry",
-    "stylers": [
-      {
-        "color": "#e5e5e5"
-      }
-    ]
-  },
-  {
-    "featureType": "transit.station",
-    "elementType": "geometry",
-    "stylers": [
-      {
-        "color": "#eeeeee"
-      }
-    ]
-  },
-  {
-    "featureType": "water",
-    "elementType": "geometry",
-    "stylers": [
-      {
-        "color": "#b5b5b5"
-      }
-    ]
-  },
-  {
-    "featureType": "water",
-    "elementType": "labels.text.fill",
-    "stylers": [
-      {
-        "color": "#9e9e9e"
-      }
-    ]
-  }
-]
 
 const Map = () => {
 
@@ -241,11 +38,11 @@ const Map = () => {
             longitude: position.coords.longitude,
             latitudeDelta: 0.030,
             longitudeDelta: 0.0242
-        })
+          })
         },
-        (error) => {console.error("error getMapRegion", error)}
+        (error) => { console.error("error getMapRegion", error) }
       )
-    } catch(error) {
+    } catch (error) {
       console.error("error getMapRegion", error)
     }
   }
@@ -352,6 +149,19 @@ const Map = () => {
     }
   }, [])
 
+  useEffect(() => {
+    const getData = async () => {
+      try {
+        const response = await serverInstance.get("/group")
+        const data = response.data
+        setGroupLocations(data)
+      } catch (err) {
+        console.error("failed to get group list", err)
+      }
+    }
+    getData()
+  }, [])
+
   //Google map render
   return (
     <View style={styles.container}>
@@ -408,12 +218,12 @@ const Map = () => {
         })}
 
         {/*Render the groups' location on the map as markers*/}
-        {DUMMY_GROUP_LOCATIONS.map(DUMMY_GROUP_LOCATIONS => {
+        {groupLocations.map(currentObj => {
           return <Marker
-            key={DUMMY_GROUP_LOCATIONS.markerID}
+            key={currentObj["_id"]}
             coordinate={{
-              latitude: DUMMY_GROUP_LOCATIONS.latitude,
-              longitude: DUMMY_GROUP_LOCATIONS.longitude
+              latitude: parseFloat(currentObj?.meetupLocation?.latitude) || 0,
+              longitude: parseFloat(currentObj?.meetupLocation?.longitude) || 0
             }}
           >
             {/*Render the marker as the custom image*/}
@@ -427,14 +237,14 @@ const Map = () => {
             {/*Popup UI when marker is clicked*/}
             <Callout style={{ width: 250, height: 250 }}>
               <View>
-                <Text style={{ fontSize: 20, fontWeight: 'bold' }}>{DUMMY_GROUP_LOCATIONS.title}</Text>
-                <Text style={{ fontSize: 10, color: '#808080' }}>Meetup Date: {DUMMY_GROUP_LOCATIONS.meetupTime}</Text>
-                <Text>{DUMMY_GROUP_LOCATIONS.description}</Text>
+                <Text style={{ fontSize: 20, fontWeight: 'bold' }}>{currentObj.title}</Text>
+                <Text style={{ fontSize: 10, color: '#808080' }}>Meetup Date: {moment(currentObj.meetupTime).toString()}</Text>
+                <Text>{currentObj.description}</Text>
                 <Text />
                 <Text style={{ fontSize: 15, fontWeight: 'bold' }}>Meetup Details:</Text>
-                <Text>Minimum License Level: {DUMMY_GROUP_LOCATIONS.minimumLicense}</Text>
-                <Text>Preferred Pace: {DUMMY_GROUP_LOCATIONS.minimumPace}</Text>
-                <Text>{DUMMY_GROUP_LOCATIONS.currentMembers}/{DUMMY_GROUP_LOCATIONS.maxMembers} Riders RSVP'D</Text>
+                <Text>Minimum License Level: {currentObj.minimumLicenseLevel}</Text>
+                <Text>Preferred Pace: {currentObj.minimumPreferredPace}</Text>
+                <Text>{currentObj.currentAttendant}/{currentObj.maximumAttendant} Riders RSVP'D</Text>
                 <Button title="RSVP a Slot" />
                 <Text style={{ textAlign: 'center', fontSize: 10, color: '#808080' }}>Meetup in:</Text>
                 <Text style={{ textAlign: 'center', fontSize: 15, fontWeight: 'bold' }}>00:00:00</Text>
