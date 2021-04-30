@@ -8,7 +8,8 @@ import {
   MainLayout,
   TestProfile,
   EmptyPage,
-  UserProfile
+  UserProfile,
+  MapScreenLayout
 } from './pages'
 
 const { Navigator, Screen } = createStackNavigator();
@@ -41,7 +42,7 @@ const HomeNavigator = () => {
               ?
               <>
                 <Navigator headerMode='none' initialRouteName="Map">
-                  <Screen name='Map' component={EmptyPage} />
+                  <Screen name='Map' component={MapScreenLayout} />
                   <Screen name='List' component={EmptyPage} />
                   <Screen name='Profile' component={UserProfile} />
                 </Navigator>
