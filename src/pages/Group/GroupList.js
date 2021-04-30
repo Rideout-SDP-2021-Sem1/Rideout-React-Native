@@ -7,16 +7,30 @@ import {
 } from '@ui-kitten/components';
 import { auth } from '../../helper'
 import { serverInstance } from '../../instances'
+import moment from 'moment'
 
 const GroupList = (props) => {
-  const [waiting, setWaiting] = useState(false)
+  const [showModal, setShowModal] = useState(false)
   const [groupList, setGroupList] = useState([])
+  const [currentEventDetails, setCurrentEventDetails] = useState({})
 
+
+  console.log("currentEventDetails", currentEventDetails)
   const styles = useStyleSheet(themedStyle)
 
-  const renderItemAccessory = (props) => (
-    <Button size='tiny'>View</Button>
-  )
+  const renderItemAccessory = (details) => {
+    return (
+      <Button
+        size='tiny'
+        onPress={() => {
+          setShowModal(true)
+          setCurrentEventDetails(details)
+        }}
+      >
+        View
+      </Button>
+    )
+  }
 
   const renderItemIcon = (props) => (
     <Icon {...props} name='calendar-outline' />
@@ -38,17 +52,55 @@ const GroupList = (props) => {
   return (
     <>
       <Modal
-        visible={waiting}
+        visible={showModal}
         backdropStyle={{
           backgroundColor: "rgba(0, 0, 0, 0.5)"
         }}
+        onBackdropPress={() => setShowModal(false)}
       >
-        <Spinner size="giant" />
+        <Layout
+          level="1"
+          style={{
+            alignItems: "center",
+            display: "flex",
+            alignContent: 'center'
+          }}
+        >
+          <Card
+            style={{
+              alignItems: "center",
+              display: "flex",
+              alignContent: 'center'
+            }}
+          >
+            <Text
+              category="h6"
+            >
+              {`${currentEventDetails?.title}`}
+            </Text>
+            <Text
+              category="p1"
+            >
+              {`${currentEventDetails?.description}`}
+            </Text>
+            <Text
+              category="p1"
+            >
+              {`Current Attendant: ${currentEventDetails?.currentAttendant}`}
+            </Text>
+            <Text
+              category="p1"
+            >
+              {`Maximum Attendant: ${currentEventDetails?.maximumAttendant}`}
+            </Text>
+            <Text
+              category="p1"
+            >
+              {`Meetup Time: ${moment(currentEventDetails?.meetupTime).toString() || moment().toString()}`}
+            </Text>
+          </Card>
+        </Layout>
       </Modal>
-      {/* <ScrollView
-        style={styles.container}
-        contentContainerStyle={styles.contentContainer}
-      > */}
       <Layout
         level="1"
         style={styles.container}
@@ -61,13 +113,12 @@ const GroupList = (props) => {
                 title={item.title}
                 description={item.description}
                 accessoryLeft={renderItemIcon}
-                accessoryRight={renderItemAccessory}
+                accessoryRight={() => renderItemAccessory(item)}
               />
             )
           }}
         />
       </Layout>
-      {/* </ScrollView> */}
     </>
   );
 };
