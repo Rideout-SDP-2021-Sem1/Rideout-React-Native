@@ -8,7 +8,10 @@ import {
   useStyleSheet,
   Select,
   SelectItem,
+  TopNavigation,
 } from '@ui-kitten/components';
+
+const BackIcon = props => <Icon {...props} name="arrow-back" />;
 
 export const Creategroup = () => {
   const licenseList = ['Learners', 'Restricted', 'Full'];
@@ -25,8 +28,12 @@ export const Creategroup = () => {
 
   const styles = useStyleSheet(themedStyles);
 
+  const renderBackAction = () => <TopNavigationAction icon={BackIcon} />;
+
   return (
     <>
+      <TopNavigation title="Create Group" accessoryLeft={renderBackAction} />
+      <Divider />
       <View style={style.container}>
         <Scrollview style={StyleSheet.scrollcontainer} level="1">
           <Text category="s1">Group Name:</Text>

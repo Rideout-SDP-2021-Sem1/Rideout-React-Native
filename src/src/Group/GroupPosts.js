@@ -2,16 +2,9 @@ import React, {useState, useContext} from 'react';
 import {ScrollView, StyleSheet, View} from 'react-native';
 import {
   IndexPath,
-  Button,
   StyleService,
   useStyleSheet,
-  Input,
-  Select,
-  SelectItem,
-  Text,
-  Layout,
-  Modal,
-  Card,
+  TopNavigation,
 } from '@ui-kitten/components';
 import CreateGroup from './Creategroup';
 export const GroupPosts = props => {
@@ -34,12 +27,12 @@ export const GroupPosts = props => {
   const updateEditable = () => {
     setIsEditable(!isEditable);
   };
-
+  const renderBackAction = () => <TopNavigationAction icon={BackIcon} />;
   return (
     <>
+      <TopNavigation title={groupname} accessoryLeft={renderBackAction} />
       <ScrollView>
         <Scrollview styles={styles.scrollcontainer} level="1">
-          <p category="s1">{groupname}:</p>
           <p category="s1">{Location}:</p>
           <p category="s1">{displayDate}:</p>
           <p category="s1">Attendants:{Attendants}:</p>
