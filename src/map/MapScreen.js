@@ -1,6 +1,8 @@
 import React from 'react';
 import { View, Image, Text, StyleSheet, Button } from 'react-native';
 import MapView, { Marker, Callout, PROVIDER_GOOGLE } from 'react-native-maps';
+navigator.geolocation = require('@react-native-community/geolocation')
+import Geolocation from '@react-native-community/geolocation'
 
 //Map style
 const styles = StyleSheet.create({
@@ -263,16 +265,17 @@ const Map = () => {
 
   //Function to get the current location of the user
   const findCoordinates = () => {
-    navigator.geolocation.getCurrentPosition(
-      position => {
-        const location = JSON.stringify(position);
+    try {
+      Geolocation.getCurrentPosition(
+        info => console.log(info),
+        (error) => console.error("error findCoordinates", err)
+      )
+    } catch (err) {
+      console.error("findCoordinates error", err)
+    }
+  }
 
-        this.setState({ location });
-      },
-      error => Alert.alert(error.message),
-      { enableHighAccuracy: true, timeout: 20000, maximumAge: 1000 }
-    );
-  };
+  findCoordinates()
 
   //Google map render
   return (
