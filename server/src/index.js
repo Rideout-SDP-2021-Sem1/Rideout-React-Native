@@ -1,7 +1,7 @@
 const express = require('express')
 const config = require('./config')
 const morgan = require('morgan')
-const { userRoute } = require('./routes')
+const { userRoute, locationRoute } = require('./routes')
 const { checkFirebaseToken } = require("./middleware")
 
 const PORT = config.port || 5000
@@ -14,7 +14,11 @@ if (config.NODE_ENV !== "production") {
   app.use(morgan('dev'))
 }
 
-app.use("", userRoute)
+app.use(
+  "",
+  userRoute,
+  locationRoute
+)
 
 app.listen(PORT, () => {
   console.log(`Rideout Server is running on port ${PORT}`)

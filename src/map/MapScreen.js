@@ -1,8 +1,8 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Image, Text, StyleSheet, Button } from 'react-native';
-import MapView, { Marker, Callout, PROVIDER_GOOGLE } from 'react-native-maps';
-navigator.geolocation = require('@react-native-community/geolocation')
+import MapView, { Marker, Callout, PROVIDER_GOOGLE } from 'react-native-maps'
 import Geolocation from '@react-native-community/geolocation'
+import { serverInstance } from '../instances'
 
 //Map style
 const styles = StyleSheet.create({
@@ -262,20 +262,62 @@ const Map = () => {
     },
   ]
 
+  // Setup state variables for this component
+  const [riderLocations, setRiderLocations] = useState([])
+  const [groupLocations, setGroupLocations] = useState([])
+
+  // Function to send the user's location to the server
+  const sendMyLocation = async (location) => {
+    try {
+      const lat = location?.coords?.latitude
+      const lng = location?.coords?.longitude
+      if (lat === undefined || lng === undefined || lat === "" || lng === "") {
+        // pass
+      } else {
+        await serverInstance.post("/location", {
+          latitude: lat,
+          longitude: lng,
+          hidden: false
+        })
+      }
+    } catch (err) {
+      console.error("sendMyLocation err", err)
+    }
+  }
 
   //Function to get the current location of the user
-  const findCoordinates = () => {
+  const getMyLocation = () => {
     try {
       Geolocation.getCurrentPosition(
-        info => console.log(info),
-        (error) => console.error("error findCoordinates", err)
+        info => sendMyLocation(info),
+        (error) => console.error("error findCoordinates", error)
       )
     } catch (err) {
       console.error("findCoordinates error", err)
     }
   }
 
-  findCoordinates()
+  // Get other rider's location
+  const getRidersLocation = async () => {
+    try {
+      const response = await serverInstance.get("/location")
+      const data = response.data
+      setRiderLocations(data)
+      console.log("user locations\n", JSON.stringify(data, null, 4))
+    } catch (err) {
+      console.error("getRidersLocation error", err)
+    }
+  }
+
+  useEffect(() => {
+    const updateMyLocationInterval = setInterval(() => {
+      getMyLocation()
+    }, 10000)
+    getRidersLocation()
+    return () => {
+      clearInterval(updateMyLocationInterval)
+    }
+  }, [])
 
   //Google map render
   return (
@@ -299,14 +341,14 @@ const Map = () => {
         showsTraffic={false}
       >
         {/*Render the users' location on the map as markers*/}
-        {DUMMY_RIDER_LOCATIONS.map(DUMMY_RIDER_LOCATIONS => {
+        {riderLocations.map(currentObj => {
           return <Marker
-            key={DUMMY_RIDER_LOCATIONS.markerID}
+            key={currentObj.userId}
             coordinate={{
-              latitude: DUMMY_RIDER_LOCATIONS.latitude,
-              longitude: DUMMY_RIDER_LOCATIONS.longitude
+              latitude: parseFloat(currentObj.latitude) || 0,
+              longitude: parseFloat(currentObj.longitude) || 0
             }}
-            title={DUMMY_RIDER_LOCATIONS.nickname}
+            title={currentObj.nickname}
           >
             {/*Render the marker as the custom image*/}
             <Image
@@ -319,13 +361,13 @@ const Map = () => {
             {/*Popup UI when marker is clicked*/}
             <Callout style={{ width: 250, height: 250 }}>
               <View>
-                <Text style={{ fontSize: 20, fontWeight: 'bold' }}>{DUMMY_RIDER_LOCATIONS.nickname}</Text>
-                <Text>License Level: {DUMMY_RIDER_LOCATIONS.license}</Text>
-                <Text>Preferred Pace: {DUMMY_RIDER_LOCATIONS.pace}</Text>
+                <Text style={{ fontSize: 20, fontWeight: 'bold' }}>{currentObj.nickname}</Text>
+                <Text>License Level: {currentObj.license}</Text>
+                <Text>Preferred Pace: {currentObj.pace}</Text>
                 <Text />
                 <Text style={{ fontSize: 15, fontWeight: 'bold' }}>Bike detail: </Text>
-                <Text>{DUMMY_RIDER_LOCATIONS.year} {DUMMY_RIDER_LOCATIONS.make} {DUMMY_RIDER_LOCATIONS.model}</Text>
-                <Text>Engine size: {DUMMY_RIDER_LOCATIONS.size}cc</Text>
+                <Text>{currentObj.year || ""} {currentObj.make} {currentObj.model}</Text>
+                <Text>Engine size: {currentObj.size}cc</Text>
                 <Button title="Request Rideout" />
               </View>
             </Callout>
