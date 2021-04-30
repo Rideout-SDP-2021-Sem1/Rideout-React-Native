@@ -2,8 +2,9 @@ import firebase from '@react-native-firebase/app'
 
 export const signOut = async () => {
   try {
-    await firebase.auth().signOut();
+    await firebase.auth().signOut()
+    return Promise.resolve(true)
   } catch (e) {
-    throw new Error('Error while signing out');
+    return Promise.reject(err)
   }
 }
