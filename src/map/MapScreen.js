@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Image, Text, StyleSheet, Button } from 'react-native';
 import MapView, { Marker, Callout, PROVIDER_GOOGLE } from 'react-native-maps';
 navigator.geolocation = require('@react-native-community/geolocation')
@@ -222,6 +222,39 @@ const rideoutMapStyle = [
 ]
 
 const Map = () => {
+
+  //Map region of the user's location
+  const [currentLocation, setCurrentLocation] = useState({
+    latitude: -36.82967,
+    longitude: 174.7449,
+    latitudeDelta: 0.030,
+    longitudeDelta: 0.0242,
+  })
+
+  //Get the map region where the user is at
+  const getMapRegion = () => {
+    try {
+      Geolocation.getCurrentPosition(
+        (position) => {
+          setCurrentLocation({
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude,
+            latitudeDelta: 0.030,
+            longitudeDelta: 0.0242
+        })
+        },
+        (error) => {console.error("error getMapRegion", error)}
+      )
+    } catch(error) {
+      console.error("error getMapRegion", error)
+    }
+  }
+
+  //Center the map on the user when app is launched
+  useEffect(() => {
+    getMapRegion()
+  }, [])
+
   //Array which contains dummy users, will be swapped with real data from server
   const DUMMY_RIDER_LOCATIONS = [
     {
@@ -256,7 +289,7 @@ const Map = () => {
       minimumPace: "Spirited", //Minimum pace required for user to RSVP
       minimumLicense: "Full", //Minimum license required for user to RSVP
       description: "This is for a trackday meetup at Hampton Downs Race Track. Free Entry.", //Text description by user
-      descrptionEdit: 0, //Unix time of last time description was edited
+      descriptionEdit: 0, //Unix time of last time description was edited
       title: "Trackday Session", //Group title by user
       creatorUserID: 90, //User ID of the creator of this meetup
     },
@@ -268,14 +301,12 @@ const Map = () => {
     try {
       Geolocation.getCurrentPosition(
         info => console.log(info),
-        (error) => console.error("error findCoordinates", err)
+        (error) => console.error("error findCoordinates", error)
       )
-    } catch (err) {
-      console.error("findCoordinates error", err)
+    } catch (error) {
+      console.error("findCoordinates error", error)
     }
   }
-
-  findCoordinates()
 
   //Google map render
   return (
@@ -285,10 +316,10 @@ const Map = () => {
         style={styles.map}
         customMapStyle={rideoutMapStyle}
         region={{
-          latitude: -36.85087,
-          longitude: 174.7645,
-          latitudeDelta: 0.030,
-          longitudeDelta: 0.0242,
+          latitude: currentLocation.latitude,
+          longitude: currentLocation.longitude,
+          latitudeDelta: currentLocation.latitudeDelta,
+          longitudeDelta: currentLocation.longitudeDelta
         }}
         showsUserLocation={true}
         userLocationPriority={'high'}
@@ -367,7 +398,6 @@ const Map = () => {
             </Callout>
           </Marker>
         })}
-
       </MapView>
     </View>
   )
