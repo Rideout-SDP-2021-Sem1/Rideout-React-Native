@@ -133,7 +133,6 @@ const Map = () => {
       const response = await serverInstance.get("/location")
       const data = response.data
       setRiderLocations(data)
-      console.log("user locations\n", JSON.stringify(data, null, 4))
     } catch (err) {
       console.error("getRidersLocation error", err)
     }
@@ -142,10 +141,13 @@ const Map = () => {
   useEffect(() => {
     const updateMyLocationInterval = setInterval(() => {
       getMyLocation()
+    }, 15000)
+    const updateOtherRidersLocationInterval = setInterval(() => {
+      getRidersLocation()
     }, 10000)
-    getRidersLocation()
     return () => {
       clearInterval(updateMyLocationInterval)
+      clearInterval(updateOtherRidersLocationInterval)
     }
   }, [])
 
