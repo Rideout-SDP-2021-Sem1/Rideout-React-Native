@@ -272,11 +272,11 @@ const Map = () => {
                 userLocationPriority = {'high'}
                 userLocationAnnotationTitle = {'Me'}
                 followsUserLocation = {true}
-                showsMyLocationButton = {false}
+                showsMyLocationButton = {true}
                 showsTraffic = {false}
                 >
                     {DUMMY_RIDER_LOCATIONS.map(DUMMY_RIDER_LOCATIONS => {return <Marker
-                        key = {DUMMY_RIDER_LOCATIONS.id}
+                        key = {DUMMY_RIDER_LOCATIONS.markerID}
                         coordinate={{
                             latitude: DUMMY_RIDER_LOCATIONS.latitude,
                             longitude: DUMMY_RIDER_LOCATIONS.longitude
@@ -303,7 +303,7 @@ const Map = () => {
                             </Callout>
                         </Marker>})}
                         {DUMMY_GROUP_LOCATIONS.map(DUMMY_GROUP_LOCATIONS => {return <Marker
-                        key = {DUMMY_GROUP_LOCATIONS.id}
+                        key = {DUMMY_GROUP_LOCATIONS.markerID}
                         coordinate={{
                             latitude: DUMMY_GROUP_LOCATIONS.latitude,
                             longitude: DUMMY_GROUP_LOCATIONS.longitude
@@ -327,7 +327,7 @@ const Map = () => {
                                 <Text>{DUMMY_GROUP_LOCATIONS.currentMembers}/{DUMMY_GROUP_LOCATIONS.maxMembers} Riders RSVP'D</Text>
                                 <Button title="RSVP a Slot"/>
                                 <Text style={{textAlign: 'center', fontSize: 10, color: '#808080'}}>Meetup in:</Text>
-                                <Text style={{textAlign: 'center', fontSize: 15, fontWeight: 'bold'}}>02:04:59</Text>
+                                <Text style={{textAlign: 'center', fontSize: 15, fontWeight: 'bold'}}>00:00:00</Text>
                               </View>
                             </Callout>
                         </Marker>})}
