@@ -34,7 +34,8 @@ const groupSchema = new Schema({
     index: true
   },
   title: {
-    type: String
+    type: String,
+    index: true
   },
   description: {
     type: String

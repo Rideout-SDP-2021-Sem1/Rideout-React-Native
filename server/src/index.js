@@ -1,7 +1,7 @@
 const express = require('express')
 const config = require('./config')
 const morgan = require('morgan')
-const { userRoute, locationRoute } = require('./routes')
+const { userRoute, locationRoute, groupRoute } = require('./routes')
 const { checkFirebaseToken } = require("./middleware")
 
 const PORT = config.port || 5000
@@ -17,7 +17,8 @@ if (config.NODE_ENV !== "production") {
 app.use(
   "",
   userRoute,
-  locationRoute
+  locationRoute,
+  groupRoute
 )
 
 app.listen(PORT, () => {
