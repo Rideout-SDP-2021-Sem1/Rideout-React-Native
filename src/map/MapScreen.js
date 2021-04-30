@@ -219,19 +219,6 @@ const rideoutMapStyle = [
   }
 ]
 
-//Function to get the current location of the user
-findCoordinates = () => {
-  navigator.geolocation.getCurrentPosition(
-    position => {
-      const location = JSON.stringify(position);
-
-      this.setState({ location });
-    },
-    error => Alert.alert(error.message),
-    { enableHighAccuracy: true, timeout: 20000, maximumAge: 1000 }
-  );
-};
-
 const Map = () => {
   //Array which contains dummy users, will be swapped with real data from server
   const DUMMY_RIDER_LOCATIONS = [
@@ -272,6 +259,20 @@ const Map = () => {
       creatorUserID: 90, //User ID of the creator of this meetup
     },
   ]
+
+
+  //Function to get the current location of the user
+  const findCoordinates = () => {
+    navigator.geolocation.getCurrentPosition(
+      position => {
+        const location = JSON.stringify(position);
+
+        this.setState({ location });
+      },
+      error => Alert.alert(error.message),
+      { enableHighAccuracy: true, timeout: 20000, maximumAge: 1000 }
+    );
+  };
 
   //Google map render
   return (
