@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Image, Text, StyleSheet, Button } from 'react-native';
 import MapView, { Marker, Callout, PROVIDER_GOOGLE } from 'react-native-maps';
 
+//Map style
 const styles = StyleSheet.create({
     container: {
         ...StyleSheet.absoluteFillObject,
@@ -13,6 +14,7 @@ const styles = StyleSheet.create({
     },
 });
 
+//Map visual style
 const rideoutMapStyle = [
   {
     "elementType": "geometry",
@@ -217,6 +219,7 @@ const rideoutMapStyle = [
   }
 ]
 
+//Function to get the current location of the user
 findCoordinates = () => {
   navigator.geolocation.getCurrentPosition(
     position => {
@@ -230,6 +233,7 @@ findCoordinates = () => {
 };
 
 const Map = () => {
+  //Array which contains dummy users, will be swapped with real data from server
     const DUMMY_RIDER_LOCATIONS = [
         {
           markerID: 0, //Unique marker ID
@@ -249,6 +253,7 @@ const Map = () => {
         {markerID: 3, userID: 37, latitude: -36.8496, longitude: 174.8184, nickname: 'Ranish', pace: "Mixed", license: "Restricted", make: "Honda", model: "VFR400", year: 1998, size: 400}
     ]
 
+    //Array which contains dummy groups, will be swapped with real data from server
     const DUMMY_GROUP_LOCATIONS = [
         {
           markerID: 4, //Unique marker ID
@@ -268,6 +273,7 @@ const Map = () => {
         },
     ]
 
+    //Google map render
     return (
         <View style={styles.container}>
             <MapView
@@ -284,10 +290,11 @@ const Map = () => {
                 userLocationPriority = {'high'}
                 userLocationAnnotationTitle = {'Me'}
                 followsUserLocation = {true}
-                showsMyLocationButton = {true}
+                showsMyLocationButton = {false}
                 showsCompass = {true}
                 showsTraffic = {false}
                 >
+                    {/*Render the users' location on the map as markers*/}
                     {DUMMY_RIDER_LOCATIONS.map(DUMMY_RIDER_LOCATIONS => {return <Marker
                         key = {DUMMY_RIDER_LOCATIONS.markerID}
                         coordinate={{
@@ -296,12 +303,15 @@ const Map = () => {
                         }}
                         title = {DUMMY_RIDER_LOCATIONS.nickname}
                         >
+                            {/*Render the marker as the custom image*/}
                             <Image 
                                 source={require('./rider_marker_solid.png')}
                                 style={{width: 36, height: 36}}
                                 resizeMethod="resize"
                                 resizeMode="contain"
                             />
+
+                            {/*Popup UI when marker is clicked*/}
                             <Callout style={{ width: 250, height: 250}}>
                               <View>
                                 <Text style={{ fontSize: 20, fontWeight: 'bold'}}>{DUMMY_RIDER_LOCATIONS.nickname}</Text>
@@ -315,6 +325,8 @@ const Map = () => {
                               </View>
                             </Callout>
                         </Marker>})}
+
+                        {/*Render the groups' location on the map as markers*/}
                         {DUMMY_GROUP_LOCATIONS.map(DUMMY_GROUP_LOCATIONS => {return <Marker
                         key = {DUMMY_GROUP_LOCATIONS.markerID}
                         coordinate={{
@@ -322,12 +334,15 @@ const Map = () => {
                             longitude: DUMMY_GROUP_LOCATIONS.longitude
                         }}
                         >
+                            {/*Render the marker as the custom image*/}
                             <Image 
                                 source={require('./group_marker_solid.png')}
                                 style={{width: 36, height: 36}}
                                 resizeMethod="resize"
                                 resizeMode="contain"
                             />
+                            
+                            {/*Popup UI when marker is clicked*/}
                             <Callout style={{ width: 250, height: 250}}>
                               <View>
                                 <Text style={{ fontSize: 20, fontWeight: 'bold'}}>{DUMMY_GROUP_LOCATIONS.title}</Text>
