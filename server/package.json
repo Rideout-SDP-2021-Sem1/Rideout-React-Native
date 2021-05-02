@@ -21,6 +21,8 @@
   "dependencies": {
     "express": "^4.17.1",
     "firebase-admin": "^9.7.0",
-    "mongoose": "^5.12.5"
+    "mongoose": "^5.12.5",
+    "swagger-jsdoc": "6.0.0",
+    "swagger-ui-express": "^4.1.6"
   }
 }
