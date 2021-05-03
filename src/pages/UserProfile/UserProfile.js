@@ -1,18 +1,19 @@
-import React, { useState } from 'react';
-import { ScrollView, Image, SafeAreaView, View } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { ScrollView, Image, SafeAreaView, View, Alert } from 'react-native';
 import {
   IndexPath, Button, StyleService, useStyleSheet, Input, Select,
-  SelectItem, Text, Layout, Modal, Card
+  SelectItem, Text, Layout, Modal, Card, Spinner
 } from '@ui-kitten/components';
 import { auth } from '../../helper'
+import { serverInstance } from '../../instances'
 
 const UserProfile = (props) => {
-  const Ldata = [
+  const licenseList = [
     'Learners',
     'Restricted',
     'Full',
   ];
-  const Pdata = [
+  const preferredPaceList = [
     'Relaxed',
     'Mixed',
     'Spirited',
@@ -21,15 +22,17 @@ const UserProfile = (props) => {
   const [nickname, setNickname] = useState("");
   const [isEditable, setIsEditable] = useState(true);
   const [username, setUsername] = useState("");
-  const [selectedLIndex, setSelectedLIndex] = useState(new IndexPath(0));
-  const [selectedPIndex, setSelectedPIndex] = useState(new IndexPath(0));
-  const displayLValue = Ldata[selectedLIndex.row];
-  const displayPValue = Pdata[selectedPIndex.row];
+  const [selectedLicenseIndex, setSelectedLicenseIndex] = useState(new IndexPath(0));
+  const [selectedPaceIndex, setSelectedPaceIndex] = useState(new IndexPath(0));
+  const displayLValue = licenseList[selectedLicenseIndex.row];
+  const displayPValue = preferredPaceList[selectedPaceIndex.row];
   const [model, setModel] = useState("");
   const [size, setSize] = useState("0");
   const [make, setMake] = useState("");
 
   const [showDialog, setShowDialog] = useState(false)
+
+  const [waiting, setWaiting] = useState(false)
 
   const styles = useStyleSheet(themedStyle);
 
@@ -44,10 +47,6 @@ const UserProfile = (props) => {
     setSize(number)
   }
 
-  const updateEditable = () => {
-    setIsEditable(!isEditable)
-  }
-
   const handleLogout = async () => {
     try {
       await auth.signOut()
@@ -57,8 +56,59 @@ const UserProfile = (props) => {
     }
   }
 
+  const handlePostUserProfile = async () => {
+    try {
+      setWaiting(true)
+      await serverInstance.post("/update-profile", {
+        nickname: nickname,
+        bike_details: [{
+          make: make,
+          model: model,
+          size: size
+        }],
+        license_level: licenseList[selectedLicenseIndex.row],
+        preferred_pace: preferredPaceList[selectedPaceIndex.row]
+      })
+      Alert.alert("Success", "Updated Profile.")
+      setWaiting(false)
+      setIsEditable(true)
+    } catch (err) {
+      console.error("error handlePostUserProfile", err)
+      Alert.alert("Error", err)
+      setWaiting(false)
+    }
+  }
+
+  useEffect(() => {
+    const getData = async () => {
+      try {
+        const response = await serverInstance.get("/user")
+        const data = response.data
+        setNickname(data?.nickname || "")
+        const licenseTypeIndex = licenseList.indexOf(data?.license_level || 0)
+        const preferredPaceIndex = preferredPaceList.indexOf(data?.preferred_pace || 0)
+        setSelectedLicenseIndex(new IndexPath(licenseTypeIndex))
+        setSelectedPaceIndex(new IndexPath(preferredPaceIndex))
+        setMake(data?.make || "")
+        setModel(data?.model || "")
+        setSize(data?.size || "")
+      } catch (err) {
+        console.error("error getting data", err)
+      }
+    }
+    getData()
+  }, [])
+
   return (
     <>
+      <Modal
+        visible={waiting}
+        backdropStyle={{
+          backgroundColor: "rgba(0, 0, 0, 0.5)"
+        }}
+      >
+        <Spinner size="giant" />
+      </Modal>
       <ScrollView
         style={styles.container}
         contentContainerStyle={styles.contentContainer}
@@ -88,8 +138,8 @@ const UserProfile = (props) => {
           <Input
             style={styles.bottomSpace}
             placeholder='Nickname'
-            value={username}
-            onChangeText={setUsername}
+            value={nickname}
+            onChangeText={setNickname}
             disabled={isEditable}
           />
 
@@ -103,12 +153,12 @@ const UserProfile = (props) => {
             style={styles.bottomSpace}
             placeholder='Select License Type'
             value={displayLValue}
-            selectedIndex={selectedLIndex}
-            onSelect={index => setSelectedLIndex(index)}
+            selectedIndex={selectedLicenseIndex}
+            onSelect={index => setSelectedLicenseIndex(index)}
             disabled={isEditable}
           >
             {
-              Ldata.map((license) => {
+              licenseList.map((license) => {
                 return (
                   <SelectItem key={license} title={license} />
                 )
@@ -126,12 +176,12 @@ const UserProfile = (props) => {
             style={styles.bottomSpace}
             placeholder='Select Preferred Pace'
             value={displayPValue}
-            selectedIndex={selectedPIndex}
-            onSelect={index => setSelectedPIndex(index)}
+            selectedIndex={selectedPaceIndex}
+            onSelect={index => setSelectedPaceIndex(index)}
             disabled={isEditable}
           >
             {
-              Pdata.map((pace) => {
+              preferredPaceList.map((pace) => {
                 return (
                   <SelectItem key={pace} title={pace} />
                 )
@@ -193,7 +243,15 @@ const UserProfile = (props) => {
               marginHorizontal: 24,
               marginTop: 24,
             }}
-            onPress={updateEditable}
+            onPress={() => {
+              if (isEditable) {
+                // Allow editing
+                setIsEditable(false)
+              } else {
+                // POST the new user data
+                handlePostUserProfile()
+              }
+            }}
             size='giant'
           >
             {
