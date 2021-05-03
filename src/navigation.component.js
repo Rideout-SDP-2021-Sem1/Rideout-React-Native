@@ -9,7 +9,9 @@ import {
   MainLayout,
   TestProfile,
   EmptyPage,
-  UserProfile
+  UserProfile,
+  MapScreenLayout,
+  GroupListLayout
 } from './pages'
 
 const { Navigator, Screen } = createStackNavigator();
@@ -31,7 +33,6 @@ const HomeNavigator = () => {
     })
     return unsubscribe
   }, [])
-  console.log("user main", user)
 
   return (
     <AuthContext.Provider value={user}>

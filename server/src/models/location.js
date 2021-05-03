@@ -15,7 +15,7 @@ const locationSchema = new Schema({
     type: Schema.Types.Boolean,
     index: true
   }
-})
+}, { timestamps: true })
 
 const Location = rideOut.model("Location", locationSchema)
 
