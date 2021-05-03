@@ -189,7 +189,7 @@ const UserProfile = (props) => {
           />
           <Button
             style={{
-              backgroundColor: isEditable ? 'blue' : 'green',
+              backgroundColor: isEditable ? '#27afe2' : 'green',
               marginHorizontal: 24,
               marginTop: 24,
             }}
@@ -198,7 +198,7 @@ const UserProfile = (props) => {
           >
             {
               isEditable ? "Edit Profile" : "Save Profile"
-            }
+}
           </Button>
 
           <Button
