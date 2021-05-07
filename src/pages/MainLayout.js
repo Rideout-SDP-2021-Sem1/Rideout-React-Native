@@ -20,7 +20,7 @@ const MainLayout = (props) => {
   const navigation = props.navigation
 
   const handleNavigateToPage = (pageName) => {
-    navigation && navigation.push(pageName);
+    navigation && navigation.navigate(pageName);
   }
 
   const handleSelectChange = (index) => {
