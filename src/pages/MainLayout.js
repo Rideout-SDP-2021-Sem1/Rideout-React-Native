@@ -52,7 +52,7 @@ const MainLayout = (props) => {
         </View>
         <SafeAreaView style={styles.bottomNavigationSafeAreaView}>
           <BottomNavigation
-            style={styles.bottomNavigation}
+            style={styles.bottomNavigationView}
             selectedIndex={index}
             onSelect={(index) => handleSelectChange(index)}
           >
@@ -79,10 +79,10 @@ const styles = StyleSheet.create({
     display: "flex",
     flex: 1,
     flexGrow: 1,
-    backgroundColor: "white" || "#27afe2"
+    backgroundColor: "white"
   },
   bottomNavigationView: {
     display: "flex",
-    justifyContent: "flex-end"
+    //justifyContent: "flex-end"
   }
 });
