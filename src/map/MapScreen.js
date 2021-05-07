@@ -133,7 +133,7 @@ const Map = () => {
         provider={PROVIDER_GOOGLE}
         style={styles.map}
         customMapStyle={rideoutMapStyle}
-        region={{
+        initialRegion={{
           latitude: currentLocation.latitude,
           longitude: currentLocation.longitude,
           latitudeDelta: currentLocation.latitudeDelta,
