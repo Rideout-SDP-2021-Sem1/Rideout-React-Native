@@ -57,7 +57,7 @@ const MainLayout = (props) => {
             onSelect={(index) => handleSelectChange(index)}
           >
             <BottomNavigationTab title='MAP' icon={MapIcon} />
-            <BottomNavigationTab title='EVENT' icon={EventIcon} />
+            <BottomNavigationTab title='LIST' icon={EventIcon} />
             <BottomNavigationTab title='PROFILE' icon={ProfileIcon} />
           </BottomNavigation>
         </SafeAreaView>
@@ -82,7 +82,6 @@ const styles = StyleSheet.create({
     backgroundColor: "white"
   },
   bottomNavigationView: {
-    display: "flex",
-    //justifyContent: "flex-end"
+    display: "flex"
   }
 });
