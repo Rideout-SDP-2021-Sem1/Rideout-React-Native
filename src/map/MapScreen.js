@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { View, Image, Text, StyleSheet, Button, PermissionsAndroid } from 'react-native';
+import { View, Image, Text, StyleSheet, Button } from 'react-native';
 import MapView, { Marker, Callout, PROVIDER_GOOGLE } from 'react-native-maps'
 import Geolocation from '@react-native-community/geolocation'
 import { serverInstance } from '../instances'
 import { rideoutMapStyle } from './rideoutMapStyle'
 import moment from 'moment'
+import RiderCallout from './RiderCallout'
 
 //Map style
 const styles = StyleSheet.create({
@@ -139,11 +140,11 @@ const Map = () => {
           latitudeDelta: currentLocation.latitudeDelta,
           longitudeDelta: currentLocation.longitudeDelta
         }}
-        showsUserLocation={true}
+        showsUserLocation={false} //IOS ONLY
         userLocationPriority={'high'}
         userLocationAnnotationTitle={'Me'}
-        followsUserLocation={true}
-        showsMyLocationButton={true}
+        followsUserLocation={false} //IOS ONLY
+        showsMyLocationButton={false}
         showsCompass={true}
         showsTraffic={false}
       >
@@ -167,16 +168,7 @@ const Map = () => {
 
             {/*Popup UI when marker is clicked*/}
             <Callout style={{ width: 250, height: 250 }}>
-              <View>
-                <Text style={{ fontSize: 20, fontWeight: 'bold' }}>{currentObj.nickname}</Text>
-                <Text>License Level: {currentObj.license}</Text>
-                <Text>Preferred Pace: {currentObj.pace}</Text>
-                <Text />
-                <Text style={{ fontSize: 15, fontWeight: 'bold' }}>Bike detail: </Text>
-                <Text>{currentObj.year || ""} {currentObj.make} {currentObj.model}</Text>
-                <Text>Engine size: {currentObj.size}cc</Text>
-                <Button title="Request Rideout" />
-              </View>
+              <RiderCallout />
             </Callout>
           </Marker>
         })}
