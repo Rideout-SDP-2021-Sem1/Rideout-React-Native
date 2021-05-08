@@ -41,7 +41,7 @@ const Map = () => {
           })
         },
         (error) => { console.error("error getMapRegion", error) },
-        {enableHighAccuracy: true, timeout: 30000, maximumAge: 0},
+        {enableHighAccuracy: true, timeout: 10000, maximumAge: 0},
       )
     } catch (error) {
       console.error("error getMapRegion", error)
@@ -82,7 +82,7 @@ const Map = () => {
       Geolocation.getCurrentPosition(
         info => sendMyLocation(info),
         (error) => console.error("error findCoordinates", error),
-        {enableHighAccuracy: true, timeout: 30000, maximumAge: 0},
+        {enableHighAccuracy: true, timeout: 10000, maximumAge: 0},
       )
     } catch (error) {
       console.error("findCoordinates error", error)
