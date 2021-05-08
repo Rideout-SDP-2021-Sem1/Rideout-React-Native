@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { View, Image, Text, StyleSheet, Button } from 'react-native';
+import { View, Image, StyleSheet } from 'react-native';
 import MapView, { Marker, Callout, PROVIDER_GOOGLE } from 'react-native-maps'
 import Geolocation from '@react-native-community/geolocation'
 import { serverInstance } from '../instances'
 import { rideoutMapStyle } from './rideoutMapStyle'
-import moment from 'moment'
 import RiderCallout from './RiderCallout'
+import GroupCallout from './GroupCallout'
 
 //Map style
 const styles = StyleSheet.create({
@@ -140,11 +140,11 @@ const Map = () => {
           latitudeDelta: currentLocation.latitudeDelta,
           longitudeDelta: currentLocation.longitudeDelta
         }}
-        showsUserLocation={false} //IOS ONLY
+        showsUserLocation={true} 
         userLocationPriority={'high'}
         userLocationAnnotationTitle={'Me'}
         followsUserLocation={false} //IOS ONLY
-        showsMyLocationButton={false}
+        showsMyLocationButton={false} //IOS ONLY (i think)
         showsCompass={true}
         showsTraffic={false}
       >
@@ -165,10 +165,9 @@ const Map = () => {
               resizeMethod="resize"
               resizeMode="contain"
             />
-
             {/*Popup UI when marker is clicked*/}
             <Callout style={{ width: 250, height: 250 }}>
-              <RiderCallout />
+              <RiderCallout rider={currentObj} />
             </Callout>
           </Marker>
         })}
@@ -189,22 +188,9 @@ const Map = () => {
               resizeMethod="resize"
               resizeMode="contain"
             />
-
             {/*Popup UI when marker is clicked*/}
             <Callout style={{ width: 250, height: 250 }}>
-              <View>
-                <Text style={{ fontSize: 20, fontWeight: 'bold' }}>{currentObj.title}</Text>
-                <Text style={{ fontSize: 10, color: '#808080' }}>Meetup Date: {moment(currentObj.meetupTime).toString()}</Text>
-                <Text>{currentObj.description}</Text>
-                <Text />
-                <Text style={{ fontSize: 15, fontWeight: 'bold' }}>Meetup Details:</Text>
-                <Text>Minimum License Level: {currentObj.minimumLicenseLevel}</Text>
-                <Text>Preferred Pace: {currentObj.minimumPreferredPace}</Text>
-                <Text>{currentObj.currentAttendant}/{currentObj.maximumAttendant} Riders RSVP'D</Text>
-                <Button title="RSVP a Slot" />
-                <Text style={{ textAlign: 'center', fontSize: 10, color: '#808080' }}>Meetup in:</Text>
-                <Text style={{ textAlign: 'center', fontSize: 15, fontWeight: 'bold' }}>00:00:00</Text>
-              </View>
+              <GroupCallout group={currentObj} />
             </Callout>
           </Marker>
         })}
