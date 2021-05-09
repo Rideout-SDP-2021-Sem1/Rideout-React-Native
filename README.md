@@ -1,1 +1,2 @@
-# Rideout-SDP-2021-Sem1
+# Rideout 🏍️
+An app to connect riders.
