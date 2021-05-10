@@ -6,6 +6,8 @@ import {
 } from '@ui-kitten/components';
 import { auth } from '../../helper'
 import { serverInstance } from '../../instances'
+import { color } from 'react-native-reanimated';
+import { Colors } from 'react-native/Libraries/NewAppScreen';
 
 const UserProfile = (props) => {
   const licenseList = [
@@ -328,7 +330,7 @@ const themedStyle = StyleService.create({
   container: {
     marginLeft: 10,
     marginRight: 10,
-    backgroundColor: "white"
+    backgroundColor: "#ffff"
   },
   contentContainer: {
     paddingVertical: 24,
@@ -339,6 +341,7 @@ const themedStyle = StyleService.create({
   },
   subtitleBox: {
     marginHorizontal: 10
+    
   },
   Logo: {
     height: 100,

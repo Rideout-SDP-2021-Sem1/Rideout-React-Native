@@ -101,6 +101,7 @@ const GroupList = (props) => {
           </Card>
         </Layout>
       </Modal>
+      <SafeAreaView>
       <Layout
         level="1"
         style={styles.container}
@@ -119,6 +120,7 @@ const GroupList = (props) => {
           }}
         />
       </Layout>
+      </SafeAreaView>
     </>
   );
 };

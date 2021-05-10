@@ -48,8 +48,8 @@ const HomeNavigator = () => {
                 <Tab.Navigator headerMode='none' initialRouteName="Map" screenOptions= {{
                   tabBarVisible: false
                 }}>
-                  <Tab.Screen name='Map' component={EmptyPage} />
-                  <Tab.Screen name='List' component={EmptyPage} />
+                  <Tab.Screen name='Map' component={MapScreenLayout} />
+                  <Tab.Screen name='List' component={GroupListLayout} />
                   <Tab.Screen name='Profile' component={UserProfile} />
                 </Tab.Navigator>
               </>
