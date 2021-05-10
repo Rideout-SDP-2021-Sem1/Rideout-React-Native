@@ -81,7 +81,7 @@ export default ({ navigation }) => {
               style={styles.signInLabel}
               category='s1'
               status='control'>
-              An app by Khaled for Khaled
+              Love to RIDE
           </Text>
           </>
         </ImageOverlay>

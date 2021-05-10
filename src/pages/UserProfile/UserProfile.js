@@ -257,7 +257,7 @@ const UserProfile = (props) => {
           >
             {
               isEditable ? "Edit Profile" : "Save Profile"
-            }
+}
           </Button>
 
           <Button
