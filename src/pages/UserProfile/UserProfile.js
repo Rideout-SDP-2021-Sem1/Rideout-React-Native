@@ -242,6 +242,7 @@ const UserProfile = (props) => {
           <Button
             style={{
               backgroundColor: isEditable ? '#27afe2' : 'green',
+              borderColor: isEditable ? '#27afe2' : 'green',
               marginHorizontal: 24,
               marginTop: 24,
             }}

@@ -45,7 +45,7 @@ const HomeNavigator = () => {
             user !== null
               ?
               <>
-                <Tab.Navigator headerMode='none' initialRouteName="Map" screenOptions= {{
+                <Tab.Navigator headerMode='none' initialRouteName="Map" screenOptions={{
                   tabBarVisible: false
                 }}>
                   <Tab.Screen name='Map' component={MapScreenLayout} />
