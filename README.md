@@ -1,6 +1,6 @@
 # gotta add code:
 
-MapScreen.test.js
+src/tests/MapScreen.test.js
 
 import MapScreen from '../map/MapScreen.js'
 
