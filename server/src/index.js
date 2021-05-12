@@ -29,3 +29,7 @@ app.use(
 app.listen(PORT, () => {
   console.log(`Rideout Server is running on port ${PORT}`)
 })
+
+module.exports = {
+  app
+}

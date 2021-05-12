@@ -4,18 +4,9 @@ const { User } = require('../models/index')
 const userRoute = Router()
 
 userRoute.route("/user")
-  /**
-   * @openapi
-   * /user:
-   *   get:
-   *     description: Welcome to swagger-jsdoc!
-   *     responses:
-   *       200:
-   *         description: Returns a mysterious string.
-   */
   .get(async (req, res) => {
     const headerUid = req.header.uid
-    const uid = req.params.uid
+    const uid = req.query.uid
 
     let uidSearchUp = ""
     const selfLookup = uid === undefined
@@ -48,15 +39,6 @@ userRoute.route("/user")
       return res.status(500).json(err)
     }
   })
-  /**
-   * @openapi
-   * /user:
-   *   post:
-   *     description: Welcome to swagger-jsdoc!
-   *     responses:
-   *       200:
-   *         description: Returns a mysterious string.
-   */
   .post(async (req, res) => {
     const data = req.body.data
 
