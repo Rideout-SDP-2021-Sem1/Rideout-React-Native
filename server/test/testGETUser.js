@@ -14,13 +14,16 @@ describe("Our application", () => {
   })
 })
 
-describe("User endpoint", async () => {
-  it("Get user details of testUid", async () => {
+describe("User endpoint", () => {
+  it("Get user details of testUid", (done) => {
     request(app)
       .get("/user?uid=testUid")
       .set("Content-Type", "application/json")
       .expect("Content-Type", /json/)
       .expect(200, (err, res) => {
+        if (err) {
+          return done(err)
+        }
         result = res.body
         expect(JSON.stringify(result)).to.be.equal(JSON.stringify({
           "license_level": "Full",
@@ -29,6 +32,7 @@ describe("User endpoint", async () => {
           "model": "Model 3",
           "size": "N/A"
         }))
+        return done()
       })
   })
 })
