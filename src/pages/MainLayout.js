@@ -20,7 +20,7 @@ const MainLayout = (props) => {
   const navigation = props.navigation
 
   const handleNavigateToPage = (pageName) => {
-    navigation && navigation.push(pageName);
+    navigation && navigation.navigate(pageName);
   }
 
   const handleSelectChange = (index) => {
@@ -52,12 +52,12 @@ const MainLayout = (props) => {
         </View>
         <SafeAreaView style={styles.bottomNavigationSafeAreaView}>
           <BottomNavigation
-            style={styles.bottomNavigation}
+            style={styles.bottomNavigationView}
             selectedIndex={index}
             onSelect={(index) => handleSelectChange(index)}
           >
             <BottomNavigationTab title='MAP' icon={MapIcon} />
-            <BottomNavigationTab title='EVENT' icon={EventIcon} />
+            <BottomNavigationTab title='LIST' icon={EventIcon} />
             <BottomNavigationTab title='PROFILE' icon={ProfileIcon} />
           </BottomNavigation>
         </SafeAreaView>
@@ -79,10 +79,9 @@ const styles = StyleSheet.create({
     display: "flex",
     flex: 1,
     flexGrow: 1,
-    backgroundColor: "white" || "#27afe2"
+    backgroundColor: "white"
   },
   bottomNavigationView: {
-    display: "flex",
-    justifyContent: "flex-end"
+    display: "flex"
   }
 });

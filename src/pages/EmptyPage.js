@@ -1,8 +1,11 @@
 import React from 'react'
 import { StyleSheet, View } from 'react-native'
-import { Button, Layout } from '@ui-kitten/components'
+import { Button, Layout, Input} from '@ui-kitten/components'
 import MainLayout from './MainLayout'
 import { signOut } from '../helper/auth'
+// import { Input } from 'react-native-ui-kitten'
+import react from 'react'
+import { color } from 'react-native-reanimated'
 
 const EmptyPage = (props) => {
   const handleSignOut = async () => {
@@ -13,13 +16,17 @@ const EmptyPage = (props) => {
     }
   }
 
+  const [username, setUsername] = react.useState("");
+
   return (
     <>
       <MainLayout {...props}>
         <Layout style={styles.contianer} level="1">
-          <Button onPress={() => handleSignOut()}>
-            Some other test
+          <Button 
+          onPress={() => handleSignOut()}>
+            Test
           </Button>
+      
         </Layout>
       </MainLayout>
     </>

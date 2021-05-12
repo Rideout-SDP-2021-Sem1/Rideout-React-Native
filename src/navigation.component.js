@@ -3,16 +3,20 @@ import { NavigationContainer } from '@react-navigation/native'
 import { createStackNavigator } from '@react-navigation/stack'
 import { Login, Signup, ForgotPassword } from './auth/index'
 import { AuthContext, NavigationContext } from './context'
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { firebase } from '@react-native-firebase/auth'
 import {
   MainLayout,
   TestProfile,
   EmptyPage,
   UserProfile,
-  MapScreenLayout
+  MapScreenLayout,
+  GroupListLayout
 } from './pages'
 
 const { Navigator, Screen } = createStackNavigator();
+const Tab = createBottomTabNavigator();
+
 
 const HomeNavigator = () => {
   const [user, setUser] = useState(null)
@@ -41,11 +45,13 @@ const HomeNavigator = () => {
             user !== null
               ?
               <>
-                <Navigator headerMode='none' initialRouteName="Map">
-                  <Screen name='Map' component={MapScreenLayout} />
-                  <Screen name='List' component={EmptyPage} />
-                  <Screen name='Profile' component={UserProfile} />
-                </Navigator>
+                <Tab.Navigator headerMode='none' initialRouteName="Map" screenOptions={{
+                  tabBarVisible: false
+                }}>
+                  <Tab.Screen name='Map' component={MapScreenLayout} />
+                  <Tab.Screen name='List' component={GroupListLayout} />
+                  <Tab.Screen name='Profile' component={UserProfile} />
+                </Tab.Navigator>
               </>
               :
               <>
