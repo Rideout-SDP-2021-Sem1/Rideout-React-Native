@@ -27,15 +27,12 @@ const MapScreenLayout = (props) => {
 const GroupListLayout = (props) => {
   return (
     <MainLayout {...props}>
-      <GroupList {...props} />
+      <CreateGroup {...props} />
     </MainLayout>
   )
 }
 
 export {
-  MainLayout,
-  TestProfile,
-  EmptyPage,
   UserProfile,
   MapScreenLayout,
   GroupListLayout

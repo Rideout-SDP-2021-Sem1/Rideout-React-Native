@@ -6,9 +6,6 @@ import { AuthContext, NavigationContext } from './context'
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { firebase } from '@react-native-firebase/auth'
 import {
-  MainLayout,
-  TestProfile,
-  EmptyPage,
   UserProfile,
   MapScreenLayout,
   GroupListLayout
