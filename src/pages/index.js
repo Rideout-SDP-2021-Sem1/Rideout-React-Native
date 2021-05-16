@@ -4,7 +4,7 @@ import TestProfile from './TestProfile'
 import EmptyPage from './EmptyPage'
 import UserProfileComponent from './UserProfile/UserProfile'
 import { MapScreen } from '../map'
-import { GroupList } from './Group'
+import { GroupList, CreateGroup } from './Group'
 
 const UserProfile = (props) => {
   return (
