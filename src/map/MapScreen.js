@@ -28,9 +28,9 @@ const Map = () => {
     longitudeDelta: 0.0242,
   });
 
-  const [sharingLocation, setSharing] = useState(true)
+  const [sharingLocation, setSharing] = useState(false)
 
-  const [sharingTitle, setSharingTitle] = useState("Go Offline")
+  const [sharingTitle, setSharingTitle] = useState("Go Online")
   const [sharingStyle, setSharingStyle] = useState({buttonColor: 'blue'})
 
   const changeSharingStatus = () => {
@@ -80,8 +80,8 @@ const Map = () => {
     try {
       const lat = location?.coords?.latitude;
       const lng = location?.coords?.longitude;
-      if (!sharingLocation || lat === undefined || lng === undefined || lat === "" || lng === "") {
-        console.log("Not sending location")
+      if (sharingLocation == false || lat === undefined || lng === undefined || lat === "" || lng === "") {
+        console.log("Not sending location. Sharing location setting: " + sharingLocation) //Boolean doesn't update in sendMyLocation function
       } else {
         await serverInstance.post("/location", {
           latitude: lat,
@@ -226,7 +226,6 @@ const Map = () => {
         }}
       >
         <Button title={sharingTitle} onPress={changeSharingStatus} style={sharingStyle}/>
-        {console.log("Sharing location: " + sharingLocation)}
       </View>
     </View>
   );
