@@ -111,7 +111,13 @@ export const CreateGroup = (props) => {
           <Text style={styles.subtitleBox} category="s1">
             Location
           </Text>
-          {/* <GoogleAutoComplete apiKey="AIzaSyB-ebrCUSbJeoTMpBNoRD-mh1aIei3eK3Y" debounce={300}>
+          <Input
+            style={styles.bottomSpace}
+            placeholder="Meetup Location"
+            value={meetupLocation}
+            onChangeText={(text) => setMeetupLocation(text)}
+          />
+          <GoogleAutoComplete apiKey="AIzaSyCKX3VD9qQtp6esG1Xe52s3vT1DAm72Wpo" debounce={300}>
             {({ inputValue, handleTextChange, locationResults, fetchDetails }) => (
               <React.Fragment>
                 <TextInput
@@ -126,17 +132,20 @@ export const CreateGroup = (props) => {
                   placeholder="Location..."
                 />
                 <ScrollView style={{ maxHeight: 100 }}>
-                  {locationResults.map((el, i) => (
-                    <LocationItem
-                      {...el}
-                      fetchDetails={fetchDetails}
-                      key={String(i)}
-                    />
-                  ))}
+                  {locationResults.map((el, i) => {
+                    console.log("The results", el, i)
+                    return (
+                      <Text
+                        {...el}
+                        fetchDetails={fetchDetails}
+                        key={String(i)}
+                      />
+                    )
+                  })}
                 </ScrollView>
               </React.Fragment>
             )}
-          </GoogleAutoComplete> */}
+          </GoogleAutoComplete>
 
           {/* <Autocomplete
             placeholder="Search for a location"
