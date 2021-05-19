@@ -67,14 +67,14 @@ const GroupList = (props) => {
           style={{
             alignItems: "center",
             display: "flex",
-            alignContent: 'center'
+            alignContent: 'center',
           }}
         >
           <Card
             style={{
               alignItems: "center",
               display: "flex",
-              alignContent: 'center'
+              alignContent: 'center',
             }}
           >
             <Text
@@ -111,6 +111,10 @@ const GroupList = (props) => {
         style={styles.container}
       >
         <List
+        style = {{
+          height: '100%',
+          backgroundColor: 'white'
+        }}
           data={groupList}
           renderItem={({ item }) => {
             return (
@@ -135,7 +139,7 @@ const themedStyle = StyleService.create({
   container: {
     marginLeft: 10,
     marginRight: 10,
-    backgroundColor: "white"
+    backgroundColor: 'white'
   },
   contentContainer: {
     paddingVertical: 24,
