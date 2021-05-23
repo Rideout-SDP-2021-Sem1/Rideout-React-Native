@@ -4,7 +4,7 @@ import TestProfile from './TestProfile'
 import EmptyPage from './EmptyPage'
 import UserProfileComponent from './UserProfile/UserProfile'
 import { MapScreen } from '../map'
-import { GroupList } from './Group'
+import { GroupList, CreateGroup } from './Group'
 
 const UserProfile = (props) => {
   return (
@@ -24,6 +24,14 @@ const MapScreenLayout = (props) => {
   )
 }
 
+const GroupCreateLayout = (props) => {
+  return (
+    <MainLayout {...props}>
+      <CreateGroup {...props} />
+    </MainLayout>
+  )
+}
+
 const GroupListLayout = (props) => {
   return (
     <MainLayout {...props}>
@@ -33,10 +41,8 @@ const GroupListLayout = (props) => {
 }
 
 export {
-  MainLayout,
-  TestProfile,
-  EmptyPage,
   UserProfile,
   MapScreenLayout,
-  GroupListLayout
+  GroupListLayout,
+  GroupCreateLayout
 }

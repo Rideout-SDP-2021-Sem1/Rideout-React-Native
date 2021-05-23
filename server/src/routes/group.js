@@ -15,29 +15,21 @@ groupRoute.route("/group")
   })
   .post(async (req, res) => {
     const data = req.body.data
+    const headerUid = req.header.uid
 
     try {
-      const check = await User.findOne({
-        uid: data.uid
-      }).select("").lean().exec()
-      if (check !== null) {
-        return res.status(200).send("ok")
+      const insertObj = {
+        ...data,
+        ownerUid: headerUid,
+        usersUid: [],
+        currentAttendant: 1
       }
-      const newUser = await User.findOneAndUpdate({
-        uid: data.uid,
-      }, {
-        uid: data.uid,
-        nickname: data.nickname,
-        email: data.email,
-        bike_details: data.bike_details,
-        license_level: data.license_level,
-        preferred_pace: data.preferred_pace,
-        role: "user"
-      }, { upsert: true, new: true }).select("").lean().exec()
+      
+      const insertResult = await (new Group(insertObj)).save()
 
-      return res.status(200).json(newUser["_id"])
+      return res.status(200).json(insertResult["_id"])
     } catch (err) {
-      console.error("POST user error", err)
+      console.error("POST greoup error", err)
       return res.status(500).json(err)
     }
   })
