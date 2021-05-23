@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { ScrollView, View, Platform } from "react-native";
+import { ScrollView, View, Platform, Alert } from "react-native";
 import {
   StyleService,
   useStyleSheet,
@@ -120,9 +120,51 @@ export const CreateGroup = (props) => {
     setShowDialog(false)
   }
 
+  const resetAllFields = () => {
+    setTitle("")
+    setMeetupLocation("")
+    setMaximumAttendant("")
+    setDescription("")
+    setDate(new Date())
+    setTime(new Date())
+    setPlaceId("")
+    setAddressLookup("")
+    setAddressAutocompleteResult([])
+  }
+
   const handleCreateEvent = async () => {
     try {
+      setWaiting(true)
 
+      // Get the geometry location of the selected place ID
+      const placeData = (await axios.get("https://maps.googleapis.com/maps/api/place/details/json", {
+        params: {
+          placeid: placeId,
+          key: "AIzaSyCKX3VD9qQtp6esG1Xe52s3vT1DAm72Wpo"
+        }
+      })).data
+
+      const meetupLocation = {
+        latitude: placeData?.result?.geometry?.location?.lat || "",
+        longitude: placeData?.result?.geometry?.location?.lng || "",
+      }
+
+      const eventObj = {
+        meetupLocation: meetupLocation,
+        meetupTime: moment(date).toISOString(),
+        maximumAttendant: maximumAttendant,
+        minimumLicenseLevel: licenseList[selectedLicenseIndex.row],
+        minimumPreferredPace: preferredPaceList[selectedPaceIndex.row],
+        title: title,
+        description: description
+      }
+
+      await serverInstance.post("/group", {
+        data: eventObj
+      })
+      setWaiting(false)
+      Alert.alert("Success", "The event has successfully been created!")
+      resetAllFields()
     } catch (err) {
       console.error("error handleCreateEvent", err)
     }
@@ -274,7 +316,7 @@ export const CreateGroup = (props) => {
             textStyle={{ minHeight: 64 }}
             placeholder="Description"
           />
-          <Button style={styles.button} size="giant">
+          <Button style={styles.button} onPress={() => handleCreateEvent()} size="giant">
             Create
           </Button>
         </Layout>
