@@ -1,27 +1,25 @@
 import React, { useState } from "react";
-import { ScrollView, Image, View, Alert, TouchableOpacity, Platform, TextInput } from "react-native";
+import { ScrollView, View, Platform } from "react-native";
 import {
   StyleService,
   useStyleSheet,
   Button,
   SelectItem,
   Layout,
-  Datepicker,
-  Icon,
   Input,
   IndexPath,
   Select,
   Text,
-  Autocomplete,
+  Modal,
+  Card,
+  List,
+  ListItem
 } from "@ui-kitten/components";
 import DateTimePicker from '@react-native-community/datetimepicker'
 import moment from 'moment'
-import { GoogleAutoComplete } from 'react-native-google-autocomplete';
-// import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplete";
-
-const CalendarIcon = (props) => <Icon {...props} name="calendar" />;
-
-const EditIcon = (props) => <Icon {...props} name="edit-outline" />;
+import axios from 'axios'
+import { serverInstance } from '../../instances'
+import { LoadingScreen } from '../../components'
 
 export const CreateGroup = (props) => {
   const styles = useStyleSheet(themedStyle);
@@ -52,13 +50,11 @@ export const CreateGroup = (props) => {
   const [time, setTime] = useState(new Date())
   const [showTimePicker, setShowTimePicker] = useState(false)
 
-  // const EditDateIcon = (props) => {
-  //   return (
-  //     <TouchableOpacity onPress={() => setShowDatePicker(true)}>
-  //       <Icon {...props} name={"edit-outline"} />
-  //     </TouchableOpacity>
-  //   )
-  // }
+  const [showDialog, setShowDialog] = useState(false)
+  const [addressLookup, setAddressLookup] = useState("")
+  const [addressAutocompleteResult, setAddressAutocompleteResult] = useState([])
+  const [placeId, setPlaceId] = useState("")
+  const [waiting, setWaiting] = useState(false)
 
   const handleDateAndTime = (inputValue, type) => {
     if (inputValue == null) {
@@ -84,8 +80,57 @@ export const CreateGroup = (props) => {
     }
   }
 
+  const handleAutocomplete = async (addressText) => {
+    if (addressText == null) {
+      return
+    }
+    setAddressLookup(addressText)
+    if (String(addressText).length <= 4) {
+      // Need more characters
+      return
+    }
+
+    try {
+      const result = await axios.get("https://maps.googleapis.com/maps/api/place/autocomplete/json", {
+        params: {
+          input: addressText,
+          types: "address",
+          language: "en",
+          key: "AIzaSyCKX3VD9qQtp6esG1Xe52s3vT1DAm72Wpo",
+          components: "country:nz"
+        }
+      })
+      const resultData = result.data
+      if (resultData?.status === "OK") {
+        setAddressAutocompleteResult(resultData?.predictions || [])
+      }
+    } catch (err) {
+      console.error("error handleAutocomplete", err)
+    }
+  }
+
+  const handleSelectAddress = (address) => {
+    const description = address?.description || ""
+    const place_id = address?.place_id || ""
+
+    setMeetupLocation(description)
+    setPlaceId(place_id)
+    // setAddressAutocompleteResult([])
+    // setAddressLookup("")
+    setShowDialog(false)
+  }
+
+  const handleCreateEvent = async () => {
+    try {
+
+    } catch (err) {
+      console.error("error handleCreateEvent", err)
+    }
+  }
+
   return (
     <>
+      <LoadingScreen waiting={waiting} />
       <ScrollView
         style={styles.container}
         contentContainerStyle={styles.contentContainer}
@@ -115,70 +160,15 @@ export const CreateGroup = (props) => {
             style={styles.bottomSpace}
             placeholder="Meetup Location"
             value={meetupLocation}
-            onChangeText={(text) => setMeetupLocation(text)}
+            disabled={true}
+            selection={{
+              start: 0,
+              end: 0
+            }}
           />
-          <GoogleAutoComplete apiKey="AIzaSyCKX3VD9qQtp6esG1Xe52s3vT1DAm72Wpo" debounce={300}>
-            {({ inputValue, handleTextChange, locationResults, fetchDetails }) => (
-              <React.Fragment>
-                <TextInput
-                  style={{
-                    height: 40,
-                    width: 300,
-                    borderWidth: 1,
-                    paddingHorizontal: 16,
-                  }}
-                  value={inputValue}
-                  onChangeText={handleTextChange}
-                  placeholder="Location..."
-                />
-                <ScrollView style={{ maxHeight: 100 }}>
-                  {locationResults.map((el, i) => {
-                    console.log("The results", el, i)
-                    return (
-                      <Text
-                        {...el}
-                        fetchDetails={fetchDetails}
-                        key={String(i)}
-                      />
-                    )
-                  })}
-                </ScrollView>
-              </React.Fragment>
-            )}
-          </GoogleAutoComplete>
-
-          {/* <Autocomplete
-            placeholder="Search for a location"
-            value={meetupLocation}
-            style={styles.bottomSpace}
-          /> */}
-          {/* <Input
-            style={styles.bottomSpace}
-            placeholder="Address"
-            value={meetupLocation}
-            onChangeText={(text) => setMeetupLocation(text)}
-          /> */}
-          {/* <View>
-            <GooglePlacesAutocomplete
-              placeholder='Search'
-              onPress={(data, details = null) => {
-                // 'details' is provided when fetchDetails = true
-                console.log(data, details);
-              }}
-              query={{
-                key: 'AIzaSyB-ebrCUSbJeoTMpBNoRD-mh1aIei3eK3Y',
-                language: 'en',
-              }}
-              styles={{
-                textInputContainer: {
-                  backgroundColor: "grey"
-                },
-                textInput: {
-                  backgroundColor: "grey"
-                }
-              }}
-            />
-          </View> */}
+          <Button style={styles.bottomSpace} onPress={() => setShowDialog(true)}>
+            Search address
+          </Button>
 
           <Text style={styles.subtitleBox} category="s1">
             Attendants
@@ -289,6 +279,40 @@ export const CreateGroup = (props) => {
           </Button>
         </Layout>
       </ScrollView>
+      <Modal
+        visible={showDialog}
+        backdropStyle={{
+          backgroundColor: "rgba(0, 0, 0, 0.5)"
+        }}
+        onBackdropPress={() => setShowDialog(false)}
+      >
+        <Card
+          style={{
+            minWidth: 300,
+            width: "90%"
+          }}
+        >
+          <View>
+            <Text category="s1">
+              Address autocomplete:
+            </Text>
+            <Input
+              placeholder="Address..."
+              value={addressLookup}
+              onChangeText={(text) => handleAutocomplete(text)}
+              autoCorrect={false}
+            />
+            <List
+              data={addressAutocompleteResult}
+              renderItem={({ item, index }) => {
+                return (
+                  <ListItem title={`${item.description}`} onPress={() => handleSelectAddress(item)} />
+                )
+              }}
+            />
+          </View>
+        </Card>
+      </Modal>
     </>
   );
 };
