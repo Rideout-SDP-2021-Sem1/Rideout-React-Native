@@ -6,6 +6,8 @@ import {
 } from '@ui-kitten/components';
 import { auth } from '../../helper'
 import { serverInstance } from '../../instances'
+import { color } from 'react-native-reanimated';
+import { Colors } from 'react-native/Libraries/NewAppScreen';
 
 const UserProfile = (props) => {
   const licenseList = [
@@ -239,7 +241,8 @@ const UserProfile = (props) => {
           />
           <Button
             style={{
-              backgroundColor: isEditable ? 'blue' : 'green',
+              backgroundColor: isEditable ? '#27afe2' : 'green',
+              borderColor: isEditable ? '#27afe2' : 'green',
               marginHorizontal: 24,
               marginTop: 24,
             }}
@@ -256,7 +259,7 @@ const UserProfile = (props) => {
           >
             {
               isEditable ? "Edit Profile" : "Save Profile"
-            }
+}
           </Button>
 
           <Button
@@ -328,7 +331,7 @@ const themedStyle = StyleService.create({
   container: {
     marginLeft: 10,
     marginRight: 10,
-    backgroundColor: "white"
+    backgroundColor: "#ffff"
   },
   contentContainer: {
     paddingVertical: 24,
@@ -339,6 +342,7 @@ const themedStyle = StyleService.create({
   },
   subtitleBox: {
     marginHorizontal: 10
+    
   },
   Logo: {
     height: 100,

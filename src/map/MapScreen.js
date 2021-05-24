@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { View, Image, Text, StyleSheet, Button } from 'react-native';
+import { View, Image, StyleSheet } from 'react-native';
 import MapView, { Marker, Callout, PROVIDER_GOOGLE } from 'react-native-maps'
 import Geolocation from '@react-native-community/geolocation'
 import { serverInstance } from '../instances'
 import { rideoutMapStyle } from './rideoutMapStyle'
-import moment from 'moment'
+import RiderCallout from './RiderCallout'
+import GroupCallout from './GroupCallout'
 
 //Map style
 const styles = StyleSheet.create({
@@ -40,7 +41,8 @@ const Map = () => {
             longitudeDelta: 0.0242
           })
         },
-        (error) => { console.error("error getMapRegion", error) }
+        (error) => { console.error("error getMapRegion", error) },
+        {enableHighAccuracy: true, timeout: 10000, maximumAge: 0},
       )
     } catch (error) {
       console.error("error getMapRegion", error)
@@ -80,7 +82,8 @@ const Map = () => {
     try {
       Geolocation.getCurrentPosition(
         info => sendMyLocation(info),
-        (error) => console.error("error findCoordinates", error)
+        (error) => console.error("error findCoordinates", error),
+        {enableHighAccuracy: true, timeout: 10000, maximumAge: 0},
       )
     } catch (error) {
       console.error("findCoordinates error", error)
@@ -136,17 +139,17 @@ const Map = () => {
         provider={PROVIDER_GOOGLE}
         style={styles.map}
         customMapStyle={rideoutMapStyle}
-        region={{
+        initialRegion={{
           latitude: currentLocation.latitude,
           longitude: currentLocation.longitude,
           latitudeDelta: currentLocation.latitudeDelta,
           longitudeDelta: currentLocation.longitudeDelta
         }}
-        showsUserLocation={true}
+        showsUserLocation={true} 
         userLocationPriority={'high'}
         userLocationAnnotationTitle={'Me'}
-        followsUserLocation={true}
-        showsMyLocationButton={false}
+        followsUserLocation={false} //IOS ONLY
+        showsMyLocationButton={false} //IOS ONLY (i think)
         showsCompass={true}
         showsTraffic={false}
       >
@@ -167,19 +170,9 @@ const Map = () => {
               resizeMethod="resize"
               resizeMode="contain"
             />
-
             {/*Popup UI when marker is clicked*/}
             <Callout style={{ width: 250, height: 250 }}>
-              <View>
-                <Text style={{ fontSize: 20, fontWeight: 'bold' }}>{currentObj.nickname}</Text>
-                <Text>License Level: {currentObj.license}</Text>
-                <Text>Preferred Pace: {currentObj.pace}</Text>
-                <Text />
-                <Text style={{ fontSize: 15, fontWeight: 'bold' }}>Bike detail: </Text>
-                <Text>{currentObj.year || ""} {currentObj.make} {currentObj.model}</Text>
-                <Text>Engine size: {currentObj.size}cc</Text>
-                <Button title="Request Rideout" />
-              </View>
+              <RiderCallout rider={currentObj} />
             </Callout>
           </Marker>
         })}
@@ -200,22 +193,9 @@ const Map = () => {
               resizeMethod="resize"
               resizeMode="contain"
             />
-
             {/*Popup UI when marker is clicked*/}
             <Callout style={{ width: 250, height: 250 }}>
-              <View>
-                <Text style={{ fontSize: 20, fontWeight: 'bold' }}>{currentObj.title}</Text>
-                <Text style={{ fontSize: 10, color: '#808080' }}>Meetup Date: {moment(currentObj.meetupTime).toString()}</Text>
-                <Text>{currentObj.description}</Text>
-                <Text />
-                <Text style={{ fontSize: 15, fontWeight: 'bold' }}>Meetup Details:</Text>
-                <Text>Minimum License Level: {currentObj.minimumLicenseLevel}</Text>
-                <Text>Preferred Pace: {currentObj.minimumPreferredPace}</Text>
-                <Text>{currentObj.currentAttendant}/{currentObj.maximumAttendant} Riders RSVP'D</Text>
-                <Button title="RSVP a Slot" />
-                <Text style={{ textAlign: 'center', fontSize: 10, color: '#808080' }}>Meetup in:</Text>
-                <Text style={{ textAlign: 'center', fontSize: 15, fontWeight: 'bold' }}>00:00:00</Text>
-              </View>
+              <GroupCallout group={currentObj} />
             </Callout>
           </Marker>
         })}

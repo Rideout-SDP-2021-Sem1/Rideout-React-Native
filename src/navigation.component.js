@@ -11,6 +11,8 @@ import {
   GroupListLayout,
   GroupCreateLayout
 } from './pages'
+import PopUps from './pages/PopUps/PopUps'
+import { set } from 'react-native-reanimated'
 
 const { Navigator, Screen } = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -18,6 +20,7 @@ const Tab = createBottomTabNavigator();
 
 const HomeNavigator = () => {
   const [user, setUser] = useState(null)
+  const [display, setDisplay] = useState(true)
   const [selectedNavigationIndex, setSelectedNavigationIndex] = useState(0)
   const navigationRef = useRef(null)
 
@@ -34,7 +37,12 @@ const HomeNavigator = () => {
 
   return (
     <AuthContext.Provider value={user}>
+      <PopUps
+      display = {display}
+      setDisplay = {setDisplay}
+      />
       <NavigationContext.Provider value={{
+
         index: selectedNavigationIndex,
         setIndex: setSelectedNavigationIndex
       }}>

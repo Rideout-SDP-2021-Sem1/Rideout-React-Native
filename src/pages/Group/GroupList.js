@@ -21,7 +21,11 @@ const GroupList = (props) => {
   const renderItemAccessory = (details) => {
     return (
       <Button
-        size='tiny'
+      size='tiny'
+      style={{
+        backgroundColor: '#27afe2',
+        borderColor: '#27afe2'
+      }}
         onPress={() => {
           setShowModal(true)
           setCurrentEventDetails(details)
@@ -68,14 +72,14 @@ const GroupList = (props) => {
           style={{
             alignItems: "center",
             display: "flex",
-            alignContent: 'center'
+            alignContent: 'center',
           }}
         >
           <Card
             style={{
               alignItems: "center",
               display: "flex",
-              alignContent: 'center'
+              alignContent: 'center',
             }}
           >
             <Text
@@ -106,11 +110,16 @@ const GroupList = (props) => {
           </Card>
         </Layout>
       </Modal>
+      <SafeAreaView>
       <Layout
         level="1"
         style={styles.container}
       >
         <List
+        style = {{
+          height: '100%',
+          backgroundColor: 'white'
+        }}
           data={groupList}
           renderItem={({ item }) => {
             return (
@@ -125,6 +134,7 @@ const GroupList = (props) => {
         />
       </Layout>
       <FAB buttonColor="blue" iconTextColor="#FFFFFF" onClickAction={() => { navigateToCreateGroupPage() }} visible={true} />
+      </SafeAreaView>
     </>
   );
 };
@@ -135,7 +145,7 @@ const themedStyle = StyleService.create({
   container: {
     marginLeft: 10,
     marginRight: 10,
-    backgroundColor: "white"
+    backgroundColor: 'white'
   },
   contentContainer: {
     paddingVertical: 24,
