@@ -101,30 +101,35 @@ const Map = () => {
     }
   }
 
+  // Get list of group location
+  const getGroupLocation = async () => {
+    try {
+      const response = await serverInstance.get("/group")
+      const data = response.data
+      setGroupLocations(data)
+    } catch (err) {
+      console.error("getGroupLocation error", err)
+    }
+  }
+
   useEffect(() => {
+    getMyLocation()
+    getRidersLocation()
+    getGroupLocation()
     const updateMyLocationInterval = setInterval(() => {
       getMyLocation()
-    }, 15000)
+    }, 4000)
     const updateOtherRidersLocationInterval = setInterval(() => {
       getRidersLocation()
+    }, 10000)
+    const updateGroupLocationInterval = setInterval(() => {
+      getGroupLocation()
     }, 10000)
     return () => {
       clearInterval(updateMyLocationInterval)
       clearInterval(updateOtherRidersLocationInterval)
+      clearInterval(updateGroupLocationInterval)
     }
-  }, [])
-
-  useEffect(() => {
-    const getData = async () => {
-      try {
-        const response = await serverInstance.get("/group")
-        const data = response.data
-        setGroupLocations(data)
-      } catch (err) {
-        console.error("failed to get group list", err)
-      }
-    }
-    getData()
   }, [])
 
   //Google map render

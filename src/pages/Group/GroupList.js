@@ -8,14 +8,14 @@ import {
 import { auth } from '../../helper'
 import { serverInstance } from '../../instances'
 import moment from 'moment'
+import FAB from 'react-native-fab'
 
 const GroupList = (props) => {
+  const navigation = props.navigation
   const [showModal, setShowModal] = useState(false)
   const [groupList, setGroupList] = useState([])
   const [currentEventDetails, setCurrentEventDetails] = useState({})
 
-
-  console.log("currentEventDetails", currentEventDetails)
   const styles = useStyleSheet(themedStyle)
 
   const renderItemAccessory = (details) => {
@@ -45,6 +45,7 @@ const GroupList = (props) => {
       try {
         const response = await serverInstance.get("/group")
         const data = response.data
+
         setGroupList(data)
       } catch (err) {
         console.error("failed to get group list", err)
@@ -52,6 +53,10 @@ const GroupList = (props) => {
     }
     getData()
   }, [])
+
+  const navigateToCreateGroupPage = () => {
+    navigation && navigation.navigate("CreateEvent")
+  }
 
   return (
     <>
@@ -128,6 +133,7 @@ const GroupList = (props) => {
           }}
         />
       </Layout>
+      <FAB buttonColor="blue" iconTextColor="#FFFFFF" onClickAction={() => { navigateToCreateGroupPage() }} visible={true} />
       </SafeAreaView>
     </>
   );
