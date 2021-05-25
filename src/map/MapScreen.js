@@ -28,21 +28,25 @@ const Map = () => {
     longitudeDelta: 0.0242,
   });
 
-  const [sharingLocation, setSharing] = useState(false)
+  const [sharingLocation, setSharing] = useState(false);
 
-  const [sharingTitle, setSharingTitle] = useState("Go Online")
-  const [sharingStyle, setSharingStyle] = useState({buttonColor: 'blue'})
+  const [sharingTitle, setSharingTitle] = useState("Go Online");
+  const [sharingStyle, setSharingStyle] = useState({ buttonColor: "blue" });
 
   const changeSharingStatus = () => {
     if (sharingLocation) {
-      setSharingTitle("Go Online")
-      setSharingStyle({buttonColor: 'blue'})
+      setSharingTitle("Go Online");
+      setSharingStyle({ buttonColor: "blue" });
     } else {
-      setSharingTitle("Go Offline")
-      setSharingStyle({buttonColor: 'grey'})
+      setSharingTitle("Go Offline");
+      setSharingStyle({ buttonColor: "grey" });
     }
-    setSharing(!sharingLocation)
-  }
+    setSharing((sharingLocation) => !sharingLocation);
+  };
+
+  useEffect(() => {
+    console.log("sharingLocation: " + sharingLocation);
+  }, [sharingLocation]);
 
   //Get the map region where the user is at
   const getMapRegion = () => {
@@ -80,15 +84,15 @@ const Map = () => {
     try {
       const lat = location?.coords?.latitude;
       const lng = location?.coords?.longitude;
-      if (sharingLocation == false || lat === undefined || lng === undefined || lat === "" || lng === "") {
-        console.log("Not sending location. Sharing location setting: " + sharingLocation) //Boolean doesn't update in sendMyLocation function
+      if (lat === undefined || lng === undefined || lat === "" || lng === "") {
+        console.log("sendMyLocation refused to send.");
       } else {
         await serverInstance.post("/location", {
           latitude: lat,
           longitude: lng,
           hidden: false,
         });
-        console.log("Sent location")
+        console.log("sendMyLocation sent location.");
       }
     } catch (err) {
       console.error("sendMyLocation err", err);
@@ -98,6 +102,7 @@ const Map = () => {
   //Function to get the current location of the user
   const getMyLocation = () => {
     try {
+      console.log("getMyLocation getting current position.");
       Geolocation.getCurrentPosition(
         (info) => sendMyLocation(info),
         (error) => console.error("error findCoordinates", error),
@@ -121,7 +126,7 @@ const Map = () => {
 
   useEffect(() => {
     const updateMyLocationInterval = setInterval(() => {
-      getMyLocation();
+        getMyLocation();
     }, 15000);
     const updateOtherRidersLocationInterval = setInterval(() => {
       getRidersLocation();
@@ -225,7 +230,11 @@ const Map = () => {
           alignSelf: "center",
         }}
       >
-        <Button title={sharingTitle} onPress={changeSharingStatus} style={sharingStyle}/>
+        <Button
+          title={sharingTitle}
+          onPress={changeSharingStatus}
+          style={sharingStyle}
+        />
       </View>
     </View>
   );
