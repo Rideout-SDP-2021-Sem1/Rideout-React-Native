@@ -17,6 +17,11 @@ const styles = StyleSheet.create({
   map: {
     ...StyleSheet.absoluteFillObject,
   },
+  riderCallout: {
+    height: 180,
+    width: 250,
+    backgroundColor: 'white',
+  }
 });
 
 const Map = () => {
@@ -31,15 +36,15 @@ const Map = () => {
   const [sharingLocation, setSharing] = useState(false);
 
   const [sharingTitle, setSharingTitle] = useState("Go Online");
-  const [sharingStyle, setSharingStyle] = useState({ buttonColor: "blue" });
+  const [sharingStyle, setSharingStyle] = useState("#27afe2");
 
   const changeSharingStatus = () => {
     if (sharingLocation) {
       setSharingTitle("Go Online");
-      setSharingStyle({ buttonColor: "blue" });
+      setSharingStyle("#27afe2");
     } else {
       setSharingTitle("Go Offline");
-      setSharingStyle({ buttonColor: "grey" });
+      setSharingStyle("#4dd14d");
     }
     setSharing((sharingLocation) => !sharingLocation);
   };
@@ -102,7 +107,6 @@ const Map = () => {
   //Function to get the current location of the user
   const getMyLocation = () => {
     try {
-      console.log("getMyLocation getting current position.");
       Geolocation.getCurrentPosition(
         (info) => sendMyLocation(info),
         (error) => console.error("error findCoordinates", error),
@@ -181,6 +185,7 @@ const Map = () => {
                 longitude: parseFloat(currentObj.longitude) || 0,
               }}
               title={currentObj.nickname}
+              calloutAnchor={{x: 0.5, y: -0.1}}
             >
               {/*Render the marker as the custom image*/}
               <Image
@@ -190,7 +195,7 @@ const Map = () => {
                 resizeMode="contain"
               />
               {/*Popup UI when marker is clicked*/}
-              <Callout style={{ width: 250, height: 250 }}>
+              <Callout tooltip={true} style={styles.riderCallout}>
                 <RiderCallout rider={currentObj} />
               </Callout>
             </Marker>
@@ -233,7 +238,7 @@ const Map = () => {
         <Button
           title={sharingTitle}
           onPress={changeSharingStatus}
-          style={sharingStyle}
+          color={sharingStyle}
         />
       </View>
     </View>
