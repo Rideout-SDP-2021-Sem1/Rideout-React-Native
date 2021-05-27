@@ -35,6 +35,26 @@ const Map = () => {
     longitudeDelta: 0.0242,
   });
 
+  const [sharingLocation, setSharingStatus] = useState(false);
+
+  const [SharingTitle, setSharingTitle] = useState("Go Online");
+  const [sharingStyle, setSharingStyle] = useState("#27afe2");
+
+  const changeSharingStatus = () => {
+    if (sharingLocation) {
+      setSharingTitle("Go Online");
+      setSharingStyle("#27afe2");
+    } else {
+      setSharingTitle("Go OFfline");
+      setSharingStyle("#4dd14d");
+    }
+    setSharingStatus((sharingLocation) => !sharingLocation);
+  };
+
+  useEffect(() => {
+    console.log("Log: state sharingLocation: " + sharingLocation);
+  }, [sharingLocation]);
+
   const [followUser, setFollowUser] = useState(true);
 
   const [followTitle, setFollowTitle] = useState(
@@ -157,7 +177,7 @@ const Map = () => {
     getData();
   }, []);
 
-  function userLocationChanged(event) {
+  const userLocationChanged = (event) => {
     if (followUser) {
       setRegion({
         latitude: event.nativeEvent.coordinate.latitude,
@@ -166,11 +186,11 @@ const Map = () => {
         longitudeDelta: region.longitudeDelta,
       });
 
-      animateToRegion();
+      animateToRegion;
     }
   }
 
-  function animateToRegion() {
+  const animateToRegion = () => {
     if (mapRef.current) {
       mapRef.current.animateToRegion(
         {
@@ -184,7 +204,7 @@ const Map = () => {
     }
   }
 
-  function regionChanged(event) {
+  const regionChanged = (event)  => {
     setRegion({
       latitude: event.latitude,
       longitude: event.longitude,
@@ -192,6 +212,10 @@ const Map = () => {
       longitudeDelta: event.longitudeDelta,
     });
   }
+
+  const requestRide = (userid) => {
+    //request
+  } 
 
   //Google map render
   return (
@@ -228,6 +252,7 @@ const Map = () => {
               }}
               title={currentObj.nickname}
               calloutAnchor={{ x: 0.5, y: -0.1 }}
+              onCalloutPress={requestRide(currentObj.userId)}
             >
               {/*Render the marker as the custom image*/}
               <Image
@@ -277,6 +302,11 @@ const Map = () => {
           alignSelf: "center",
         }}
       >
+        <Button
+          title={SharingTitle}
+          onPress={changeSharingStatus}
+          color={sharingStyle}
+        />
         <Button
           title={followTitle}
           onPress={changeFollowStatus}
