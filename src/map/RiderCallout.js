@@ -26,13 +26,13 @@ const styles = StyleSheet.create({
   request: {
     backgroundColor: "#27afe2",
     color: "white",
-    fontSize: 25,
+    fontSize: 20,
     fontWeight: "bold",
     width: "100%",
     height: "100%",
     textAlign: "center",
     textAlignVertical: "top",
-    paddingTop: 13,
+    paddingTop: 15,
   },
 });
 
