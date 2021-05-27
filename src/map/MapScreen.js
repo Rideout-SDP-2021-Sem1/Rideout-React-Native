@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react";
-import { View, Button, Image, StyleSheet, EventEmitter } from "react-native";
+import React, { useEffect, useState, useRef } from "react";
+import { View, Button, Image, StyleSheet } from "react-native";
 import MapView, { Marker, Callout, PROVIDER_GOOGLE } from "react-native-maps";
 import Geolocation from "@react-native-community/geolocation";
 import { serverInstance } from "../instances";
@@ -25,6 +25,8 @@ const styles = StyleSheet.create({
 });
 
 const Map = () => {
+  const mapRef = useRef(null);
+
   //Map region of the user's location
   const [region, setRegion] = useState({
     latitude: -36.82967,
@@ -169,8 +171,8 @@ const Map = () => {
   }
 
   function animateToRegion() {
-    if (this.map) {
-      this.map.animateToRegion(
+    if (mapRef.current) {
+      mapRef.current.animateToRegion(
         {
           latitude: region.latitude,
           longitude: region.longitude,
@@ -195,7 +197,7 @@ const Map = () => {
   return (
     <View style={styles.container}>
       <MapView
-        ref={(ref) => (this.map = ref)}
+        ref={mapRef}
         provider={PROVIDER_GOOGLE}
         style={styles.map}
         customMapStyle={rideoutMapStyle}
