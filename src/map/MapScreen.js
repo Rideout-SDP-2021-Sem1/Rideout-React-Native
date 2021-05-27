@@ -132,11 +132,11 @@ const Map = () => {
     try {
       Geolocation.getCurrentPosition(
         (info) => sendMyLocation(info),
-        (error) => console.error("error findCoordinates", error),
+        (error) => console.error("ERROR: findCoordinates geolocation could not get location. ", error),
         { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
       );
     } catch (error) {
-      console.error("findCoordinates error", error);
+      console.error("ERROR: findCoordinates could not get location. ", error);
     }
   };
 
@@ -147,7 +147,7 @@ const Map = () => {
       const data = response.data;
       setRiderLocations(data);
     } catch (err) {
-      console.error("getRidersLocation error", err);
+      console.error("ERROR: getRidersLocation could not get riders from server. ", err);
     }
   };
 
@@ -171,7 +171,7 @@ const Map = () => {
         const data = response.data;
         setGroupLocations(data);
       } catch (err) {
-        console.error("failed to get group list", err);
+        console.error("ERROR: getData could not get groups from server. ", err);
       }
     };
     getData();
@@ -185,7 +185,6 @@ const Map = () => {
         latitudeDelta: region.latitudeDelta,
         longitudeDelta: region.longitudeDelta,
       });
-
       animateToRegion;
     }
   }
