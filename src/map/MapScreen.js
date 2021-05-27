@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { View, Button, Image, StyleSheet } from "react-native";
+import { View, Button, Image, StyleSheet, EventEmitter } from "react-native";
 import MapView, { Marker, Callout, PROVIDER_GOOGLE } from "react-native-maps";
 import Geolocation from "@react-native-community/geolocation";
 import { serverInstance } from "../instances";
@@ -20,65 +20,63 @@ const styles = StyleSheet.create({
   riderCallout: {
     height: 180,
     width: 250,
-    backgroundColor: 'white',
-  }
+    backgroundColor: "white",
+  },
 });
 
 const Map = () => {
   //Map region of the user's location
-  const [currentLocation, setCurrentLocation] = useState({
+  const [region, setRegion] = useState({
     latitude: -36.82967,
     longitude: 174.7449,
     latitudeDelta: 0.03,
     longitudeDelta: 0.0242,
   });
 
-  const [sharingLocation, setSharing] = useState(false);
+  const [followUser, setFollowUser] = useState(true);
 
-  const [sharingTitle, setSharingTitle] = useState("Go Online");
-  const [sharingStyle, setSharingStyle] = useState("#27afe2");
+  const [followTitle, setFollowTitle] = useState(
+    "Stop Following My Location"
+  );
+  const [followStyle, setFollowStyle] = useState("#4dd14d");
 
-  const changeSharingStatus = () => {
-    if (sharingLocation) {
-      setSharingTitle("Go Online");
-      setSharingStyle("#27afe2");
+  const changeFollowStatus = () => {
+    if (followUser) {
+      setFollowTitle("Follow My Location");
+      setFollowStyle("#27afe2");
     } else {
-      setSharingTitle("Go Offline");
-      setSharingStyle("#4dd14d");
+      setFollowTitle("Stop Following");
+      setFollowStyle("#4dd14d");
     }
-    setSharing((sharingLocation) => !sharingLocation);
+    setFollowUser((followUser) => !followUser);
   };
 
   useEffect(() => {
-    console.log("sharingLocation: " + sharingLocation);
-  }, [sharingLocation]);
+    console.log("Log: state followUser: " + followUser);
+  }, [followUser]);
 
   //Get the map region where the user is at
-  const getMapRegion = () => {
+  const getUserRegion = () => {
     try {
       Geolocation.getCurrentPosition(
         (position) => {
           setCurrentLocation({
             latitude: position.coords.latitude,
             longitude: position.coords.longitude,
-            latitudeDelta: 0.03,
-            longitudeDelta: 0.0242,
           });
         },
         (error) => {
-          console.error("error getMapRegion", error);
+          console.error(
+            "ERROR: Could not get user region using geolocation. ",
+            error
+          );
         },
         { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
       );
     } catch (error) {
-      console.error("error getMapRegion", error);
+      console.error("ERROR: could not get user region. ", error);
     }
   };
-
-  //Center the map on the user when app is launched
-  useEffect(() => {
-    getMapRegion();
-  }, []);
 
   // Setup state variables for this component
   const [riderLocations, setRiderLocations] = useState([]);
@@ -90,17 +88,20 @@ const Map = () => {
       const lat = location?.coords?.latitude;
       const lng = location?.coords?.longitude;
       if (lat === undefined || lng === undefined || lat === "" || lng === "") {
-        console.log("sendMyLocation refused to send.");
+        console.log("Log: sendMyLocation refused to send location to server. ");
       } else {
         await serverInstance.post("/location", {
           latitude: lat,
           longitude: lng,
           hidden: false,
         });
-        console.log("sendMyLocation sent location.");
+        console.log("Log: sendMyLocation sent location to server. ");
       }
     } catch (err) {
-      console.error("sendMyLocation err", err);
+      console.error(
+        "ERROR: sendMyLocation could not send user location to server. ",
+        err
+      );
     }
   };
 
@@ -130,7 +131,7 @@ const Map = () => {
 
   useEffect(() => {
     const updateMyLocationInterval = setInterval(() => {
-        getMyLocation();
+      getMyLocation();
     }, 15000);
     const updateOtherRidersLocationInterval = setInterval(() => {
       getRidersLocation();
@@ -154,26 +155,65 @@ const Map = () => {
     getData();
   }, []);
 
+  function userLocationChanged(event) {
+    if (followUser) {
+      setRegion({
+        latitude: event.nativeEvent.coordinate.latitude,
+        longitude: event.nativeEvent.coordinate.longitude,
+        latitudeDelta: region.latitudeDelta,
+        longitudeDelta: region.longitudeDelta,
+      });
+
+      animateToRegion();
+    }
+  }
+
+  function animateToRegion() {
+    if (this.map) {
+      this.map.animateToRegion(
+        {
+          latitude: region.latitude,
+          longitude: region.longitude,
+          latitudeDelta: region.latitudeDelta,
+          longitudeDelta: region.longitudeDelta,
+        },
+        1000
+      );
+    }
+  }
+
+  function regionChanged(event) {
+    setRegion({
+      latitude: event.latitude,
+      longitude: event.longitude,
+      latitudeDelta: event.latitudeDelta,
+      longitudeDelta: event.longitudeDelta,
+    });
+  }
+
   //Google map render
   return (
     <View style={styles.container}>
       <MapView
+        ref={(ref) => (this.map = ref)}
         provider={PROVIDER_GOOGLE}
         style={styles.map}
         customMapStyle={rideoutMapStyle}
-        initialRegion={{
-          latitude: currentLocation.latitude,
-          longitude: currentLocation.longitude,
-          latitudeDelta: currentLocation.latitudeDelta,
-          longitudeDelta: currentLocation.longitudeDelta,
-        }}
-        showsUserLocation={true}
+        initialRegion={region} //Change this to a function to get current location?
+        followsUserLocation={followUser} //IOS ONLY
+        onUserLocationChange={(event) =>
+          followUser && userLocationChanged(event)
+        } //not sure about `followUser &&`
+        onRegionChangeCompleted={(event) => regionChanged(event)}
         userLocationPriority={"high"}
         userLocationAnnotationTitle={"Me"}
-        followsUserLocation={false} //IOS ONLY
-        showsMyLocationButton={false} //IOS ONLY (i think)
+        showsUserLocation={true}
+        showsMyLocationButton={false} //IOS ONLY
         showsCompass={true}
         showsTraffic={false}
+        loadingEnabled={true}
+        loadingIndicatorColor={"#27afe2"}
+        loadingBackgroundColor={"#dedede"}
       >
         {/*Render the users' location on the map as markers*/}
         {riderLocations.map((currentObj) => {
@@ -185,7 +225,7 @@ const Map = () => {
                 longitude: parseFloat(currentObj.longitude) || 0,
               }}
               title={currentObj.nickname}
-              calloutAnchor={{x: 0.5, y: -0.1}}
+              calloutAnchor={{ x: 0.5, y: -0.1 }}
             >
               {/*Render the marker as the custom image*/}
               <Image
@@ -236,9 +276,9 @@ const Map = () => {
         }}
       >
         <Button
-          title={sharingTitle}
-          onPress={changeSharingStatus}
-          color={sharingStyle}
+          title={followTitle}
+          onPress={changeFollowStatus}
+          color={followStyle}
         />
       </View>
     </View>
