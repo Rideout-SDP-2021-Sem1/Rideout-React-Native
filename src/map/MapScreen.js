@@ -57,9 +57,7 @@ const Map = () => {
 
   const [followUser, setFollowUser] = useState(true);
 
-  const [followTitle, setFollowTitle] = useState(
-    "Stop Following My Location"
-  );
+  const [followTitle, setFollowTitle] = useState("Stop Following My Location");
   const [followStyle, setFollowStyle] = useState("#4dd14d");
 
   const changeFollowStatus = () => {
@@ -132,7 +130,11 @@ const Map = () => {
     try {
       Geolocation.getCurrentPosition(
         (info) => sendMyLocation(info),
-        (error) => console.error("ERROR: findCoordinates geolocation could not get location. ", error),
+        (error) =>
+          console.error(
+            "ERROR: findCoordinates geolocation could not get location. ",
+            error
+          ),
         { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
       );
     } catch (error) {
@@ -147,7 +149,10 @@ const Map = () => {
       const data = response.data;
       setRiderLocations(data);
     } catch (err) {
-      console.error("ERROR: getRidersLocation could not get riders from server. ", err);
+      console.error(
+        "ERROR: getRidersLocation could not get riders from server. ",
+        err
+      );
     }
   };
 
@@ -177,18 +182,6 @@ const Map = () => {
     getData();
   }, []);
 
-  const userLocationChanged = (event) => {
-    if (followUser) {
-      setRegion({
-        latitude: event.nativeEvent.coordinate.latitude,
-        longitude: event.nativeEvent.coordinate.longitude,
-        latitudeDelta: region.latitudeDelta,
-        longitudeDelta: region.longitudeDelta,
-      });
-      animateToRegion;
-    }
-  }
-
   const animateToRegion = () => {
     if (mapRef.current) {
       mapRef.current.animateToRegion(
@@ -201,20 +194,35 @@ const Map = () => {
         1000
       );
     }
-  }
+  };
 
-  const regionChanged = (event)  => {
+  const userLocationChanged = (event) => {
+    console.log("userLocationChanged");
+    if (followUser) {
+      console.log("followUser true");
+      setRegion({
+        latitude: event.nativeEvent.coordinate.latitude,
+        longitude: event.nativeEvent.coordinate.longitude,
+        latitudeDelta: region.latitudeDelta,
+        longitudeDelta: region.longitudeDelta,
+      });
+      animateToRegion();
+    }
+  };
+
+  const regionChanged = (event) => {
+    console.log("regionChanged");
     setRegion({
       latitude: event.latitude,
       longitude: event.longitude,
       latitudeDelta: event.latitudeDelta,
       longitudeDelta: event.longitudeDelta,
     });
-  }
+  };
 
   const requestRide = (userid) => {
     //request
-  } 
+  };
 
   //Google map render
   return (

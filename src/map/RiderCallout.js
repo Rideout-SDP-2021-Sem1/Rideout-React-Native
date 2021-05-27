@@ -45,9 +45,8 @@ const RiderCallout = (props) => {
         <Text>Pace: {" " + props.rider.pace}</Text>
         <Text style={styles.bikeDetailTitle}>Bike detail: </Text>
         <Text>
-          {props.rider.year + " " || ""}
-          {props.rider.make + " " || ""}
-          {props.rider.model + " " || ""}
+          {props?.rider?.make ? String(props?.rider?.make).trim() + " " : ""}
+          {props?.rider?.model ? String(props?.rider?.model).trim() + " " : ""}
         </Text>
       </View>
       <Text style={styles.request}>REQUEST RIDEOUT</Text>
