@@ -30,29 +30,30 @@ const Map = () => {
   var RNFS = require("react-native-fs");
   const path = RNFS.DocumentDirectoryPath + "/locationHistory.txt";
 
-  useEffect(() => {
-    //RNFS.readFile(path).then((result) => {
-    //  console.log("Result: ", result);
-    //});
-
+  const checkHistoryFile = () => {
     RNFS.exists(path)
       .then((success) => {
         if (!success) {
-          RNFS.writeFile(path, "-location hisotry file-", "utf8")
+          RNFS.writeFile(path, "", "utf8")
             .then((success) => {
-              console.log("Log: new history file created. ");
+              console.log("New history file created. ");
             })
             .catch((err) => {
-              console.log("ERROR: " + err.message);
+              console.error("checkHistory1: " + err.message);
             });
         }
       })
       .catch((err) => {
-        console.log("ERROR: " + err.message, err.code);
+        console.error("checkHistory2: " + err.message);
       });
+  };
+
+  useEffect(() => {
+    checkHistoryFile();
   }, []);
 
   const recordLocation = (latitude, longitude) => {
+    checkHistoryFile();
     const content =
       '{"timestamp":"' +
       new Date().getTime() +
@@ -63,11 +64,43 @@ const Map = () => {
       '"}, ';
     RNFS.appendFile(path, content, "utf8")
       .then((success) => {
-        console.log("Log: user location recorded locally. ");
+        console.log("User location recorded locally. ");
       })
       .catch((err) => {
-        console.log("ERROR: " + err.message);
+        console.error("recordLocation: " + err.message);
       });
+  };
+
+  const exportHistory = () => {
+    checkHistoryFile();
+    const exportPath = RNFS.DownloadDirectoryPath + "/locationHistory.txt";
+    RNFS.copyFile(path, exportPath)
+      .then((success) => {
+        console.log("Exported history log to downloads directory. ");
+      })
+      .catch((err) => {
+        console.error("exportHistory: " + err.message);
+      });
+  };
+
+  const clearHistory = () => {
+    checkHistoryFile();
+    RNFS.unlink(path)
+      .then((success) => {
+        console.log("Cleared location history. ");
+      })
+      .catch((err) => {
+        console.error("clearHistory: " + err.message);
+      });
+  };
+
+  const printHistoryConsole = () => {
+    checkHistoryFile();
+    RNFS.readFile(path).then((result) => {
+      console.info("Location History: ", result);
+    }).catch((err) => {
+      console.error("printHistory: " + err.message)
+    });
   };
 
   //Map region of the user's location
@@ -218,13 +251,13 @@ const Map = () => {
   };
 
   const userLocationChanged = (event) => {
-      setRegion({
-        latitude: event.nativeEvent.coordinate.latitude,
-        longitude: event.nativeEvent.coordinate.longitude,
-        latitudeDelta: region.latitudeDelta,
-        longitudeDelta: region.longitudeDelta,
-      });
-      animateToRegion();
+    setRegion({
+      latitude: event.nativeEvent.coordinate.latitude,
+      longitude: event.nativeEvent.coordinate.longitude,
+      latitudeDelta: region.latitudeDelta,
+      longitudeDelta: region.longitudeDelta,
+    });
+    animateToRegion();
   };
 
   const requestRide = (userid) => {
@@ -241,7 +274,9 @@ const Map = () => {
         customMapStyle={rideoutMapStyle}
         initialRegion={region} //Change this to a function to get current location?
         followsUserLocation={followUser} //IOS ONLY
-        onUserLocationChange={(event) => followUser && userLocationChanged(event)} //not sure about `followUser &&`
+        onUserLocationChange={(event) =>
+          followUser && userLocationChanged(event)
+        } //not sure about `followUser &&`
         userLocationPriority={"high"}
         userLocationAnnotationTitle={"Me"}
         showsUserLocation={true}
@@ -322,6 +357,25 @@ const Map = () => {
           title={followTitle}
           onPress={changeFollowStatus}
           color={followStyle}
+        />
+      </View>
+      <View
+        style={{
+          position: "absolute",
+          bottom: "5%",
+          alignSelf: "center",
+        }}
+      >
+        <Button
+          title="Export History"
+          onPress={exportHistory}
+          color="#27afe2"
+        />
+        <Button title="Clear History" onPress={clearHistory} color="#c71432" />
+        <Button
+          title="DEBUG: Print History"
+          onPress={printHistoryConsole}
+          color="#27afe2"
         />
       </View>
     </View>
