@@ -27,6 +27,49 @@ const styles = StyleSheet.create({
 const Map = () => {
   const mapRef = useRef(null);
 
+  var RNFS = require("react-native-fs");
+  const path = RNFS.DocumentDirectoryPath + "/locationHistory.txt";
+
+  useEffect(() => {
+    //RNFS.readFile(path).then((result) => {
+    //  console.log("Result: ", result);
+    //});
+
+    RNFS.exists(path)
+      .then((success) => {
+        if (!success) {
+          RNFS.writeFile(path, "-location hisotry file-", "utf8")
+            .then((success) => {
+              console.log("Log: new history file created. ");
+            })
+            .catch((err) => {
+              console.log("ERROR: " + err.message);
+            });
+        }
+      })
+      .catch((err) => {
+        console.log("ERROR: " + err.message, err.code);
+      });
+  }, []);
+
+  const recordLocation = (latitude, longitude) => {
+    const content =
+      '{"timestamp":"' +
+      new Date().getTime() +
+      '", "latitude":"' +
+      latitude +
+      '", "longitude":"' +
+      longitude +
+      '"}, ';
+    RNFS.appendFile(path, content, "utf8")
+      .then((success) => {
+        console.log("Log: user location recorded locally. ");
+      })
+      .catch((err) => {
+        console.log("ERROR: " + err.message);
+      });
+  };
+
   //Map region of the user's location
   const [region, setRegion] = useState({
     latitude: -36.82967,
@@ -123,6 +166,7 @@ const Map = () => {
         err
       );
     }
+    recordLocation(location.coords.latitude, location.coords.longitude);
   };
 
   //Function to get the current location of the user
@@ -197,9 +241,7 @@ const Map = () => {
   };
 
   const userLocationChanged = (event) => {
-    console.log("userLocationChanged");
     if (followUser) {
-      console.log("followUser true");
       setRegion({
         latitude: event.nativeEvent.coordinate.latitude,
         longitude: event.nativeEvent.coordinate.longitude,
@@ -211,7 +253,6 @@ const Map = () => {
   };
 
   const regionChanged = (event) => {
-    console.log("regionChanged");
     setRegion({
       latitude: event.latitude,
       longitude: event.longitude,

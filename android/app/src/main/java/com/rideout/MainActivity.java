@@ -12,12 +12,4 @@ public class MainActivity extends ReactActivity {
   protected String getMainComponentName() {
     return "rideout";
   }
-
-  @Override
-    protected List<ReactPackage> getPackages() {
-      return Arrays.<ReactPackage>asList(
-        new MainReactPackage(),
-        new RNFSPackage()
-      );
-    }
 }
