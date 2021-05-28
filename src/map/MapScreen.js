@@ -88,7 +88,7 @@ const Map = () => {
       setSharingTitle("Go Online");
       setSharingStyle("#27afe2");
     } else {
-      setSharingTitle("Go OFfline");
+      setSharingTitle("Go Offline");
       setSharingStyle("#4dd14d");
     }
     setSharingStatus((sharingLocation) => !sharingLocation);
@@ -117,29 +117,6 @@ const Map = () => {
   useEffect(() => {
     console.log("Log: state followUser: " + followUser);
   }, [followUser]);
-
-  //Get the map region where the user is at
-  const getUserRegion = () => {
-    try {
-      Geolocation.getCurrentPosition(
-        (position) => {
-          setCurrentLocation({
-            latitude: position.coords.latitude,
-            longitude: position.coords.longitude,
-          });
-        },
-        (error) => {
-          console.error(
-            "ERROR: Could not get user region using geolocation. ",
-            error
-          );
-        },
-        { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
-      );
-    } catch (error) {
-      console.error("ERROR: could not get user region. ", error);
-    }
-  };
 
   // Setup state variables for this component
   const [riderLocations, setRiderLocations] = useState([]);
@@ -241,7 +218,6 @@ const Map = () => {
   };
 
   const userLocationChanged = (event) => {
-    if (followUser) {
       setRegion({
         latitude: event.nativeEvent.coordinate.latitude,
         longitude: event.nativeEvent.coordinate.longitude,
@@ -249,16 +225,6 @@ const Map = () => {
         longitudeDelta: region.longitudeDelta,
       });
       animateToRegion();
-    }
-  };
-
-  const regionChanged = (event) => {
-    setRegion({
-      latitude: event.latitude,
-      longitude: event.longitude,
-      latitudeDelta: event.latitudeDelta,
-      longitudeDelta: event.longitudeDelta,
-    });
   };
 
   const requestRide = (userid) => {
@@ -275,10 +241,7 @@ const Map = () => {
         customMapStyle={rideoutMapStyle}
         initialRegion={region} //Change this to a function to get current location?
         followsUserLocation={followUser} //IOS ONLY
-        onUserLocationChange={(event) =>
-          followUser && userLocationChanged(event)
-        } //not sure about `followUser &&`
-        onRegionChangeCompleted={(event) => regionChanged(event)}
+        onUserLocationChange={(event) => followUser && userLocationChanged(event)} //not sure about `followUser &&`
         userLocationPriority={"high"}
         userLocationAnnotationTitle={"Me"}
         showsUserLocation={true}
