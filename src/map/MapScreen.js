@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from "react";
-import { View, Button, Image, StyleSheet } from "react-native";
+import { View, Button, Image, StyleSheet, Linking } from "react-native";
 import MapView, { Marker, Callout, PROVIDER_GOOGLE } from "react-native-maps";
 import Geolocation from "@react-native-community/geolocation";
 import { serverInstance } from "../instances";
@@ -260,6 +260,10 @@ const Map = () => {
     animateToRegion();
   };
 
+  const callEmergency = () => {
+    Linking.openURL(`tel:${111}`)
+  }
+
   const requestRide = (userid) => {
     //request
   };
@@ -363,7 +367,7 @@ const Map = () => {
         style={{
           position: "absolute",
           bottom: "5%",
-          alignSelf: "center",
+          alignSelf: "flex-start",
         }}
       >
         <Button
@@ -376,6 +380,19 @@ const Map = () => {
           title="DEBUG: Print History"
           onPress={printHistoryConsole}
           color="#27afe2"
+        />
+      </View>
+      <View
+        style={{
+          position: "absolute",
+          bottom: "5%",
+          alignSelf: "flex-end",
+        }}
+      >
+        <Button
+          title="EMERGENCY"
+          onPress={callEmergency}
+          color="#c71432"
         />
       </View>
     </View>
