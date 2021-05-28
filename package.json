@@ -31,6 +31,7 @@
     "react-native": "0.64.0",
     "react-native-dotenv": "^2.5.5",
     "react-native-encrypted-storage": "^4.0.2",
+    "react-native-fs": "^2.18.0",
     "react-native-gesture-handler": "^1.10.3",
     "react-native-image-overlay": "^0.1.2",
     "react-native-maps": "0.28.0",
