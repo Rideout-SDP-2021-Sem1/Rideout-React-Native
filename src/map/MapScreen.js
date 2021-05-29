@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from "react";
-import { View, Button, Image, StyleSheet, Linking } from "react-native";
+import { View, Button, Image, StyleSheet, Linking, Text } from "react-native";
 import MapView, { Marker, Callout, PROVIDER_GOOGLE } from "react-native-maps";
 import Geolocation from "@react-native-community/geolocation";
 import { serverInstance } from "../instances";
@@ -26,6 +26,31 @@ const styles = StyleSheet.create({
 
 const Map = () => {
   const mapRef = useRef(null);
+
+  const [forecast, setForecast] = useState("Updating Forcast...");
+
+  const updateForecast = () => {
+    console.log("Getting forecast from API. ");
+    var formattedLat = Math.trunc(region.latitude);
+    var formattedLong = Math.trunc(region.longitude);
+    const url =
+      "https://api.openweathermap.org/data/2.5/weather?lat=" +
+      formattedLat +
+      "&lon=" +
+      formattedLong +
+      "&appid=5d9c4214bba669bd9a39192ab06885f2";
+
+    fetch(url)
+      .then((result) => result.json())
+      .then((data) => {
+        setForecast(data.weather[0].main)
+        console.log("Successfully recieved forecast from API. ");
+        console.info("Forecast retrieved: "+data.weather[0].main)
+      })
+      .catch((error) => {
+        console.error("WeatherAPI Fetch: " + error.message);
+      });
+  };
 
   var RNFS = require("react-native-fs");
   const path = RNFS.DocumentDirectoryPath + "/locationHistory.txt";
@@ -92,15 +117,18 @@ const Map = () => {
       .catch((err) => {
         console.error("clearHistory: " + err.message);
       });
+    checkHistoryFile();
   };
 
   const printHistoryConsole = () => {
     checkHistoryFile();
-    RNFS.readFile(path).then((result) => {
-      console.info("Location History: ", result);
-    }).catch((err) => {
-      console.error("printHistory: " + err.message)
-    });
+    RNFS.readFile(path)
+      .then((result) => {
+        console.info("Location History: ", result);
+      })
+      .catch((err) => {
+        console.error("printHistory: " + err.message);
+      });
   };
 
   //Map region of the user's location
@@ -217,10 +245,18 @@ const Map = () => {
     const updateOtherRidersLocationInterval = setInterval(() => {
       getRidersLocation();
     }, 10000);
+    const updateForecastDisplayInterval = setInterval(() => {
+      updateForecast();
+    }, 60000);
     return () => {
       clearInterval(updateMyLocationInterval);
       clearInterval(updateOtherRidersLocationInterval);
+      clearInterval(updateForecastDisplayInterval);
     };
+  }, []);
+
+  useEffect(() => {
+    updateForecast();
   }, []);
 
   useEffect(() => {
@@ -261,8 +297,8 @@ const Map = () => {
   };
 
   const callEmergency = () => {
-    Linking.openURL(`tel:${111}`)
-  }
+    Linking.openURL(`tel:${111}`);
+  };
 
   const requestRide = (userid) => {
     //request
@@ -352,6 +388,7 @@ const Map = () => {
           alignSelf: "center",
         }}
       >
+        <Text>{forecast}</Text>
         <Button
           title={SharingTitle}
           onPress={changeSharingStatus}
@@ -389,11 +426,7 @@ const Map = () => {
           alignSelf: "flex-end",
         }}
       >
-        <Button
-          title="EMERGENCY"
-          onPress={callEmergency}
-          color="#c71432"
-        />
+        <Button title="EMERGENCY" onPress={callEmergency} color="#c71432" />
       </View>
     </View>
   );
