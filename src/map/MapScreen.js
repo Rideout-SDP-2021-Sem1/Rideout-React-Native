@@ -1,11 +1,17 @@
 import React, { useEffect, useState, useRef } from "react";
 import { View, Button, Image, StyleSheet, Linking, Text } from "react-native";
-import MapView, { Marker, Callout, PROVIDER_GOOGLE } from "react-native-maps";
+import MapView, {
+  Circle,
+  Marker,
+  Callout,
+  PROVIDER_GOOGLE,
+} from "react-native-maps";
 import Geolocation from "@react-native-community/geolocation";
 import { serverInstance } from "../instances";
 import { rideoutMapStyle } from "./rideoutMapStyle";
 import RiderCallout from "./RiderCallout";
 import GroupCallout from "./GroupCallout";
+import { getDistance } from "geolib";
 
 //Map style
 const styles = StyleSheet.create({
@@ -43,23 +49,29 @@ const Map = () => {
     fetch(url)
       .then((result) => result.json())
       .then((data) => {
-        setForecast(data.weather[0].main)
+        setForecast(data.weather[0].main);
         console.log("Successfully recieved forecast from API. ");
-        console.info("Forecast retrieved: "+data.weather[0].main)
+        console.info("Forecast retrieved: " + data.weather[0].main);
       })
       .catch((error) => {
         console.error("WeatherAPI Fetch: " + error.message);
       });
   };
 
+  const [home, setHome] = useState({
+    latitude: -36.82967,
+    longitude: 174.7449,
+  });
+
   var RNFS = require("react-native-fs");
-  const path = RNFS.DocumentDirectoryPath + "/locationHistory.txt";
+  const locationHistoryPath =
+    RNFS.DocumentDirectoryPath + "/locationHistory.txt";
 
   const checkHistoryFile = () => {
-    RNFS.exists(path)
+    RNFS.exists(locationHistoryPath)
       .then((success) => {
         if (!success) {
-          RNFS.writeFile(path, "", "utf8")
+          RNFS.writeFile(locationHistoryPath, "", "utf8")
             .then((success) => {
               console.log("New history file created. ");
             })
@@ -87,7 +99,7 @@ const Map = () => {
       '", "longitude":"' +
       longitude +
       '"}, ';
-    RNFS.appendFile(path, content, "utf8")
+    RNFS.appendFile(locationHistoryPath, content, "utf8")
       .then((success) => {
         console.log("User location recorded locally. ");
       })
@@ -99,7 +111,7 @@ const Map = () => {
   const exportHistory = () => {
     checkHistoryFile();
     const exportPath = RNFS.DownloadDirectoryPath + "/locationHistory.txt";
-    RNFS.copyFile(path, exportPath)
+    RNFS.copyFile(locationHistoryPath, exportPath)
       .then((success) => {
         console.log("Exported history log to downloads directory. ");
       })
@@ -110,7 +122,7 @@ const Map = () => {
 
   const clearHistory = () => {
     checkHistoryFile();
-    RNFS.unlink(path)
+    RNFS.unlink(locationHistoryPath)
       .then((success) => {
         console.log("Cleared location history. ");
       })
@@ -122,7 +134,7 @@ const Map = () => {
 
   const printHistoryConsole = () => {
     checkHistoryFile();
-    RNFS.readFile(path)
+    RNFS.readFile(locationHistoryPath)
       .then((result) => {
         console.info("Location History: ", result);
       })
@@ -139,7 +151,11 @@ const Map = () => {
     longitudeDelta: 0.0242,
   });
 
-  const [sharingLocation, setSharingStatus] = useState(false);
+  const [sharingLocation, setSharingStatus] = useState(false); //for button (online, offline) button only
+  const [atHome, setAtHome] = useState(true); //use this to determine if user sends location to server or not
+  useEffect(() => {
+    console.info("At home: " + atHome);
+  }, [atHome]);
 
   const [SharingTitle, setSharingTitle] = useState("Go Online");
   const [sharingStyle, setSharingStyle] = useState("#27afe2");
@@ -189,6 +205,7 @@ const Map = () => {
       const lat = location?.coords?.latitude;
       const lng = location?.coords?.longitude;
       if (lat === undefined || lng === undefined || lat === "" || lng === "") {
+        //put atHome here
         console.log("Log: sendMyLocation refused to send location to server. ");
       } else {
         await serverInstance.post("/location", {
@@ -286,14 +303,59 @@ const Map = () => {
     }
   };
 
+  const checkIfAtHome = (latitude, longitude, isUserChange) => {
+    var distance = 0;
+    if (isUserChange) {
+      distance = getDistance(
+        { latitude: latitude, longitude: longitude },
+        { latitude: home.latitude, longitude: home.longitude }
+      );
+    } else {
+      distance = getDistance(
+        { latitude: region.latitude, longitude: region.longitude },
+        { latitude: latitude, longitude: longitude }
+      );
+    }
+    console.info("Distance between user and home: " + distance);
+    if (distance < 250) {
+      setAtHome(true);
+    } else {
+      setAtHome(false);
+    }
+  };
+
+  /* now dependent on userLocationChanged happening when app launches
+  useEffect(() => {
+    checkIfAtHome();
+  }, []);
+  */
+
   const userLocationChanged = (event) => {
-    setRegion({
-      latitude: event.nativeEvent.coordinate.latitude,
-      longitude: event.nativeEvent.coordinate.longitude,
-      latitudeDelta: region.latitudeDelta,
-      longitudeDelta: region.longitudeDelta,
+    var lat = event.nativeEvent.coordinate.latitude;
+    var long = event.nativeEvent.coordinate.longitude;
+    if (followUser) {
+      setRegion({
+        latitude: lat,
+        longitude: long,
+        latitudeDelta: region.latitudeDelta,
+        longitudeDelta: region.longitudeDelta,
+      });
+      animateToRegion();
+    }
+    checkIfAtHome(lat, long, true);
+  };
+
+  const userHomeChanged = (event) => {
+    var lat = event.nativeEvent.coordinate.latitude;
+    var long = event.nativeEvent.coordinate.longitude;
+    setHome({
+      latitude: lat,
+      longitude: long,
     });
-    animateToRegion();
+    console.info(
+      "Home location changed: " + home.latitude + ", " + home.longitude
+    );
+    checkIfAtHome(lat, long, false);
   };
 
   const callEmergency = () => {
@@ -314,9 +376,7 @@ const Map = () => {
         customMapStyle={rideoutMapStyle}
         initialRegion={region} //Change this to a function to get current location?
         followsUserLocation={followUser} //IOS ONLY
-        onUserLocationChange={(event) =>
-          followUser && userLocationChanged(event)
-        } //not sure about `followUser &&`
+        onUserLocationChange={(event) => userLocationChanged(event)}
         userLocationPriority={"high"}
         userLocationAnnotationTitle={"Me"}
         showsUserLocation={true}
@@ -380,6 +440,33 @@ const Map = () => {
             </Marker>
           );
         })}
+
+        <Marker
+          key={"home"}
+          coordinate={{
+            latitude: home.latitude,
+            longitude: home.longitude,
+          }}
+          draggable={true}
+          onDragEnd={(event) => userHomeChanged(event)}
+        >
+          <Image
+            source={require("./home_marker.png")}
+            style={{ width: 36, height: 36 }}
+            resizeMethod="resize"
+            resizeMode="contain"
+          />
+        </Marker>
+        <Circle
+          center={{
+            latitude: home.latitude,
+            longitude: home.longitude,
+          }}
+          radius={250}
+          strokeWidth={1}
+          strokeColor={"#27afe2"}
+          fillColor={"rgba(39, 175, 226, 0.1)"}
+        />
       </MapView>
       <View
         style={{
