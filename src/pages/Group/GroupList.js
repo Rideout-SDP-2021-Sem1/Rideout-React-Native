@@ -13,6 +13,7 @@ import FAB from 'react-native-fab'
 const GroupList = (props) => {
   const navigation = props.navigation
   const [showModal, setShowModal] = useState(false)
+  const [isAdmin, setIsAdmin] = useState(true)
   const [groupList, setGroupList] = useState([])
   const [currentEventDetails, setCurrentEventDetails] = useState({})
 
@@ -27,7 +28,7 @@ const GroupList = (props) => {
         borderColor: '#27afe2'
       }}
         onPress={() => {
-          setShowModal(true)
+          isAdmin?  navigateToAdminView() : setShowModal(true)
           setCurrentEventDetails(details)
         }}
       >
@@ -56,6 +57,10 @@ const GroupList = (props) => {
 
   const navigateToCreateGroupPage = () => {
     navigation && navigation.navigate("CreateEvent")
+  }
+
+  const navigateToAdminView = () =>{
+    navigation && navigation.navigate("AdminViewGroup")
   }
 
   return (
@@ -133,7 +138,7 @@ const GroupList = (props) => {
           }}
         />
       </Layout>
-      <FAB buttonColor="blue" iconTextColor="#FFFFFF" onClickAction={() => { navigateToCreateGroupPage() }} visible={true} />
+      <FAB buttonColor="#27afe2" iconTextColor="#FFFFFF" onClickAction={() => { navigateToCreateGroupPage() }} visible={true} />
       </SafeAreaView>
     </>
   );

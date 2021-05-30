@@ -9,7 +9,8 @@ import {
   UserProfile,
   MapScreenLayout,
   GroupListLayout,
-  GroupCreateLayout
+  GroupCreateLayout,
+  AdminViewGroup
 } from './pages'
 import PopUps from './pages/PopUps/PopUps'
 import { set } from 'react-native-reanimated'
@@ -58,6 +59,7 @@ const HomeNavigator = () => {
                   <Tab.Screen name='List' component={GroupListLayout} />
                   <Tab.Screen name='Profile' component={UserProfile} />
                   <Tab.Screen name="CreateEvent" component={GroupCreateLayout} />
+                  <Tab.Screen name="AdminViewGroup" component={AdminViewGroup} />
                 </Tab.Navigator>
               </>
               :

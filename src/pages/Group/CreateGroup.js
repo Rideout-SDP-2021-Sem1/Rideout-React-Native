@@ -13,7 +13,8 @@ import {
   Modal,
   Card,
   List,
-  ListItem
+  ListItem, 
+  Icon
 } from "@ui-kitten/components";
 import DateTimePicker from '@react-native-community/datetimepicker'
 import moment from 'moment'
@@ -208,7 +209,7 @@ export const CreateGroup = (props) => {
               end: 0
             }}
           />
-          <Button style={styles.bottomSpace} onPress={() => setShowDialog(true)}>
+          <Button style={[styles.bottomSpace, styles.button]} onPress={() => setShowDialog(true)}>
             Search address
           </Button>
 
@@ -255,10 +256,10 @@ export const CreateGroup = (props) => {
             flex: 1,
             marginBottom: 20
           }}>
-            <Button style={{ flex: 1 }} onPress={() => setShowDatePicker(true)}>
+            <Button style={[{ flex: 1 },styles.button]} onPress={() => setShowDatePicker(true)}>
               Set date
             </Button>
-            <Button style={{ flex: 1 }} onPress={() => setShowTimePicker(true)}>
+            <Button style={[{ flex: 1 }, styles.button]} onPress={() => setShowTimePicker(true)}>
               Set time
             </Button>
           </View>
@@ -372,7 +373,6 @@ const themedStyle = StyleService.create({
     marginTop: 30,
     alignSelf: "center",
   },
-
   bottomSpace: {
     marginBottom: 20,
   },
@@ -381,5 +381,6 @@ const themedStyle = StyleService.create({
   },
   button: {
     margin: 2,
+    backgroundColor: '#27afe2'
   },
 });
