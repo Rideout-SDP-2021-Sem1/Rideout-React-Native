@@ -111,12 +111,34 @@ const Map = () => {
   const exportHistory = () => {
     checkHistoryFile();
     const exportPath = RNFS.DownloadDirectoryPath + "/locationHistory.txt";
-    RNFS.copyFile(locationHistoryPath, exportPath)
+
+    RNFS.exists(exportPath)
       .then((success) => {
-        console.log("Exported history log to downloads directory. ");
+        RNFS.unlink(exportPath)
+          .then((success) => {
+            console.log("Exported location history deleted. ");
+          })
+          .catch((err) => {
+            console.error("exportHistory unlink: " + err.message);
+          });
       })
       .catch((err) => {
-        console.error("exportHistory: " + err.message);
+        console.log("exportHistory [RNFS.exists]: " + err.message);
+      });
+
+    RNFS.writeFile(exportPath, "", "utf8")
+      .then((success) => {
+        console.log("New export history file created. ");
+        RNFS.copyFile(locationHistoryPath, exportPath)
+          .then((success) => {
+            console.log("Exported history log to downloads directory. ");
+          })
+          .catch((err) => {
+            console.error("exportHistory: " + err.message);
+          });
+      })
+      .catch((err) => {
+        console.error("exportHistory writeFile: " + err.message);
       });
   };
 
