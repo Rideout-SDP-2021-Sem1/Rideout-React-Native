@@ -36,7 +36,6 @@ const Map = () => {
   const [forecast, setForecast] = useState("Updating Forcast...");
 
   const updateForecast = () => {
-    console.log("Getting forecast from API. ");
     var formattedLat = Math.trunc(region.latitude);
     var formattedLong = Math.trunc(region.longitude);
     const url =
@@ -50,8 +49,6 @@ const Map = () => {
       .then((result) => result.json())
       .then((data) => {
         setForecast(data.weather[0].main);
-        console.log("Successfully recieved forecast from API. ");
-        console.info("Forecast retrieved: " + data.weather[0].main);
       })
       .catch((error) => {
         console.error("WeatherAPI Fetch: " + error.message);
@@ -73,7 +70,6 @@ const Map = () => {
         if (!success) {
           RNFS.writeFile(locationHistoryPath, "", "utf8")
             .then((success) => {
-              console.log("New history file created. ");
             })
             .catch((err) => {
               console.error("checkHistory1: " + err.message);
@@ -101,7 +97,6 @@ const Map = () => {
       '"}, ';
     RNFS.appendFile(locationHistoryPath, content, "utf8")
       .then((success) => {
-        console.log("User location recorded locally. ");
       })
       .catch((err) => {
         console.error("recordLocation: " + err.message);
@@ -116,22 +111,19 @@ const Map = () => {
       .then((success) => {
         RNFS.unlink(exportPath)
           .then((success) => {
-            console.log("Exported location history deleted. ");
           })
           .catch((err) => {
             console.error("exportHistory unlink: " + err.message);
           });
       })
       .catch((err) => {
-        console.log("exportHistory [RNFS.exists]: " + err.message);
+        console.error("exportHistory [RNFS.exists]: " + err.message);
       });
 
     RNFS.writeFile(exportPath, "", "utf8")
       .then((success) => {
-        console.log("New export history file created. ");
         RNFS.copyFile(locationHistoryPath, exportPath)
           .then((success) => {
-            console.log("Exported history log to downloads directory. ");
           })
           .catch((err) => {
             console.error("exportHistory: " + err.message);
@@ -146,7 +138,6 @@ const Map = () => {
     checkHistoryFile();
     RNFS.unlink(locationHistoryPath)
       .then((success) => {
-        console.log("Cleared location history. ");
       })
       .catch((err) => {
         console.error("clearHistory: " + err.message);
@@ -194,7 +185,7 @@ const Map = () => {
   };
 
   useEffect(() => {
-    console.log("Log: state sharingLocation: " + sharingLocation);
+    // console.log("Log: state sharingLocation: " + sharingLocation);
   }, [sharingLocation]);
 
   const [followUser, setFollowUser] = useState(true);
@@ -214,7 +205,7 @@ const Map = () => {
   };
 
   useEffect(() => {
-    console.log("Log: state followUser: " + followUser);
+    // console.log("Log: state followUser: " + followUser);
   }, [followUser]);
 
   // Setup state variables for this component
@@ -228,14 +219,14 @@ const Map = () => {
       const lng = location?.coords?.longitude;
       if (lat === undefined || lng === undefined || lat === "" || lng === "") {
         //put atHome here
-        console.log("Log: sendMyLocation refused to send location to server. ");
+        // console.log("Log: sendMyLocation refused to send location to server. ");
       } else {
         await serverInstance.post("/location", {
           latitude: lat,
           longitude: lng,
           hidden: false,
         });
-        console.log("Log: sendMyLocation sent location to server. ");
+        // console.log("Log: sendMyLocation sent location to server. ");
       }
     } catch (err) {
       console.error(
@@ -352,7 +343,6 @@ const Map = () => {
         { latitude: latitude, longitude: longitude }
       );
     }
-    console.info("Distance between user and home: " + distance);
     if (distance < 250) {
       setAtHome(true);
     } else {
@@ -444,7 +434,9 @@ const Map = () => {
                 resizeMode="contain"
               />
               {/*Popup UI when marker is clicked*/}
-              <Callout tooltip={true} style={styles.riderCallout}>
+              <Callout tooltip={true} style={styles.riderCallout} onPress={() => {
+                console.log("call out pressed", currentObj.userId)
+              }}>
                 <RiderCallout rider={currentObj} />
               </Callout>
             </Marker>
