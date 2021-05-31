@@ -277,7 +277,21 @@ const Map = () => {
     }
   };
 
+  // Get list of group location
+  const getGroupLocation = async () => {
+    try {
+      const response = await serverInstance.get("/group")
+      const data = response.data
+      setGroupLocations(data)
+    } catch (err) {
+      console.error("getGroupLocation error", err)
+    }
+  }
+
   useEffect(() => {
+    getMyLocation()
+    getRidersLocation()
+    getGroupLocation()
     const updateMyLocationInterval = setInterval(() => {
       getMyLocation();
     }, 15000);
