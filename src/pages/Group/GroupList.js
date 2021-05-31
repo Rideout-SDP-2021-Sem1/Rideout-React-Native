@@ -21,7 +21,11 @@ const GroupList = (props) => {
   const renderItemAccessory = (details) => {
     return (
       <Button
-        size='tiny'
+      size='tiny'
+      style={{
+        backgroundColor: '#27afe2',
+        borderColor: '#27afe2'
+      }}
         onPress={() => {
           setShowModal(true)
           setCurrentEventDetails(details)
