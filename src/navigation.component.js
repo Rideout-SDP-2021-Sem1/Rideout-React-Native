@@ -21,7 +21,7 @@ const Tab = createBottomTabNavigator();
 
 const HomeNavigator = () => {
   const [user, setUser] = useState(null)
-  const [display, setDisplay] = useState(true)
+  const [display, setDisplay] = useState(false)
   const [selectedNavigationIndex, setSelectedNavigationIndex] = useState(0)
   const navigationRef = useRef(null)
 
@@ -39,8 +39,8 @@ const HomeNavigator = () => {
   return (
     <AuthContext.Provider value={user}>
       <PopUps
-      display = {display}
-      setDisplay = {setDisplay}
+        display={display}
+        setDisplay={setDisplay}
       />
       <NavigationContext.Provider value={{
 

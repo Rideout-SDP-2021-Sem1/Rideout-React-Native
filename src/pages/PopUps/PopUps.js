@@ -1,12 +1,10 @@
 import React, { useEffect, useState } from 'react'
-import { StyleSheet, View } from 'react-native'
+import { StyleSheet } from 'react-native'
 import { Button, Layout, Modal, Card, Text } from '@ui-kitten/components'
 // import MainLayout from './MainLayout'
 // import { signOut } from '../helper/auth'
 import { serverInstance } from '../../instances'
 import { RideRequestPopup } from './PopUps/PopUps'
-// import { useState } from 'react/cjs/react.production.min'
-import { Size } from '@ui-kitten/components/devsupport'
 
 const PopUps = (props) => {
   const { navigation, display, setDisplay } = props
@@ -48,7 +46,7 @@ const PopUps = (props) => {
         
       </Modal> */}
       <Modal
-        visible={ display }
+        visible={display}
         backdropStyle={{
           backgroundColor: "rgba(0, 0, 0, 0.5)"
         }}
@@ -102,7 +100,7 @@ const PopUps = (props) => {
                 style={{
                   backgroundColor: '#27afe2',
                 }}
-                onPress = {() => setDisplay(false)}>
+                onPress={() => setDisplay(false)}>
                 Accept
              </Button>
               <Button
@@ -112,7 +110,7 @@ const PopUps = (props) => {
                 }}
                 status='danger'
                 appearance='outline'
-                onPress = {() => setDisplay(false)}
+                onPress={() => setDisplay(false)}
               >
                 Decline
              </Button>

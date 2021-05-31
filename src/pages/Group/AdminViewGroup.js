@@ -4,16 +4,14 @@ import {
   IndexPath, Button, StyleService, useStyleSheet, Input, Select,
   SelectItem, Text, Layout, Modal, Card, Spinner, Icon
 } from '@ui-kitten/components';
-import { auth } from '../../helper'
 import { serverInstance } from '../../instances'
-import { color } from 'react-native-reanimated';
-import { Colors } from 'react-native/Libraries/NewAppScreen';
 
 export const AdminViewGroup = (props) => {
-  const {navigation, Id} = props
+  const { navigation, Id } = props
   
+  const [waiting, setWaiting] = useState(false)
 
-  
+  const styles = themedStyle
 
   const handlePostUserProfile = async () => {
     try {
@@ -47,14 +45,15 @@ export const AdminViewGroup = (props) => {
       try {
         const response = await serverInstance.get("/user")
         const data = response.data
-        setNickname(data?.nickname || "")
-        const licenseTypeIndex = licenseList.indexOf(data?.license_level || 0)
-        const preferredPaceIndex = preferredPaceList.indexOf(data?.preferred_pace || 0)
-        setSelectedLicenseIndex(new IndexPath(licenseTypeIndex))
-        setSelectedPaceIndex(new IndexPath(preferredPaceIndex))
-        setMake(data?.make || "")
-        setModel(data?.model || "")
-        setSize(data?.size || "")
+        console.log("data", data)
+        // setNickname(data?.nickname || "")
+        // const licenseTypeIndex = licenseList.indexOf(data?.license_level || 0)
+        // const preferredPaceIndex = preferredPaceList.indexOf(data?.preferred_pace || 0)
+        // setSelectedLicenseIndex(new IndexPath(licenseTypeIndex))
+        // setSelectedPaceIndex(new IndexPath(preferredPaceIndex))
+        // setMake(data?.make || "")
+        // setModel(data?.model || "")
+        // setSize(data?.size || "")
       } catch (err) {
         console.error("error getting data", err)
       }
@@ -74,36 +73,35 @@ export const AdminViewGroup = (props) => {
       </Modal>
       <ScrollView
         style={styles.container}
-        // contentContainerStyle={styles.contentContainer}
       >
         <SafeAreaView
-        style={styles.container}>
+          style={styles.container}
+        >
           <Layout>
-          <Button
-            style={{
-              marginLeft: 0,
-              width: 100,
-            }}
-            status = 'basic'
-            appearance = 'ghost'
-            accessoryLeft = {renderBackIcon}
-            onPress = {() => navigateToGroupRides()}
-            
-          >
-            Group Rides
-          </Button>
-          <Image
-            style={styles.Logo}
-            source={require('./../UserProfile/extra/Logo.png')}
-          />
+            <Button
+              style={{
+                marginLeft: 0,
+                width: 100,
+              }}
+              status='basic'
+              appearance='ghost'
+              // accessoryLeft={renderBackIcon}
+              onPress={() => navigateToGroupRides()}
+
+            >
+              Group Rides
+            </Button>
+            <Image
+              style={styles.Logo}
+              source={require('../UserProfile/extra/Logo.png')}
+            />
           </Layout>
           <Text>
-          {`${Id}`}
+            {`Get information from the server about this group ride.`}
           </Text>
         </SafeAreaView>
-        
       </ScrollView>
-      
+
     </>
   );
 };
@@ -124,7 +122,7 @@ const themedStyle = StyleService.create({
   },
   subtitleBox: {
     marginHorizontal: 10
-    
+
   },
   Logo: {
     height: 100,

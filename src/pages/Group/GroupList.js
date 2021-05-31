@@ -29,9 +29,14 @@ const GroupList = (props) => {
         borderColor: '#27afe2'
       }}
         onPress={() => {
-          isAdmin? <AdminViewGroup Id = {`${details._id}`}/>: null,
-          isAdmin?  navigateToAdminView() : setShowModal(true),
-          setCurrentEventDetails(details)
+          if (isAdmin) {
+            // Show admin's page
+            navigateToAdminView()
+          } else {
+            // Show event page
+            setCurrentEventDetails(details)
+            setShowModal(true)
+          }
         }}
       >
         View
