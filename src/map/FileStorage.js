@@ -10,7 +10,7 @@ export const checkFile = (RNFS, path) => {
             console.error("checkFile [write]: " + err.message);
           });
       } else {
-          console.log("File already exists: " + path)
+        console.log("File already exists: " + path);
       }
     })
     .catch((err) => {
@@ -52,25 +52,25 @@ export const exportFile = (RNFS, filePath, exportPath) => {
 };
 
 export const clearFile = (RNFS, path) => {
-    checkFile(RNFS, path);
-    RNFS.unlink(path)
-      .then((success) => {
-        console.log("Deleted file: " + path);
-      })
-      .catch((err) => {
-        console.error("clearFile [unlink]: " + err.message);
-      });
-    checkFile(RNFS, path);
-  };
+  checkFile(RNFS, path);
+  RNFS.unlink(path)
+    .then((success) => {
+      console.log("Deleted file: " + path);
+    })
+    .catch((err) => {
+      console.error("clearFile [unlink]: " + err.message);
+    });
+  checkFile(RNFS, path);
+};
 
 export const recordLocation = (RNFS, path, latitude, longitude) => {
   checkFile(RNFS, path);
   const content =
     '{"timestamp":"' +
     new Date().getTime() +
-    '", "latitude":"' +
+    '","latitude":"' +
     latitude +
-    '", "longitude":"' +
+    '","longitude":"' +
     longitude +
     '"}, ';
   RNFS.appendFile(path, content, "utf8")
@@ -83,16 +83,44 @@ export const recordLocation = (RNFS, path, latitude, longitude) => {
 };
 
 export const getHomeLocation = (RNFS, path) => {
+  checkFile(RNFS, path);
 
-}
+  var homeLocation = {
+    latitude: 0,
+    longitude: 0,
+  };
+
+  RNFS.readFile(path)
+    .then((result) => {
+      console.info("Read file: ", result);
+      if (result == null || result == "") {
+        homeLocation.latitude = -36.85088;
+        homeLocation.longitude = 174.7645;
+      } else {
+        try {
+          result = result.split(", ")[0];
+          result = JSON.parse(result);
+          homeLocation.latitude = parseFloat(result.latitude);
+          homeLocation.longitude = parseFloat(result.longitude);
+        } catch (err) {
+          console.error("getHomeLocation [parse]: " + err);
+        }
+      }
+    })
+    .catch((err) => {
+      console.error("printFileConsole: " + err.message);
+    });
+
+  return homeLocation;
+};
 
 export const printFileConsole = (RNFS, path) => {
-    checkFile(RNFS, path);
-    RNFS.readFile(path)
-      .then((result) => {
-        console.info("Read file: ", result);
-      })
-      .catch((err) => {
-        console.error("printFileConsole: " + err.message);
-      });
-  };
+  checkFile(RNFS, path);
+  RNFS.readFile(path)
+    .then((result) => {
+      console.info("Read file: ", result);
+    })
+    .catch((err) => {
+      console.error("printFileConsole: " + err.message);
+    });
+};

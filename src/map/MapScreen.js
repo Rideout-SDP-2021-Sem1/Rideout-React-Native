@@ -49,15 +49,15 @@ const Map = () => {
 
   //Map region of the user's location
   const [region, setRegion] = useState({
-    latitude: -36.82967,
-    longitude: 174.7449,
+    latitude: -36.85088,
+    longitude: 174.7645,
     latitudeDelta: 0.03,
     longitudeDelta: 0.0242,
   });
 
   const [home, setHome] = useState({
-    latitude: -36.82967,
-    longitude: 174.7449,
+    latitude: -36.85088,
+    longitude: 174.7645,
   });
 
   const [sharingLocation, setSharingStatus] = useState(false); //for button (online, offline) button only
@@ -284,13 +284,14 @@ const Map = () => {
     checkIfAtHome(lat, long, true);
   };
 
-  const getHomeLocation = () => {
-
+  const updateHomeLocation = () => {
+    var homeLocation = FS.getHomeLocation(RNFS, homeLocationPath)
+    setHome(homeLocation)
   }
 
   useEffect(() => {
-    setHome(getHomeLocation(RNFS, homeLocationPath))
-  })
+    updateHomeLocation()
+  }, [])
 
   const storeHomeLocation = (lat, long) => {
     FS.clearFile(RNFS, homeLocationPath)
