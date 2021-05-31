@@ -12,6 +12,7 @@ import { rideoutMapStyle } from "./rideoutMapStyle";
 import RiderCallout from "./RiderCallout";
 import GroupCallout from "./GroupCallout";
 import { getDistance } from "geolib";
+import * as FS from "./FileStorage";
 
 //Map style
 const styles = StyleSheet.create({
@@ -66,104 +67,14 @@ const Map = () => {
   var RNFS = require("react-native-fs");
   const locationHistoryPath =
     RNFS.DocumentDirectoryPath + "/locationHistory.txt";
-
-  const checkHistoryFile = () => {
-    RNFS.exists(locationHistoryPath)
-      .then((success) => {
-        if (!success) {
-          RNFS.writeFile(locationHistoryPath, "", "utf8")
-            .then((success) => {
-              console.log("New history file created. ");
-            })
-            .catch((err) => {
-              console.error("checkHistory1: " + err.message);
-            });
-        }
-      })
-      .catch((err) => {
-        console.error("checkHistory2: " + err.message);
-      });
-  };
+  const homeLocationPath = RNFS.DocumentDirectoryPath + "/homeLocation.txt";
+  const locationHistoryExportPath =
+    RNFS.DownloadDirectoryPath + "/locationHistory.txt";
 
   useEffect(() => {
-    checkHistoryFile();
+    FS.checkFile(RNFS, locationHistoryPath);
+    FS.checkFile(RNFS, homeLocationPath);
   }, []);
-
-  const recordLocation = (latitude, longitude) => {
-    checkHistoryFile();
-    const content =
-      '{"timestamp":"' +
-      new Date().getTime() +
-      '", "latitude":"' +
-      latitude +
-      '", "longitude":"' +
-      longitude +
-      '"}, ';
-    RNFS.appendFile(locationHistoryPath, content, "utf8")
-      .then((success) => {
-        console.log("User location recorded locally. ");
-      })
-      .catch((err) => {
-        console.error("recordLocation: " + err.message);
-      });
-  };
-
-  const exportHistory = () => {
-    checkHistoryFile();
-    const exportPath = RNFS.DownloadDirectoryPath + "/locationHistory.txt";
-
-    RNFS.exists(exportPath)
-      .then((success) => {
-        RNFS.unlink(exportPath)
-          .then((success) => {
-            console.log("Exported location history deleted. ");
-          })
-          .catch((err) => {
-            console.error("exportHistory unlink: " + err.message);
-          });
-      })
-      .catch((err) => {
-        console.log("exportHistory [RNFS.exists]: " + err.message);
-      });
-
-    RNFS.writeFile(exportPath, "", "utf8")
-      .then((success) => {
-        console.log("New export history file created. ");
-        RNFS.copyFile(locationHistoryPath, exportPath)
-          .then((success) => {
-            console.log("Exported history log to downloads directory. ");
-          })
-          .catch((err) => {
-            console.error("exportHistory: " + err.message);
-          });
-      })
-      .catch((err) => {
-        console.error("exportHistory writeFile: " + err.message);
-      });
-  };
-
-  const clearHistory = () => {
-    checkHistoryFile();
-    RNFS.unlink(locationHistoryPath)
-      .then((success) => {
-        console.log("Cleared location history. ");
-      })
-      .catch((err) => {
-        console.error("clearHistory: " + err.message);
-      });
-    checkHistoryFile();
-  };
-
-  const printHistoryConsole = () => {
-    checkHistoryFile();
-    RNFS.readFile(locationHistoryPath)
-      .then((result) => {
-        console.info("Location History: ", result);
-      })
-      .catch((err) => {
-        console.error("printHistory: " + err.message);
-      });
-  };
 
   //Map region of the user's location
   const [region, setRegion] = useState({
@@ -243,7 +154,7 @@ const Map = () => {
         err
       );
     }
-    recordLocation(location.coords.latitude, location.coords.longitude);
+    FS.recordLocation(RNFS, locationHistoryPath, location.coords.latitude, location.coords.longitude);
   };
 
   //Function to get the current location of the user
@@ -280,18 +191,18 @@ const Map = () => {
   // Get list of group location
   const getGroupLocation = async () => {
     try {
-      const response = await serverInstance.get("/group")
-      const data = response.data
-      setGroupLocations(data)
+      const response = await serverInstance.get("/group");
+      const data = response.data;
+      setGroupLocations(data);
     } catch (err) {
-      console.error("getGroupLocation error", err)
+      console.error("getGroupLocation error", err);
     }
-  }
+  };
 
   useEffect(() => {
-    getMyLocation()
-    getRidersLocation()
-    getGroupLocation()
+    getMyLocation();
+    getRidersLocation();
+    getGroupLocation();
     const updateMyLocationInterval = setInterval(() => {
       getMyLocation();
     }, 15000);
@@ -532,13 +443,13 @@ const Map = () => {
       >
         <Button
           title="Export History"
-          onPress={exportHistory}
+          onPress={() => FS.exportFile(RNFS, locationHistoryPath, locationHistoryExportPath)}
           color="#27afe2"
         />
-        <Button title="Clear History" onPress={clearHistory} color="#c71432" />
+        <Button title="Clear History" onPress={() => FS.clearFile(RNFS, locationHistoryPath)} color="#c71432" />
         <Button
           title="DEBUG: Print History"
-          onPress={printHistoryConsole}
+          onPress={() => FS.printFileConsole(RNFS, locationHistoryPath)}
           color="#27afe2"
         />
       </View>
