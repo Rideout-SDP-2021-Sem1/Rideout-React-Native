@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef, useContext } from "react";
 import { View, Button, Image, StyleSheet, Linking, Text } from "react-native";
 import MapView, {
   Circle,
@@ -12,9 +12,7 @@ import { rideoutMapStyle } from "./rideoutMapStyle";
 import RiderCallout from "./RiderCallout";
 import GroupCallout from "./GroupCallout";
 import { getDistance } from "geolib";
-import io from 'socket.io-client'
-import { SERVER_URL } from '../utils'
-import { firebase } from '@react-native-firebase/auth'
+import { SocketContext } from '../context'
 
 //Map style
 const styles = StyleSheet.create({
@@ -35,22 +33,7 @@ const styles = StyleSheet.create({
 
 const Map = () => {
   const mapRef = useRef(null);
-  const [socket, setSocket] = useState(null)
-  const [socketReady, setSocketReady] = useState(false)
-
-  useEffect(() => {
-    const socketConnection = io(SERVER_URL, {
-      query: {
-        uid: firebase.auth().currentUser?.uid ?? 'Unknown',
-      },
-    })
-    socketConnection.on("connect", () => {
-      console.log('socket id', socketConnection.id)
-      console.log('socket is connected?', socketConnection.connected)
-    })
-    setSocket(socketConnection)
-    setSocketReady(true)
-  }, [])
+  const { socket, socketReady } = useContext(SocketContext)
 
   const [forecast, setForecast] = useState("Updating Forcast...");
 
@@ -407,8 +390,12 @@ const Map = () => {
     Linking.openURL(`tel:${111}`);
   };
 
-  const requestRide = (userid) => {
+  const requestRide = (userId) => {
     //request
+    console.log("reqest", userId)
+    socket.emit("requestServerRide", {
+      userId
+    })
   };
 
   //Google map render
@@ -443,7 +430,6 @@ const Map = () => {
               }}
               title={currentObj.nickname}
               calloutAnchor={{ x: 0.5, y: -0.1 }}
-              onCalloutPress={requestRide(currentObj.userId)}
             >
               {/*Render the marker as the custom image*/}
               <Image
@@ -454,7 +440,7 @@ const Map = () => {
               />
               {/*Popup UI when marker is clicked*/}
               <Callout tooltip={true} style={styles.riderCallout} onPress={() => {
-                console.log("call out pressed", currentObj.userId)
+                requestRide(currentObj.userId)
               }}>
                 <RiderCallout rider={currentObj} />
               </Callout>
