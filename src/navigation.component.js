@@ -6,12 +6,10 @@ import { AuthContext, NavigationContext } from './context'
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { firebase } from '@react-native-firebase/auth'
 import {
-  MainLayout,
-  TestProfile,
-  EmptyPage,
   UserProfile,
   MapScreenLayout,
-  GroupListLayout
+  GroupListLayout,
+  GroupCreateLayout
 } from './pages'
 
 const { Navigator, Screen } = createStackNavigator();
@@ -51,6 +49,7 @@ const HomeNavigator = () => {
                   <Tab.Screen name='Map' component={MapScreenLayout} />
                   <Tab.Screen name='List' component={GroupListLayout} />
                   <Tab.Screen name='Profile' component={UserProfile} />
+                  <Tab.Screen name="CreateEvent" component={GroupCreateLayout} />
                 </Tab.Navigator>
               </>
               :

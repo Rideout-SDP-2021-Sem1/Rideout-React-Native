@@ -6,7 +6,7 @@ const userRoute = Router()
 userRoute.route("/user")
   .get(async (req, res) => {
     const headerUid = req.header.uid
-    const uid = req.params.uid
+    const uid = req.query.uid
 
     let uidSearchUp = ""
     const selfLookup = uid === undefined
