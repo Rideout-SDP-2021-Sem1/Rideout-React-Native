@@ -13,6 +13,7 @@ import RiderCallout from "./RiderCallout";
 import GroupCallout from "./GroupCallout";
 import { getDistance } from "geolib";
 import * as FS from "./FileStorage";
+import { getForecast } from "./Forecast";
 
 //Map style
 const styles = StyleSheet.create({
@@ -33,31 +34,6 @@ const styles = StyleSheet.create({
 
 const Map = () => {
   const mapRef = useRef(null);
-
-  const [forecast, setForecast] = useState("Updating Forcast...");
-
-  const updateForecast = () => {
-    console.log("Getting forecast from API. ");
-    var formattedLat = Math.trunc(region.latitude);
-    var formattedLong = Math.trunc(region.longitude);
-    const url =
-      "https://api.openweathermap.org/data/2.5/onecall?lat=" +
-      formattedLat +
-      "&lon=" +
-      formattedLong +
-      "&exclude=current,minutely,daily,alerts&appid=5d9c4214bba669bd9a39192ab06885f2";
-
-    fetch(url)
-      .then((result) => result.json())
-      .then((data) => {
-        setForecast(data.hourly[0].weather[0].main);
-        console.log("Successfully recieved forecast from API. ");
-        console.info("Forecast retrieved: " + data.hourly[0].weather[0].main);
-      })
-      .catch((error) => {
-        console.error("WeatherAPI Fetch: " + error.message);
-      });
-  };
 
   const [home, setHome] = useState({
     latitude: -36.82967,
@@ -108,6 +84,21 @@ const Map = () => {
     console.log("Log: state sharingLocation: " + sharingLocation);
   }, [sharingLocation]);
 
+  const [forecast, setForecast] = useState("Loading Forecast...");
+
+  const updateForecast = async () => {
+    var newForecast = await getForecast(region);
+    setForecast(newForecast);
+  };
+
+  useEffect(() => {
+    console.log("Forecast: " + forecast);
+  }, [forecast]);
+
+  useEffect(() => {
+    updateForecast();
+  }, []);
+
   const [followUser, setFollowUser] = useState(true);
 
   const [followTitle, setFollowTitle] = useState("Stop Following My Location");
@@ -154,7 +145,12 @@ const Map = () => {
         err
       );
     }
-    FS.recordLocation(RNFS, locationHistoryPath, location.coords.latitude, location.coords.longitude);
+    FS.recordLocation(
+      RNFS,
+      locationHistoryPath,
+      location.coords.latitude,
+      location.coords.longitude
+    );
   };
 
   //Function to get the current location of the user
@@ -217,10 +213,6 @@ const Map = () => {
       clearInterval(updateOtherRidersLocationInterval);
       clearInterval(updateForecastDisplayInterval);
     };
-  }, []);
-
-  useEffect(() => {
-    updateForecast();
   }, []);
 
   useEffect(() => {
@@ -443,10 +435,16 @@ const Map = () => {
       >
         <Button
           title="Export History"
-          onPress={() => FS.exportFile(RNFS, locationHistoryPath, locationHistoryExportPath)}
+          onPress={() =>
+            FS.exportFile(RNFS, locationHistoryPath, locationHistoryExportPath)
+          }
           color="#27afe2"
         />
-        <Button title="Clear History" onPress={() => FS.clearFile(RNFS, locationHistoryPath)} color="#c71432" />
+        <Button
+          title="Clear History"
+          onPress={() => FS.clearFile(RNFS, locationHistoryPath)}
+          color="#c71432"
+        />
         <Button
           title="DEBUG: Print History"
           onPress={() => FS.printFileConsole(RNFS, locationHistoryPath)}
