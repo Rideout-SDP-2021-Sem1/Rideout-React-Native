@@ -12,6 +12,9 @@ import { rideoutMapStyle } from "./rideoutMapStyle";
 import RiderCallout from "./RiderCallout";
 import GroupCallout from "./GroupCallout";
 import { getDistance } from "geolib";
+import io from 'socket.io-client'
+import { SERVER_URL } from '../utils'
+import { firebase } from '@react-native-firebase/auth'
 
 //Map style
 const styles = StyleSheet.create({
@@ -32,6 +35,22 @@ const styles = StyleSheet.create({
 
 const Map = () => {
   const mapRef = useRef(null);
+  const [socket, setSocket] = useState(null)
+  const [socketReady, setSocketReady] = useState(false)
+
+  useEffect(() => {
+    const socketConnection = io(SERVER_URL, {
+      query: {
+        uid: firebase.auth().currentUser?.uid ?? 'Unknown',
+      },
+    })
+    socketConnection.on("connect", () => {
+      console.log('socket id', socketConnection.id)
+      console.log('socket is connected?', socketConnection.connected)
+    })
+    setSocket(socketConnection)
+    setSocketReady(true)
+  }, [])
 
   const [forecast, setForecast] = useState("Updating Forcast...");
 
