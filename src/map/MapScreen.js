@@ -44,8 +44,6 @@ const Map = () => {
   const locationHistoryExportPath =
     RNFS.DownloadDirectoryPath + "/locationHistory.txt";
 
-  const [forecast, setForecast] = useState("Updating Forcast...");
-
   useEffect(() => {
     FS.checkFile(RNFS, locationHistoryPath);
     FS.checkFile(RNFS, homeLocationPath);
@@ -70,7 +68,7 @@ const Map = () => {
     console.info("At home: " + atHome);
   }, [atHome]);
 
-  const [SharingTitle, setSharingTitle] = useState("Go Online");
+  const [sharingTitle, setSharingTitle] = useState("Go Online");
   const [sharingStyle, setSharingStyle] = useState("#27afe2");
 
   const changeSharingStatus = () => {
@@ -439,7 +437,7 @@ const Map = () => {
       >
         <Text>{forecast}</Text>
         <Button
-          title={SharingTitle}
+          title={sharingTitle}
           onPress={changeSharingStatus}
           color={sharingStyle}
         />
