@@ -256,7 +256,7 @@ const Map = () => {
             "ERROR: findCoordinates geolocation could not get location. ",
             error
           ),
-        { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+        { enableHighAccuracy: false, timeout: 20000, maximumAge: 1000 }
       );
     } catch (error) {
       console.error("ERROR: findCoordinates could not get location. ", error);
