@@ -35,11 +35,6 @@ const styles = StyleSheet.create({
 const Map = () => {
   const mapRef = useRef(null);
 
-  const [home, setHome] = useState({
-    latitude: -36.82967,
-    longitude: 174.7449,
-  });
-
   var RNFS = require("react-native-fs");
   const locationHistoryPath =
     RNFS.DocumentDirectoryPath + "/locationHistory.txt";
@@ -58,6 +53,11 @@ const Map = () => {
     longitude: 174.7449,
     latitudeDelta: 0.03,
     longitudeDelta: 0.0242,
+  });
+
+  const [home, setHome] = useState({
+    latitude: -36.82967,
+    longitude: 174.7449,
   });
 
   const [sharingLocation, setSharingStatus] = useState(false); //for button (online, offline) button only
@@ -284,6 +284,19 @@ const Map = () => {
     checkIfAtHome(lat, long, true);
   };
 
+  const getHomeLocation = () => {
+
+  }
+
+  useEffect(() => {
+    setHome(getHomeLocation(RNFS, homeLocationPath))
+  })
+
+  const storeHomeLocation = (lat, long) => {
+    FS.clearFile(RNFS, homeLocationPath)
+    FS.recordLocation(RNFS, homeLocationPath, lat, long)
+  };
+
   const userHomeChanged = (event) => {
     var lat = event.nativeEvent.coordinate.latitude;
     var long = event.nativeEvent.coordinate.longitude;
@@ -294,6 +307,7 @@ const Map = () => {
     console.info(
       "Home location changed: " + home.latitude + ", " + home.longitude
     );
+    storeHomeLocation(lat, long);
     checkIfAtHome(lat, long, false);
   };
 
