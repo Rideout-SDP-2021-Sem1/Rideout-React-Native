@@ -1,8 +1,9 @@
 import axios from 'axios'
 import { firebase } from '@react-native-firebase/auth'
+import { SERVER_URL } from '../utils'
 
 const serverInstance = axios.create({
-  baseURL: "https://rideout-nz.tk" || "http://localhost:5000" || "http://139.59.120.86" || "http://191.168.1.3:5000"
+  baseURL: SERVER_URL || "https://rideout-nz.tk"
 })
 
 serverInstance.interceptors.request.use(

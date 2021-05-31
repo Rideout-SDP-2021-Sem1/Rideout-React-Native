@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef, useContext } from "react";
 import { View, Button, Image, StyleSheet, Linking, Text } from "react-native";
 import MapView, {
   Circle,
@@ -14,6 +14,7 @@ import GroupCallout from "./GroupCallout";
 import { getDistance } from "geolib";
 import * as FS from "./FileStorage";
 import { getForecast } from "./Forecast";
+import { SocketContext } from '../context'
 
 //Map style
 const styles = StyleSheet.create({
@@ -34,6 +35,7 @@ const styles = StyleSheet.create({
 
 const Map = () => {
   const mapRef = useRef(null);
+  const { socket, socketReady } = useContext(SocketContext)
 
   var RNFS = require("react-native-fs");
   const locationHistoryPath =
@@ -42,11 +44,13 @@ const Map = () => {
   const locationHistoryExportPath =
     RNFS.DownloadDirectoryPath + "/locationHistory.txt";
 
+  const [forecast, setForecast] = useState("Updating Forcast...");
+
   useEffect(() => {
     FS.checkFile(RNFS, locationHistoryPath);
     FS.checkFile(RNFS, homeLocationPath);
   }, []);
-
+  
   //Map region of the user's location
   const [region, setRegion] = useState({
     latitude: -36.85088,
@@ -81,7 +85,7 @@ const Map = () => {
   };
 
   useEffect(() => {
-    console.log("Log: state sharingLocation: " + sharingLocation);
+    // console.log("Log: state sharingLocation: " + sharingLocation);
   }, [sharingLocation]);
 
   const [forecast, setForecast] = useState("Loading Forecast...");
@@ -116,7 +120,7 @@ const Map = () => {
   };
 
   useEffect(() => {
-    console.log("Log: state followUser: " + followUser);
+    // console.log("Log: state followUser: " + followUser);
   }, [followUser]);
 
   // Setup state variables for this component
@@ -130,14 +134,14 @@ const Map = () => {
       const lng = location?.coords?.longitude;
       if (lat === undefined || lng === undefined || lat === "" || lng === "") {
         //put atHome here
-        console.log("Log: sendMyLocation refused to send location to server. ");
+        // console.log("Log: sendMyLocation refused to send location to server. ");
       } else {
         await serverInstance.post("/location", {
           latitude: lat,
           longitude: lng,
           hidden: false,
         });
-        console.log("Log: sendMyLocation sent location to server. ");
+        // console.log("Log: sendMyLocation sent location to server. ");
       }
     } catch (err) {
       console.error(
@@ -163,7 +167,7 @@ const Map = () => {
             "ERROR: findCoordinates geolocation could not get location. ",
             error
           ),
-        { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+        { enableHighAccuracy: false, timeout: 20000, maximumAge: 1000 }
       );
     } catch (error) {
       console.error("ERROR: findCoordinates could not get location. ", error);
@@ -255,7 +259,6 @@ const Map = () => {
         { latitude: latitude, longitude: longitude }
       );
     }
-    console.info("Distance between user and home: " + distance);
     if (distance < 250) {
       setAtHome(true);
     } else {
@@ -316,8 +319,12 @@ const Map = () => {
     Linking.openURL(`tel:${111}`);
   };
 
-  const requestRide = (userid) => {
+  const requestRide = (userId) => {
     //request
+    console.log("reqest", userId)
+    socket.emit("requestServerRide", {
+      userId
+    })
   };
 
   //Google map render
@@ -352,7 +359,6 @@ const Map = () => {
               }}
               title={currentObj.nickname}
               calloutAnchor={{ x: 0.5, y: -0.1 }}
-              onCalloutPress={requestRide(currentObj.userId)}
             >
               {/*Render the marker as the custom image*/}
               <Image
@@ -362,7 +368,9 @@ const Map = () => {
                 resizeMode="contain"
               />
               {/*Popup UI when marker is clicked*/}
-              <Callout tooltip={true} style={styles.riderCallout}>
+              <Callout tooltip={true} style={styles.riderCallout} onPress={() => {
+                requestRide(currentObj.userId)
+              }}>
                 <RiderCallout rider={currentObj} />
               </Callout>
             </Marker>
