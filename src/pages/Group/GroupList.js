@@ -9,6 +9,7 @@ import { auth } from '../../helper'
 import { serverInstance } from '../../instances'
 import moment from 'moment'
 import FAB from 'react-native-fab'
+import { AdminViewGroup } from './AdminViewGroup';
 
 const GroupList = (props) => {
   const navigation = props.navigation
@@ -28,7 +29,8 @@ const GroupList = (props) => {
         borderColor: '#27afe2'
       }}
         onPress={() => {
-          isAdmin?  navigateToAdminView() : setShowModal(true)
+          isAdmin? <AdminViewGroup Id = {`${details._id}`}/>: null,
+          isAdmin?  navigateToAdminView() : setShowModal(true),
           setCurrentEventDetails(details)
         }}
       >
@@ -47,6 +49,7 @@ const GroupList = (props) => {
         const response = await serverInstance.get("/group")
         const data = response.data
 
+        console.log(data)
         setGroupList(data)
       } catch (err) {
         console.error("failed to get group list", err)
