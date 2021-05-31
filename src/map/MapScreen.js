@@ -1,5 +1,13 @@
 import React, { useEffect, useState, useRef, useContext } from "react";
-import { View, Button, Image, StyleSheet, Linking, Text } from "react-native";
+import {
+  View,
+  Button,
+  Image,
+  StyleSheet,
+  Linking,
+  Text,
+  Pressable,
+} from "react-native";
 import MapView, {
   Circle,
   Marker,
@@ -14,7 +22,7 @@ import GroupCallout from "./GroupCallout";
 import { getDistance } from "geolib";
 import * as FS from "./FileStorage";
 import { getForecast } from "./Forecast";
-import { SocketContext } from '../context'
+import { SocketContext } from "../context";
 
 //Map style
 const styles = StyleSheet.create({
@@ -31,11 +39,23 @@ const styles = StyleSheet.create({
     width: 250,
     backgroundColor: "white",
   },
+  followButton: {
+    height: 50,
+    width: 50,
+    borderWidth: 2,
+    borderRadius: 15,
+    justifyContent: "center",
+  },
+  followImage: {
+    height: 35,
+    width:35,
+    alignSelf: "center"
+  },
 });
 
 const Map = () => {
   const mapRef = useRef(null);
-  const { socket, socketReady } = useContext(SocketContext)
+  const { socket, socketReady } = useContext(SocketContext);
 
   var RNFS = require("react-native-fs");
   const locationHistoryPath =
@@ -44,13 +64,11 @@ const Map = () => {
   const locationHistoryExportPath =
     RNFS.DownloadDirectoryPath + "/locationHistory.txt";
 
-  const [forecast, setForecast] = useState("Updating Forcast...");
-
   useEffect(() => {
     FS.checkFile(RNFS, locationHistoryPath);
     FS.checkFile(RNFS, homeLocationPath);
   }, []);
-  
+
   //Map region of the user's location
   const [region, setRegion] = useState({
     latitude: -36.85088,
@@ -64,8 +82,9 @@ const Map = () => {
     longitude: 174.7645,
   });
 
-  const [sharingLocation, setSharingStatus] = useState(false); //for button (online, offline) button only
+  const [sharingLocation, setSharingStatus] = useState(false); //the offline/online button
   const [atHome, setAtHome] = useState(true); //use this to determine if user sends location to server or not
+
   useEffect(() => {
     console.info("At home: " + atHome);
   }, [atHome]);
@@ -85,7 +104,7 @@ const Map = () => {
   };
 
   useEffect(() => {
-    // console.log("Log: state sharingLocation: " + sharingLocation);
+    console.log("STATE sharingLocation: " + sharingLocation);
   }, [sharingLocation]);
 
   const [forecast, setForecast] = useState("Loading Forecast...");
@@ -105,16 +124,19 @@ const Map = () => {
 
   const [followUser, setFollowUser] = useState(true);
 
-  const [followTitle, setFollowTitle] = useState("Stop Following My Location");
-  const [followStyle, setFollowStyle] = useState("#4dd14d");
+  const [followImage, setFollowImage] = useState(require('./share_faded.png'));
+  const [followStyleBackground, setFollowStyleBackground] = useState("#ffffff");
+  const [followStyleBorder, setFollowStyleBorder] = useState("#27afe2");
 
   const changeFollowStatus = () => {
     if (followUser) {
-      setFollowTitle("Follow My Location");
-      setFollowStyle("#27afe2");
+      setFollowImage(require('./share_faded.png'));
+      setFollowStyleBackground("#ffffff");
+      setFollowStyleBorder("#27afe2");
     } else {
-      setFollowTitle("Stop Following");
-      setFollowStyle("#4dd14d");
+      setFollowImage(require('./share_white.png'));
+      setFollowStyleBackground("#27afe2");
+      setFollowStyleBorder("#ffffff");
     }
     setFollowUser((followUser) => !followUser);
   };
@@ -129,6 +151,7 @@ const Map = () => {
 
   // Function to send the user's location to the server
   const sendMyLocation = async (location) => {
+    console.log("sharingLocation: " + sharingLocation + ", atHome: " + atHome);
     try {
       const lat = location?.coords?.latitude;
       const lng = location?.coords?.longitude;
@@ -167,7 +190,7 @@ const Map = () => {
             "ERROR: findCoordinates geolocation could not get location. ",
             error
           ),
-        { enableHighAccuracy: false, timeout: 20000, maximumAge: 1000 }
+        { enableHighAccuracy: true, timeout: 20000, maximumAge: 1000 }
       );
     } catch (error) {
       console.error("ERROR: findCoordinates could not get location. ", error);
@@ -288,17 +311,17 @@ const Map = () => {
   };
 
   const updateHomeLocation = () => {
-    var homeLocation = FS.getHomeLocation(RNFS, homeLocationPath)
-    setHome(homeLocation)
-  }
+    var homeLocation = FS.getHomeLocation(RNFS, homeLocationPath);
+    setHome(homeLocation);
+  };
 
   useEffect(() => {
-    updateHomeLocation()
-  }, [])
+    updateHomeLocation();
+  }, []);
 
   const storeHomeLocation = (lat, long) => {
-    FS.clearFile(RNFS, homeLocationPath)
-    FS.recordLocation(RNFS, homeLocationPath, lat, long)
+    FS.clearFile(RNFS, homeLocationPath);
+    FS.recordLocation(RNFS, homeLocationPath, lat, long);
   };
 
   const userHomeChanged = (event) => {
@@ -321,10 +344,10 @@ const Map = () => {
 
   const requestRide = (userId) => {
     //request
-    console.log("reqest", userId)
+    console.log("request", userId);
     socket.emit("requestServerRide", {
-      userId
-    })
+      userId,
+    });
   };
 
   //Google map render
@@ -368,9 +391,13 @@ const Map = () => {
                 resizeMode="contain"
               />
               {/*Popup UI when marker is clicked*/}
-              <Callout tooltip={true} style={styles.riderCallout} onPress={() => {
-                requestRide(currentObj.userId)
-              }}>
+              <Callout
+                tooltip={true}
+                style={styles.riderCallout}
+                onPress={() => {
+                  requestRide(currentObj.userId);
+                }}
+              >
                 <RiderCallout rider={currentObj} />
               </Callout>
             </Marker>
@@ -443,11 +470,9 @@ const Map = () => {
           onPress={changeSharingStatus}
           color={sharingStyle}
         />
-        <Button
-          title={followTitle}
-          onPress={changeFollowStatus}
-          color={followStyle}
-        />
+        <Pressable onPress={changeFollowStatus} style={{...styles.followButton, backgroundColor: followStyleBackground, borderColor: followStyleBorder}}>
+          <Image source={followImage} style={styles.followImage}/>
+        </Pressable>
       </View>
       <View
         style={{

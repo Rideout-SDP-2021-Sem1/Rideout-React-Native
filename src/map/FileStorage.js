@@ -86,8 +86,8 @@ export const getHomeLocation = (RNFS, path) => {
   checkFile(RNFS, path);
 
   var homeLocation = {
-    latitude: 0,
-    longitude: 0,
+    latitude: -36.85088,
+    longitude: 174.7645,
   };
 
   RNFS.readFile(path)
