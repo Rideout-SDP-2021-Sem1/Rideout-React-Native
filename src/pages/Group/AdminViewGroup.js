@@ -2,81 +2,43 @@ import React, { useState, useEffect } from 'react';
 import { ScrollView, Image, SafeAreaView, View, Alert } from 'react-native';
 import {
   IndexPath, Button, StyleService, useStyleSheet, Input, Select,
-  SelectItem, Text, Layout, Modal, Card, Spinner, Icon
+  SelectItem, Text, Layout, Modal, Card, Spinner, Icon, List, ListItem, Divider
 } from '@ui-kitten/components';
+import { auth } from '../../helper'
 import { serverInstance } from '../../instances'
+import { color } from 'react-native-reanimated';
+import { Colors } from 'react-native/Libraries/NewAppScreen';
+import Dummy from './dummyData.json'
 
-export const AdminViewGroup = (props) => {
-  const { navigation, Id } = props
-  
-  const [waiting, setWaiting] = useState(false)
+export const AdminViewGroup = ({ route, navigation }) => {
+  const { Id } = route.params
 
-  const styles = themedStyle
+  const styles = useStyleSheet(themedStyle);
 
-  const handlePostUserProfile = async () => {
-    try {
-      setWaiting(true)
-      await serverInstance.post("/update-profile", {
-        nickname: nickname,
-        bike_details: [{
-          make: make,
-          model: model,
-          size: size
-        }],
-        license_level: licenseList[selectedLicenseIndex.row],
-        preferred_pace: preferredPaceList[selectedPaceIndex.row]
-      })
-      Alert.alert("Success", "Updated Profile.")
-      setWaiting(false)
-      setIsEditable(true)
-    } catch (err) {
-      console.error("error handlePostUserProfile", err)
-      Alert.alert("Error", err)
-      setWaiting(false)
-    }
-  }
+  const renderBackIcon = (props) => (
+    <Icon {...props} name='arrow-back-outline' />
+  )
 
   const navigateToGroupRides = () => {
     navigation && navigation.navigate("List")
   }
 
-  useEffect(() => {
-    const getData = async () => {
-      try {
-        const response = await serverInstance.get("/user")
-        const data = response.data
-        console.log("data", data)
-        // setNickname(data?.nickname || "")
-        // const licenseTypeIndex = licenseList.indexOf(data?.license_level || 0)
-        // const preferredPaceIndex = preferredPaceList.indexOf(data?.preferred_pace || 0)
-        // setSelectedLicenseIndex(new IndexPath(licenseTypeIndex))
-        // setSelectedPaceIndex(new IndexPath(preferredPaceIndex))
-        // setMake(data?.make || "")
-        // setModel(data?.model || "")
-        // setSize(data?.size || "")
-      } catch (err) {
-        console.error("error getting data", err)
-      }
-    }
-    getData()
-  }, [])
+  const renderItem = ({ item }) => (
+    <ListItem
+      title={`${item.minimumPreferredPace}`}
+      description={`${item.description}`}
+    />
+  );
+
 
   return (
     <>
-      <Modal
-        visible={waiting}
-        backdropStyle={{
-          backgroundColor: "rgba(0, 0, 0, 0.5)"
-        }}
-      >
-        <Spinner size="giant" />
-      </Modal>
       <ScrollView
         style={styles.container}
+      // contentContainerStyle={styles.contentContainer}
       >
         <SafeAreaView
-          style={styles.container}
-        >
+          style={styles.container}>
           <Layout>
             <Button
               style={{
@@ -85,21 +47,42 @@ export const AdminViewGroup = (props) => {
               }}
               status='basic'
               appearance='ghost'
-              // accessoryLeft={renderBackIcon}
+              accessoryLeft={renderBackIcon}
               onPress={() => navigateToGroupRides()}
 
             >
               Group Rides
-            </Button>
+          </Button>
             <Image
               style={styles.Logo}
-              source={require('../UserProfile/extra/Logo.png')}
+              source={require('./../UserProfile/extra/Logo.png')}
             />
-          </Layout>
-          <Text>
-            {`Get information from the server about this group ride.`}
+            <Text
+              style={{ alignSelf: 'center' }}
+              category='s1'>
+              Group Ride
           </Text>
+          </Layout>
+          <Text
+            style={{ alignSelf: 'center' }}
+            category='h2'>
+            {`${Dummy.title}`}
+          </Text>
+          <Text
+            style={{ alignSelf: 'center', marginTop: 15 }}
+            category='p2'>
+            {`${Dummy.description}`}
+          </Text>
+
+          <List
+            style={styles.container}
+            data={Dummy}
+            ItemSeparatorComponent={Divider}
+            renderItem={renderItem}
+          />
+          
         </SafeAreaView>
+
       </ScrollView>
 
     </>

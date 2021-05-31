@@ -29,12 +29,13 @@ const GroupList = (props) => {
         borderColor: '#27afe2'
       }}
         onPress={() => {
+          setCurrentEventDetails(details)
           if (isAdmin) {
             // Show admin's page
             navigateToAdminView()
           } else {
             // Show event page
-            setCurrentEventDetails(details)
+            // setCurrentEventDetails(details)
             setShowModal(true)
           }
         }}
@@ -68,7 +69,10 @@ const GroupList = (props) => {
   }
 
   const navigateToAdminView = () =>{
-    navigation && navigation.navigate("AdminViewGroup")
+    console.log(currentEventDetails)
+    navigation && navigation.navigate('AdminViewGroup', {
+      Id: `${currentEventDetails._id}`})
+      
   }
 
   return (
