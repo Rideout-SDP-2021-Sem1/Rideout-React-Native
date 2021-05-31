@@ -48,8 +48,8 @@ const styles = StyleSheet.create({
   },
   followImage: {
     height: 35,
-    width:35,
-    alignSelf: "center"
+    width: 35,
+    alignSelf: "center",
   },
 });
 
@@ -124,17 +124,17 @@ const Map = () => {
 
   const [followUser, setFollowUser] = useState(true);
 
-  const [followImage, setFollowImage] = useState(require('./share_faded.png'));
+  const [followImage, setFollowImage] = useState(require("./share_faded.png"));
   const [followStyleBackground, setFollowStyleBackground] = useState("#ffffff");
   const [followStyleBorder, setFollowStyleBorder] = useState("#27afe2");
 
   const changeFollowStatus = () => {
     if (followUser) {
-      setFollowImage(require('./share_faded.png'));
+      setFollowImage(require("./share_faded.png"));
       setFollowStyleBackground("#ffffff");
       setFollowStyleBorder("#27afe2");
     } else {
-      setFollowImage(require('./share_white.png'));
+      setFollowImage(require("./share_white.png"));
       setFollowStyleBackground("#27afe2");
       setFollowStyleBorder("#ffffff");
     }
@@ -459,19 +459,43 @@ const Map = () => {
       </MapView>
       <View
         style={{
+          flexDirection: "row",
+          position: "absolute",
+          top: "0%",
+          padding: 5,
+          width: "100%",
+          alignContent: "center",
+          justifyContent: "center",
+          backgroundColor: "#ffffff",
+          borderBottomWidth: 3,
+          borderBottomColor: "#27afe2",
+        }}
+      >
+        <Text>Weather forecast in 1 hour: </Text>
+        <Text style={{fontWeight: "bold"}}>{forecast}</Text>
+      </View>
+      <View
+        style={{
+          flexDirection: "row",
           position: "absolute",
           top: "5%",
           alignSelf: "center",
         }}
       >
-        <Text>{forecast}</Text>
         <Button
           title={SharingTitle}
           onPress={changeSharingStatus}
           color={sharingStyle}
         />
-        <Pressable onPress={changeFollowStatus} style={{...styles.followButton, backgroundColor: followStyleBackground, borderColor: followStyleBorder}}>
-          <Image source={followImage} style={styles.followImage}/>
+        <Pressable
+          onPress={changeFollowStatus}
+          style={{
+            ...styles.followButton,
+            backgroundColor: followStyleBackground,
+            borderColor: followStyleBorder,
+          }}
+        >
+          <Image source={followImage} style={styles.followImage} />
         </Pressable>
       </View>
       <View
@@ -506,7 +530,16 @@ const Map = () => {
           alignSelf: "flex-end",
         }}
       >
-        <Button title="EMERGENCY" onPress={callEmergency} color="#c71432" />
+        <Pressable
+          onPress={callEmergency}
+          style={{
+            ...styles.followButton,
+            backgroundColor: "#c71432",
+            borderColor: "#ffffff",
+          }}
+        >
+          <Image source={require('./emergency_icon.png')} style={styles.followImage} />
+        </Pressable>
       </View>
     </View>
   );
