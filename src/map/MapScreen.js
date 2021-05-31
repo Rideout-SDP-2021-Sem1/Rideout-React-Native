@@ -40,18 +40,18 @@ const Map = () => {
     var formattedLat = Math.trunc(region.latitude);
     var formattedLong = Math.trunc(region.longitude);
     const url =
-      "https://api.openweathermap.org/data/2.5/weather?lat=" +
+      "https://api.openweathermap.org/data/2.5/onecall?lat=" +
       formattedLat +
       "&lon=" +
       formattedLong +
-      "&appid=5d9c4214bba669bd9a39192ab06885f2";
+      "&exclude=current,minutely,daily,alerts&appid=5d9c4214bba669bd9a39192ab06885f2";
 
     fetch(url)
       .then((result) => result.json())
       .then((data) => {
-        setForecast(data.weather[0].main);
+        setForecast(data.hourly[0].weather[0].main);
         console.log("Successfully recieved forecast from API. ");
-        console.info("Forecast retrieved: " + data.weather[0].main);
+        console.info("Forecast retrieved: " + data.hourly[0].weather[0].main);
       })
       .catch((error) => {
         console.error("WeatherAPI Fetch: " + error.message);
