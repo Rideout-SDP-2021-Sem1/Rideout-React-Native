@@ -45,5 +45,5 @@ npm run android
  
  ```
 
-#ISSUES
+# ISSUES
 Our main issue is that we are having trouble implementing google maps for IOS, A lot of the features on Android, are not as smooth or work the same way as we intended on IOS. 
