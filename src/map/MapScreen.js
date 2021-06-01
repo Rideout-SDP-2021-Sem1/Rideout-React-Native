@@ -38,6 +38,7 @@ import { getDistance } from "geolib";
 import * as FS from "./FileStorage";
 import { getForecast } from "./Forecast";
 import { SocketContext } from "../context";
+import RNFS from "react-native-fs";
 
 //Map style
 const styles = StyleSheet.create({
@@ -73,16 +74,22 @@ const styles = StyleSheet.create({
   },
 });
 
+const locationHistoryPath = RNFS.DocumentDirectoryPath + "/locationHistory.txt";
+const homeLocationPath = RNFS.DocumentDirectoryPath + "/homeLocation.txt";
+const locationHistoryExportPath =
+  RNFS.DownloadDirectoryPath + "/locationHistory.txt";
+
+export const exportLocationHistory = () => {
+  FS.exportFile(RNFS, locationHistoryPath, locationHistoryExportPath);
+};
+
+export const clearLocationHistory = () => {
+  FS.clearFile(RNFS, locationHistoryPath);
+};
+
 const Map = () => {
   const mapRef = useRef(null);
   const { socket, socketReady } = useContext(SocketContext);
-
-  var RNFS = require("react-native-fs");
-  const locationHistoryPath =
-    RNFS.DocumentDirectoryPath + "/locationHistory.txt";
-  const homeLocationPath = RNFS.DocumentDirectoryPath + "/homeLocation.txt";
-  const locationHistoryExportPath =
-    RNFS.DownloadDirectoryPath + "/locationHistory.txt";
 
   useEffect(() => {
     FS.checkFile(RNFS, locationHistoryPath);
@@ -373,130 +380,129 @@ const Map = () => {
   //Google map render
   return (
     <View style={styles.container}>
-        <MapView
-          ref={mapRef}
-          provider={PROVIDER_GOOGLE}
-          style={styles.map}
-          customMapStyle={rideoutMapStyle}
-          initialRegion={region} //Change this to a function to get current location?
-          followsUserLocation={followUser} //IOS ONLY
-          onUserLocationChange={(event) => userLocationChanged(event)}
-          userLocationPriority={"high"}
-          userLocationAnnotationTitle={"Me"}
-          showsUserLocation={true}
-          showsMyLocationButton={false} //IOS ONLY
-          showsCompass={true}
-          showsTraffic={false}
-          loadingEnabled={true}
-          loadingIndicatorColor={"#27afe2"}
-          loadingBackgroundColor={"#dedede"}
-        >
-          {/*Render the users' location on the map as markers*/}
-          {riderLocations.map((currentObj) => {
-            return (
-              <Marker
-                key={currentObj.userId}
-                coordinate={{
-                  latitude: parseFloat(currentObj.latitude) || 0,
-                  longitude: parseFloat(currentObj.longitude) || 0,
-                }}
-                title={currentObj.nickname}
-                calloutAnchor={{ x: 0.5, y: -0.1 }}
-              >
-                {/*Render the marker as the custom image*/}
-                <Image
-                  source={require("./rider_marker_solid.png")}
-                  style={{ width: 36, height: 36 }}
-                  resizeMethod="resize"
-                  resizeMode="contain"
-                />
-                {/*Popup UI when marker is clicked*/}
-                <Callout
-                  tooltip={true}
-                  style={styles.riderCallout}
-                  onPress={() => {
-                    requestRide(currentObj.userId);
-                  }}
-                >
-                  <RiderCallout rider={currentObj} />
-                </Callout>
-              </Marker>
-            );
-          })}
-
-          {/*Render the groups' location on the map as markers*/}
-          {groupLocations.map((currentObj) => {
-            return (
-              <Marker
-                key={currentObj["_id"]}
-                coordinate={{
-                  latitude:
-                    parseFloat(currentObj?.meetupLocation?.latitude) || 0,
-                  longitude:
-                    parseFloat(currentObj?.meetupLocation?.longitude) || 0,
+      <MapView
+        ref={mapRef}
+        provider={PROVIDER_GOOGLE}
+        style={styles.map}
+        customMapStyle={rideoutMapStyle}
+        initialRegion={region} //Change this to a function to get current location?
+        followsUserLocation={followUser} //IOS ONLY
+        onUserLocationChange={(event) => userLocationChanged(event)}
+        userLocationPriority={"high"}
+        userLocationAnnotationTitle={"Me"}
+        showsUserLocation={true}
+        showsMyLocationButton={false} //IOS ONLY
+        showsCompass={true}
+        showsTraffic={false}
+        loadingEnabled={true}
+        loadingIndicatorColor={"#27afe2"}
+        loadingBackgroundColor={"#dedede"}
+      >
+        {/*Render the users' location on the map as markers*/}
+        {riderLocations.map((currentObj) => {
+          return (
+            <Marker
+              key={currentObj.userId}
+              coordinate={{
+                latitude: parseFloat(currentObj.latitude) || 0,
+                longitude: parseFloat(currentObj.longitude) || 0,
+              }}
+              title={currentObj.nickname}
+              calloutAnchor={{ x: 0.5, y: -0.1 }}
+            >
+              {/*Render the marker as the custom image*/}
+              <Image
+                source={require("./rider_marker_solid.png")}
+                style={{ width: 36, height: 36 }}
+                resizeMethod="resize"
+                resizeMode="contain"
+              />
+              {/*Popup UI when marker is clicked*/}
+              <Callout
+                tooltip={true}
+                style={styles.riderCallout}
+                onPress={() => {
+                  requestRide(currentObj.userId);
                 }}
               >
-                {/*Render the marker as the custom image*/}
-                <Image
-                  source={require("./group_marker_solid.png")}
-                  style={{ width: 36, height: 36 }}
-                  resizeMethod="resize"
-                  resizeMode="contain"
-                />
-                {/*Popup UI when marker is clicked*/}
-                <Callout style={styles.groupCallout}>
-                  <GroupCallout group={currentObj} />
-                </Callout>
-              </Marker>
-            );
-          })}
+                <RiderCallout rider={currentObj} />
+              </Callout>
+            </Marker>
+          );
+        })}
 
-          <Marker
-            key={"home"}
-            coordinate={{
-              latitude: home.latitude,
-              longitude: home.longitude,
-            }}
-            draggable={true}
-            onDragEnd={(event) => userHomeChanged(event)}
-          >
-            <Image
-              source={require("./home_marker.png")}
-              style={{ width: 36, height: 36 }}
-              resizeMethod="resize"
-              resizeMode="contain"
-            />
-          </Marker>
-          <Circle
-            center={{
-              latitude: home.latitude,
-              longitude: home.longitude,
-            }}
-            radius={250}
-            strokeWidth={1}
-            strokeColor={"#27afe2"}
-            fillColor={"rgba(39, 175, 226, 0.1)"}
-          />
-        </MapView>
-        <View
-          style={{
-            flexDirection: "row",
-            padding: 5,
-            width: "75%",
-            alignContent: "center",
-            justifyContent: "center",
-            alignSelf: "center",
-            backgroundColor: "#ffffff",
-            borderWidth: 1.6,
-            borderColor: "#27afe2",
-            borderTopWidth: 0,
-            borderBottomRightRadius: 10,
-            borderBottomLeftRadius: 10,
+        {/*Render the groups' location on the map as markers*/}
+        {groupLocations.map((currentObj) => {
+          return (
+            <Marker
+              key={currentObj["_id"]}
+              coordinate={{
+                latitude: parseFloat(currentObj?.meetupLocation?.latitude) || 0,
+                longitude:
+                  parseFloat(currentObj?.meetupLocation?.longitude) || 0,
+              }}
+            >
+              {/*Render the marker as the custom image*/}
+              <Image
+                source={require("./group_marker_solid.png")}
+                style={{ width: 36, height: 36 }}
+                resizeMethod="resize"
+                resizeMode="contain"
+              />
+              {/*Popup UI when marker is clicked*/}
+              <Callout style={styles.groupCallout}>
+                <GroupCallout group={currentObj} />
+              </Callout>
+            </Marker>
+          );
+        })}
+
+        <Marker
+          key={"home"}
+          coordinate={{
+            latitude: home.latitude,
+            longitude: home.longitude,
           }}
+          draggable={true}
+          onDragEnd={(event) => userHomeChanged(event)}
         >
-          <Text>Weather forecast in 1 hour: </Text>
-          <Text style={{ fontWeight: "bold" }}>{forecast}</Text>
-        </View>
+          <Image
+            source={require("./home_marker.png")}
+            style={{ width: 36, height: 36 }}
+            resizeMethod="resize"
+            resizeMode="contain"
+          />
+        </Marker>
+        <Circle
+          center={{
+            latitude: home.latitude,
+            longitude: home.longitude,
+          }}
+          radius={250}
+          strokeWidth={1}
+          strokeColor={"#27afe2"}
+          fillColor={"rgba(39, 175, 226, 0.1)"}
+        />
+      </MapView>
+      <View
+        style={{
+          flexDirection: "row",
+          padding: 5,
+          width: "75%",
+          alignContent: "center",
+          justifyContent: "center",
+          alignSelf: "center",
+          backgroundColor: "#ffffff",
+          borderWidth: 1.6,
+          borderColor: "#27afe2",
+          borderTopWidth: 0,
+          borderBottomRightRadius: 10,
+          borderBottomLeftRadius: 10,
+        }}
+      >
+        <Text>Weather forecast in 1 hour: </Text>
+        <Text style={{ fontWeight: "bold" }}>{forecast}</Text>
+      </View>
       <View
         style={{
           flexDirection: "row",
@@ -551,33 +557,6 @@ const Map = () => {
           <Image source={followImage} style={styles.followImage} />
         </Pressable>
       </View>
-      {/*
-      <View
-        style={{
-          position: "absolute",
-          bottom: "5%",
-          alignSelf: "flex-start",
-        }}
-      >
-        <Button
-          title="Export History"
-          onPress={() =>
-            FS.exportFile(RNFS, locationHistoryPath, locationHistoryExportPath)
-          }
-          color="#27afe2"
-        />
-        <Button
-          title="Clear History"
-          onPress={() => FS.clearFile(RNFS, locationHistoryPath)}
-          color="#c71432"
-        />
-        <Button
-          title="DEBUG: Print History"
-          onPress={() => FS.printFileConsole(RNFS, locationHistoryPath)}
-          color="#27afe2"
-        />
-      </View>
-        */}
       <View
         style={{
           position: "absolute",
