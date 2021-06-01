@@ -8,6 +8,7 @@ import { auth } from '../../helper'
 import { serverInstance } from '../../instances'
 import { color } from 'react-native-reanimated';
 import { Colors } from 'react-native/Libraries/NewAppScreen';
+import { exportLocationHistory, clearLocationHistory} from './../../map/MapScreen'
 
 const UserProfile = (props) => {
   const licenseList = [
@@ -276,6 +277,37 @@ const UserProfile = (props) => {
           >
             Log Out
         </Button>
+
+        <Button
+         style={{
+          marginHorizontal: 24,
+          marginTop: 24,
+        }}
+        status='warning'
+        appearance='outline'
+        size='giant'
+        onPress={() => {
+          exportLocationHistory
+        }}
+        >
+          Location History
+        </Button>
+
+        <Button
+         style={{
+          marginHorizontal: 24,
+          marginTop: 24,
+        }}
+        status='warning'
+        appearance='outline'
+        size='giant'
+        onPress={() => {
+          clearLocationHistory
+        }}
+        >
+          Clear Location History
+        </Button>
+
         </Layout>
       </ScrollView>
       <Modal
