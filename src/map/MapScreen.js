@@ -1,3 +1,18 @@
+/**
+ * TODO
+ * Make weather bar not absolute, squish mapview down
+ * Add group rides
+ * Change online/offline button into pressable
+ * Move delete/export history to profile page
+ * Update callout styles
+ * Make callout styles dependent on isInAnActiveGroup (remove request rideout button)
+ * Move styles to stylesheet
+ * Unit testing
+ * Add comments
+ * Reflection
+ * Documentation
+ */
+
 import React, { useEffect, useState, useRef, useContext } from "react";
 import {
   View,
@@ -42,7 +57,7 @@ const styles = StyleSheet.create({
   followButton: {
     height: 50,
     width: 50,
-    borderWidth: 2,
+    borderWidth: 3,
     borderRadius: 15,
     justifyContent: "center",
   },
@@ -124,9 +139,9 @@ const Map = () => {
 
   const [followUser, setFollowUser] = useState(true);
 
-  const [followImage, setFollowImage] = useState(require("./share_faded.png"));
-  const [followStyleBackground, setFollowStyleBackground] = useState("#ffffff");
-  const [followStyleBorder, setFollowStyleBorder] = useState("#27afe2");
+  const [followImage, setFollowImage] = useState(require("./share_white.png"));
+  const [followStyleBackground, setFollowStyleBackground] = useState("#27afe2");
+  const [followStyleBorder, setFollowStyleBorder] = useState("#ffffff");
 
   const changeFollowStatus = () => {
     if (followUser) {
@@ -353,140 +368,173 @@ const Map = () => {
   //Google map render
   return (
     <View style={styles.container}>
-      <MapView
-        ref={mapRef}
-        provider={PROVIDER_GOOGLE}
-        style={styles.map}
-        customMapStyle={rideoutMapStyle}
-        initialRegion={region} //Change this to a function to get current location?
-        followsUserLocation={followUser} //IOS ONLY
-        onUserLocationChange={(event) => userLocationChanged(event)}
-        userLocationPriority={"high"}
-        userLocationAnnotationTitle={"Me"}
-        showsUserLocation={true}
-        showsMyLocationButton={false} //IOS ONLY
-        showsCompass={true}
-        showsTraffic={false}
-        loadingEnabled={true}
-        loadingIndicatorColor={"#27afe2"}
-        loadingBackgroundColor={"#dedede"}
-      >
-        {/*Render the users' location on the map as markers*/}
-        {riderLocations.map((currentObj) => {
-          return (
-            <Marker
-              key={currentObj.userId}
-              coordinate={{
-                latitude: parseFloat(currentObj.latitude) || 0,
-                longitude: parseFloat(currentObj.longitude) || 0,
-              }}
-              title={currentObj.nickname}
-              calloutAnchor={{ x: 0.5, y: -0.1 }}
-            >
-              {/*Render the marker as the custom image*/}
-              <Image
-                source={require("./rider_marker_solid.png")}
-                style={{ width: 36, height: 36 }}
-                resizeMethod="resize"
-                resizeMode="contain"
-              />
-              {/*Popup UI when marker is clicked*/}
-              <Callout
-                tooltip={true}
-                style={styles.riderCallout}
-                onPress={() => {
-                  requestRide(currentObj.userId);
+        <MapView
+          ref={mapRef}
+          provider={PROVIDER_GOOGLE}
+          style={styles.map}
+          customMapStyle={rideoutMapStyle}
+          initialRegion={region} //Change this to a function to get current location?
+          followsUserLocation={followUser} //IOS ONLY
+          onUserLocationChange={(event) => userLocationChanged(event)}
+          userLocationPriority={"high"}
+          userLocationAnnotationTitle={"Me"}
+          showsUserLocation={true}
+          showsMyLocationButton={false} //IOS ONLY
+          showsCompass={true}
+          showsTraffic={false}
+          loadingEnabled={true}
+          loadingIndicatorColor={"#27afe2"}
+          loadingBackgroundColor={"#dedede"}
+        >
+          {/*Render the users' location on the map as markers*/}
+          {riderLocations.map((currentObj) => {
+            return (
+              <Marker
+                key={currentObj.userId}
+                coordinate={{
+                  latitude: parseFloat(currentObj.latitude) || 0,
+                  longitude: parseFloat(currentObj.longitude) || 0,
+                }}
+                title={currentObj.nickname}
+                calloutAnchor={{ x: 0.5, y: -0.1 }}
+              >
+                {/*Render the marker as the custom image*/}
+                <Image
+                  source={require("./rider_marker_solid.png")}
+                  style={{ width: 36, height: 36 }}
+                  resizeMethod="resize"
+                  resizeMode="contain"
+                />
+                {/*Popup UI when marker is clicked*/}
+                <Callout
+                  tooltip={true}
+                  style={styles.riderCallout}
+                  onPress={() => {
+                    requestRide(currentObj.userId);
+                  }}
+                >
+                  <RiderCallout rider={currentObj} />
+                </Callout>
+              </Marker>
+            );
+          })}
+
+          {/*Render the groups' location on the map as markers*/}
+          {groupLocations.map((currentObj) => {
+            return (
+              <Marker
+                key={currentObj["_id"]}
+                coordinate={{
+                  latitude:
+                    parseFloat(currentObj?.meetupLocation?.latitude) || 0,
+                  longitude:
+                    parseFloat(currentObj?.meetupLocation?.longitude) || 0,
                 }}
               >
-                <RiderCallout rider={currentObj} />
-              </Callout>
-            </Marker>
-          );
-        })}
+                {/*Render the marker as the custom image*/}
+                <Image
+                  source={require("./group_marker_solid.png")}
+                  style={{ width: 36, height: 36 }}
+                  resizeMethod="resize"
+                  resizeMode="contain"
+                />
+                {/*Popup UI when marker is clicked*/}
+                <Callout style={{ width: 250, height: 250 }}>
+                  <GroupCallout group={currentObj} />
+                </Callout>
+              </Marker>
+            );
+          })}
 
-        {/*Render the groups' location on the map as markers*/}
-        {groupLocations.map((currentObj) => {
-          return (
-            <Marker
-              key={currentObj["_id"]}
-              coordinate={{
-                latitude: parseFloat(currentObj?.meetupLocation?.latitude) || 0,
-                longitude:
-                  parseFloat(currentObj?.meetupLocation?.longitude) || 0,
-              }}
-            >
-              {/*Render the marker as the custom image*/}
-              <Image
-                source={require("./group_marker_solid.png")}
-                style={{ width: 36, height: 36 }}
-                resizeMethod="resize"
-                resizeMode="contain"
-              />
-              {/*Popup UI when marker is clicked*/}
-              <Callout style={{ width: 250, height: 250 }}>
-                <GroupCallout group={currentObj} />
-              </Callout>
-            </Marker>
-          );
-        })}
-
-        <Marker
-          key={"home"}
-          coordinate={{
-            latitude: home.latitude,
-            longitude: home.longitude,
-          }}
-          draggable={true}
-          onDragEnd={(event) => userHomeChanged(event)}
-        >
-          <Image
-            source={require("./home_marker.png")}
-            style={{ width: 36, height: 36 }}
-            resizeMethod="resize"
-            resizeMode="contain"
+          <Marker
+            key={"home"}
+            coordinate={{
+              latitude: home.latitude,
+              longitude: home.longitude,
+            }}
+            draggable={true}
+            onDragEnd={(event) => userHomeChanged(event)}
+          >
+            <Image
+              source={require("./home_marker.png")}
+              style={{ width: 36, height: 36 }}
+              resizeMethod="resize"
+              resizeMode="contain"
+            />
+          </Marker>
+          <Circle
+            center={{
+              latitude: home.latitude,
+              longitude: home.longitude,
+            }}
+            radius={250}
+            strokeWidth={1}
+            strokeColor={"#27afe2"}
+            fillColor={"rgba(39, 175, 226, 0.1)"}
           />
-        </Marker>
-        <Circle
-          center={{
-            latitude: home.latitude,
-            longitude: home.longitude,
+        </MapView>
+        <View
+          style={{
+            flexDirection: "row",
+            padding: 5,
+            width: "75%",
+            alignContent: "center",
+            justifyContent: "center",
+            alignSelf: "center",
+            backgroundColor: "#ffffff",
+            borderWidth: 3,
+            borderColor: "#27afe2",
+            borderTopWidth: 0,
+            borderBottomRightRadius: 10,
+            borderBottomLeftRadius: 10,
           }}
-          radius={250}
-          strokeWidth={1}
-          strokeColor={"#27afe2"}
-          fillColor={"rgba(39, 175, 226, 0.1)"}
-        />
-      </MapView>
+        >
+          <Text>Weather forecast in 1 hour: </Text>
+          <Text style={{ fontWeight: "bold" }}>{forecast}</Text>
+        </View>
       <View
         style={{
           flexDirection: "row",
           position: "absolute",
-          top: "0%",
-          padding: 5,
-          width: "100%",
-          alignContent: "center",
-          justifyContent: "center",
-          backgroundColor: "#ffffff",
-          borderBottomWidth: 3,
-          borderBottomColor: "#27afe2",
+          top: "4.5%",
+          alignSelf: "center",
+          padding: 10,
         }}
       >
-        <Text>Weather forecast in 1 hour: </Text>
-        <Text style={{fontWeight: "bold"}}>{forecast}</Text>
+        <Pressable
+          onPress={changeSharingStatus}
+          style={{
+            backgroundColor: sharingStyle,
+            height: 50,
+            width: 200,
+            alignContent: "center",
+            justifyContent: "center",
+            borderRadius: 10,
+            borderColor: "#ffffff",
+            borderWidth: 3,
+          }}
+        >
+          <Text
+            style={{
+              fontWeight: "bold",
+              color: "#ffffff",
+              fontSize: 25,
+              alignSelf: "center",
+            }}
+          >
+            {SharingTitle}
+          </Text>
+        </Pressable>
       </View>
       <View
         style={{
           flexDirection: "row",
           position: "absolute",
-          top: "5%",
-          alignSelf: "center",
+          top: "4.5%",
+          alignSelf: "flex-end",
+          padding: 10,
         }}
       >
-        <Button
-          title={SharingTitle}
-          onPress={changeSharingStatus}
-          color={sharingStyle}
-        />
         <Pressable
           onPress={changeFollowStatus}
           style={{
@@ -498,6 +546,7 @@ const Map = () => {
           <Image source={followImage} style={styles.followImage} />
         </Pressable>
       </View>
+      {/*
       <View
         style={{
           position: "absolute",
@@ -523,11 +572,13 @@ const Map = () => {
           color="#27afe2"
         />
       </View>
+        */}
       <View
         style={{
           position: "absolute",
-          bottom: "5%",
+          bottom: "0%",
           alignSelf: "flex-end",
+          padding: 10,
         }}
       >
         <Pressable
@@ -538,7 +589,10 @@ const Map = () => {
             borderColor: "#ffffff",
           }}
         >
-          <Image source={require('./emergency_icon.png')} style={styles.followImage} />
+          <Image
+            source={require("./emergency_icon.png")}
+            style={styles.followImage}
+          />
         </Pressable>
       </View>
     </View>
