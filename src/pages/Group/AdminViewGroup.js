@@ -1,17 +1,38 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { ScrollView, Image, SafeAreaView, View, Alert } from 'react-native';
 import {
   IndexPath, Button, StyleService, useStyleSheet, Input, Select,
   SelectItem, Text, Layout, Modal, Card, Spinner, Icon, List, ListItem, Divider
 } from '@ui-kitten/components';
-import { auth } from '../../helper'
 import { serverInstance } from '../../instances'
-import { color } from 'react-native-reanimated';
-import { Colors } from 'react-native/Libraries/NewAppScreen';
-import Dummy from './dummyData.json'
+import dummy from './dummyData.json'
+import { SocketContext } from '../../context'
 
 export const AdminViewGroup = ({ route, navigation }) => {
-  const { Id } = route.params
+  const [groupId, setGroupId] = useState(route.params.Id)
+
+  const socketObj = useContext(SocketContext)
+
+  useEffect(() => {
+    const currentRouteGroupId = route.params.Id
+    setGroupId(currentRouteGroupId)
+    const getData = async () => {
+      try {
+        socketObj.setLoading(true)
+        const response = await serverInstance.get("/group-single", {
+          params: {
+            id: currentRouteGroupId
+          }
+        })
+        console.log("result", response.data)
+      } catch (err) {
+        console.error("error AdminViewGroup", err)
+      } finally {
+        socketObj.setLoading(false)
+      }
+    }
+    getData()
+  }, [route])
 
   const styles = useStyleSheet(themedStyle);
 
@@ -25,17 +46,15 @@ export const AdminViewGroup = ({ route, navigation }) => {
 
   const renderItem = ({ item }) => (
     <ListItem
-      title={`${item.minimumPreferredPace}`}
+      title={`${item.nickname}`}
       description={`${item.description}`}
     />
   );
 
-
   return (
     <>
-      <ScrollView
+      <View
         style={styles.container}
-      // contentContainerStyle={styles.contentContainer}
       >
         <SafeAreaView
           style={styles.container}>
@@ -49,7 +68,6 @@ export const AdminViewGroup = ({ route, navigation }) => {
               appearance='ghost'
               accessoryLeft={renderBackIcon}
               onPress={() => navigateToGroupRides()}
-
             >
               Group Rides
           </Button>
@@ -66,29 +84,25 @@ export const AdminViewGroup = ({ route, navigation }) => {
           <Text
             style={{ alignSelf: 'center' }}
             category='h2'>
-            {`${Dummy.title}`}
+            {`${dummy.title}`}
           </Text>
           <Text
             style={{ alignSelf: 'center', marginTop: 15 }}
             category='p2'>
-            {`${Dummy.description}`}
+            {`${dummy.description}`}
           </Text>
 
           <List
             style={styles.container}
-            data={Dummy}
+            data={dummy.users}
             ItemSeparatorComponent={Divider}
             renderItem={renderItem}
           />
-          
         </SafeAreaView>
-
-      </ScrollView>
-
+      </View>
     </>
   );
 };
-
 
 const themedStyle = StyleService.create({
   container: {

@@ -9,7 +9,6 @@ import { auth } from '../../helper'
 import { serverInstance } from '../../instances'
 import moment from 'moment'
 import FAB from 'react-native-fab'
-import { AdminViewGroup } from './AdminViewGroup';
 
 const GroupList = (props) => {
   const navigation = props.navigation
@@ -32,7 +31,7 @@ const GroupList = (props) => {
           setCurrentEventDetails(details)
           if (isAdmin) {
             // Show admin's page
-            navigateToAdminView()
+            navigateToAdminView(details)
           } else {
             // Show event page
             // setCurrentEventDetails(details)
@@ -67,9 +66,9 @@ const GroupList = (props) => {
     navigation && navigation.navigate("CreateEvent")
   }
 
-  const navigateToAdminView = () => {
+  const navigateToAdminView = (details) => {
     navigation && navigation.navigate('AdminViewGroup', {
-      Id: `${currentEventDetails._id}`
+      Id: `${details._id}`
     })
   }
 
