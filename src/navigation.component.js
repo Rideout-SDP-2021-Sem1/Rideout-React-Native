@@ -9,8 +9,11 @@ import {
   UserProfile,
   MapScreenLayout,
   GroupListLayout,
-  GroupCreateLayout
+  GroupCreateLayout,
+  AdminViewGroup
 } from './pages'
+import PopUps from './pages/PopUps/PopUps'
+import { set } from 'react-native-reanimated'
 
 const { Navigator, Screen } = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -18,6 +21,7 @@ const Tab = createBottomTabNavigator();
 
 const HomeNavigator = () => {
   const [user, setUser] = useState(null)
+  const [display, setDisplay] = useState(false)
   const [selectedNavigationIndex, setSelectedNavigationIndex] = useState(0)
   const navigationRef = useRef(null)
 

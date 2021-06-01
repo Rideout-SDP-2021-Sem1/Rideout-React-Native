@@ -1,0 +1,34 @@
+{
+    "_id": {
+      "$oid": "608ba0eda08893012c79af77"
+    },
+    "usersUid": [],
+    "ownerUid": "CEwWh5P5e8VQ868RjkB14xdfD263",
+    "meetupLocation": {
+      "latitude": "-36.84475",
+      "longitude": "174.77304"
+    },
+    "meetupTime": {
+      "$date": "2021-04-29T11:56:40.000Z"
+    },
+    "maximumAttendant": 10,
+    "currentAttendant": 5,
+    "minimumPreferredPace": "Spirited",
+    "minimumLicenseLevel": "Full",
+    "title": "Trackday Session",
+    "description": "This is for a trackday meetup at Hampton Downs Race Track. Free Entry.",
+    "createdAt": {
+      "$date": "2021-04-30T06:17:17.276Z"
+    },
+    "updatedAt": {
+      "$date": "2021-04-30T06:17:17.276Z"
+    },
+    "__v": 0,
+    "users": [{
+      "nickname": "Bob Liou",
+      "uid": "CEwWh5P5e8VQ868RjkB14xdfD263"
+    }, {
+      "nickname": "Test User",
+      "uid": "9MSUi01BEvcyP4QiljVM0Mq2Wer1"
+    }]
+  }

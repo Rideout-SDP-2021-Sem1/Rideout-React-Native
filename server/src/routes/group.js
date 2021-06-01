@@ -32,7 +32,6 @@ groupRoute.route("/group")
         usersUid: [],
         currentAttendant: 1
       }
-
       const insertResult = await (new Group(insertObj)).save()
 
       return res.status(200).json(insertResult["_id"])
