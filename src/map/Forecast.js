@@ -1,3 +1,4 @@
+// Function to get the weather forecast back using OpenWeatherMap API
 export const getForecast = async (region) => {
   console.log("Getting forecast from API. ");
   var formattedLat = Math.trunc(region.latitude);

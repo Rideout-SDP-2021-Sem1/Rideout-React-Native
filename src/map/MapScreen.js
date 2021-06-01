@@ -3,10 +3,10 @@
  * ----Make weather bar not absolute, squish mapview down----
  * Add group rides
  * ----Change online/offline button into pressable----
- * Move delete/export history to profile page
- * Update callout styles
+ * ----Move delete/export history to profile page----
+ * ----Update callout styles----
  * Make callout styles dependent on isInAnActiveGroup (remove request rideout button)
- * Move styles to stylesheet
+ * ~~~~Move styles to stylesheet~~~~
  * Unit testing
  * Add comments
  * Reflection
@@ -16,7 +16,6 @@
 import React, { useEffect, useState, useRef, useContext } from "react";
 import {
   View,
-  Button,
   Image,
   StyleSheet,
   Linking,
@@ -40,7 +39,7 @@ import { getForecast } from "./Forecast";
 import { SocketContext } from "../context";
 import RNFS from "react-native-fs";
 
-//Map style
+// Style sheet for the map, callouts, and buttons
 const styles = StyleSheet.create({
   container: {
     ...StyleSheet.absoluteFillObject,
@@ -74,29 +73,39 @@ const styles = StyleSheet.create({
   },
 });
 
+// Constants for the file location of location history and home location
 const locationHistoryPath = RNFS.DocumentDirectoryPath + "/locationHistory.txt";
 const homeLocationPath = RNFS.DocumentDirectoryPath + "/homeLocation.txt";
 const locationHistoryExportPath =
   RNFS.DownloadDirectoryPath + "/locationHistory.txt";
 
+// Exported function to export location history into downloads directory (called from profile page)
 export const exportLocationHistory = () => {
   FS.exportFile(RNFS, locationHistoryPath, locationHistoryExportPath);
+  console.log("***Exporting location history***");
 };
 
+// Exported function to clear location history file (called from profile page)
 export const clearLocationHistory = () => {
   FS.clearFile(RNFS, locationHistoryPath);
+  console.log("***Clearing location history***");
 };
 
+// Main function
 const Map = () => {
+  // Referenct for the map
   const mapRef = useRef(null);
+
+  // Socket to send/recieve request rideout with other users
   const { socket, socketReady } = useContext(SocketContext);
 
+  // Check if location history and home location files exists, if not, create one
   useEffect(() => {
     FS.checkFile(RNFS, locationHistoryPath);
     FS.checkFile(RNFS, homeLocationPath);
   }, []);
 
-  //Map region of the user's location
+  // Map region of the user's location
   const [region, setRegion] = useState({
     latitude: -36.85088,
     longitude: 174.7645,
@@ -104,21 +113,23 @@ const Map = () => {
     longitudeDelta: 0.0242,
   });
 
+  // Location of home that user sets
   const [home, setHome] = useState({
     latitude: -36.85088,
     longitude: 174.7645,
   });
 
-  const [sharingLocation, setSharingStatus] = useState(false); //the offline/online button
-  const [atHome, setAtHome] = useState(true); //use this to determine if user sends location to server or not
+  // Boolean of the online/offline button
+  const [sharingLocation, setSharingStatus] = useState(false);
 
-  useEffect(() => {
-    console.info("At home: " + atHome);
-  }, [atHome]);
+  // Boolean to show if user is at home or not
+  const [atHome, setAtHome] = useState(true);
 
+  // Online/offline button style states
   const [SharingTitle, setSharingTitle] = useState("Go Online");
   const [sharingStyle, setSharingStyle] = useState("#27afe2");
 
+  // Online/offline handling
   const changeSharingStatus = () => {
     if (sharingLocation) {
       setSharingTitle("Go Online");
@@ -130,31 +141,29 @@ const Map = () => {
     setSharingStatus((sharingLocation) => !sharingLocation);
   };
 
-  useEffect(() => {
-    console.log("STATE sharingLocation: " + sharingLocation);
-  }, [sharingLocation]);
-
+  // Forecast state, used to display the forecast from API
   const [forecast, setForecast] = useState("Loading Forecast...");
 
+  // Function to update the forecast through OpenWeatherMap API, called using setInterval
   const updateForecast = async () => {
     var newForecast = await getForecast(region);
     setForecast(newForecast);
   };
 
-  useEffect(() => {
-    console.log("Forecast: " + forecast);
-  }, [forecast]);
-
+  // Update the forecast when app is launched
   useEffect(() => {
     updateForecast();
   }, []);
 
+  // Boolean to determine to follow/center the user on the map
   const [followUser, setFollowUser] = useState(true);
 
+  // States for follow/center user button style
   const [followImage, setFollowImage] = useState(require("./share_white.png"));
   const [followStyleBackground, setFollowStyleBackground] = useState("#27afe2");
   const [followStyleBorder, setFollowStyleBorder] = useState("#ffffff");
 
+  // Follow/center button handling
   const changeFollowStatus = () => {
     if (followUser) {
       setFollowImage(require("./share_faded.png"));
@@ -168,11 +177,7 @@ const Map = () => {
     setFollowUser((followUser) => !followUser);
   };
 
-  useEffect(() => {
-    // console.log("Log: state followUser: " + followUser);
-  }, [followUser]);
-
-  // Setup state variables for this component
+  // Array of riders and group ride locations that will be filled by the server
   const [riderLocations, setRiderLocations] = useState([]);
   const [groupLocations, setGroupLocations] = useState([]);
 
@@ -183,22 +188,20 @@ const Map = () => {
       const lat = location?.coords?.latitude;
       const lng = location?.coords?.longitude;
       if (lat === undefined || lng === undefined || lat === "" || lng === "") {
-        //put atHome here
-        // console.log("Log: sendMyLocation refused to send location to server. ");
       } else {
         await serverInstance.post("/location", {
           latitude: lat,
           longitude: lng,
           hidden: false,
         });
-        // console.log("Log: sendMyLocation sent location to server. ");
       }
     } catch (err) {
       console.error(
-        "ERROR: sendMyLocation could not send user location to server. ",
+        "sendMyLocation could not send user location to server. ",
         err
       );
     }
+    // Record location of the user locally
     FS.recordLocation(
       RNFS,
       locationHistoryPath,
@@ -207,7 +210,7 @@ const Map = () => {
     );
   };
 
-  //Function to get the current location of the user
+  // Function to get the current location of the user
   const getMyLocation = () => {
     try {
       Geolocation.getCurrentPosition(
@@ -224,7 +227,7 @@ const Map = () => {
     }
   };
 
-  // Get other rider's location
+  // Function to get riders location from server
   const getRidersLocation = async () => {
     try {
       const response = await serverInstance.get("/location");
@@ -238,7 +241,7 @@ const Map = () => {
     }
   };
 
-  // Get list of group location
+  // Get list of group location from server
   const getGroupLocation = async () => {
     try {
       const response = await serverInstance.get("/group");
@@ -249,6 +252,8 @@ const Map = () => {
     }
   };
 
+  // Useeffect with setInterval to periodically call functions to get riders, groups from server
+  // And update the weather forecast
   useEffect(() => {
     getMyLocation();
     getRidersLocation();
@@ -269,6 +274,7 @@ const Map = () => {
     };
   }, []);
 
+  // Get riders and groups when app starts
   useEffect(() => {
     const getData = async () => {
       try {
@@ -282,6 +288,7 @@ const Map = () => {
     getData();
   }, []);
 
+  // Function to animate map to region, used to center user
   const animateToRegion = () => {
     if (mapRef.current) {
       mapRef.current.animateToRegion(
@@ -296,6 +303,7 @@ const Map = () => {
     }
   };
 
+  // Function to check if the user is at home or not
   const checkIfAtHome = (latitude, longitude, isUserChange) => {
     var distance = 0;
     if (isUserChange) {
@@ -316,12 +324,7 @@ const Map = () => {
     }
   };
 
-  /* now dependent on userLocationChanged happening when app launches
-  useEffect(() => {
-    checkIfAtHome();
-  }, []);
-  */
-
+  // Function to update the region of the map if the user moves
   const userLocationChanged = (event) => {
     var lat = event.nativeEvent.coordinate.latitude;
     var long = event.nativeEvent.coordinate.longitude;
@@ -337,20 +340,24 @@ const Map = () => {
     checkIfAtHome(lat, long, true);
   };
 
+  // Function to get the location of home from local storage
   const updateHomeLocation = () => {
     var homeLocation = FS.getHomeLocation(RNFS, homeLocationPath);
     setHome(homeLocation);
   };
 
+  // Get home location on app startup
   useEffect(() => {
     updateHomeLocation();
   }, []);
 
+  // Function to store the home location locally
   const storeHomeLocation = (lat, long) => {
     FS.clearFile(RNFS, homeLocationPath);
     FS.recordLocation(RNFS, homeLocationPath, lat, long);
   };
 
+  // Function to handle if the user's home marker has been moved
   const userHomeChanged = (event) => {
     var lat = event.nativeEvent.coordinate.latitude;
     var long = event.nativeEvent.coordinate.longitude;
@@ -365,10 +372,12 @@ const Map = () => {
     checkIfAtHome(lat, long, false);
   };
 
+  // Function to open phone app and set 111 as phone number to call
   const callEmergency = () => {
     Linking.openURL(`tel:${111}`);
   };
 
+  // Function to send request to ride to server
   const requestRide = (userId) => {
     //request
     console.log("request", userId);
@@ -377,7 +386,7 @@ const Map = () => {
     });
   };
 
-  //Google map render
+  // Google map render
   return (
     <View style={styles.container}>
       <MapView
@@ -385,13 +394,13 @@ const Map = () => {
         provider={PROVIDER_GOOGLE}
         style={styles.map}
         customMapStyle={rideoutMapStyle}
-        initialRegion={region} //Change this to a function to get current location?
-        followsUserLocation={followUser} //IOS ONLY
+        initialRegion={region}
+        followsUserLocation={followUser}
         onUserLocationChange={(event) => userLocationChanged(event)}
         userLocationPriority={"high"}
         userLocationAnnotationTitle={"Me"}
         showsUserLocation={true}
-        showsMyLocationButton={false} //IOS ONLY
+        showsMyLocationButton={false}
         showsCompass={true}
         showsTraffic={false}
         loadingEnabled={true}
@@ -456,7 +465,7 @@ const Map = () => {
             </Marker>
           );
         })}
-
+        {/*Render the marker of home location*/}
         <Marker
           key={"home"}
           coordinate={{
@@ -473,6 +482,7 @@ const Map = () => {
             resizeMode="contain"
           />
         </Marker>
+        {/*Render the circle around home location*/}
         <Circle
           center={{
             latitude: home.latitude,
@@ -484,6 +494,7 @@ const Map = () => {
           fillColor={"rgba(39, 175, 226, 0.1)"}
         />
       </MapView>
+      {/*View which shows the weather forecast*/}
       <View
         style={{
           flexDirection: "row",
@@ -503,6 +514,7 @@ const Map = () => {
         <Text>Weather forecast in 1 hour: </Text>
         <Text style={{ fontWeight: "bold" }}>{forecast}</Text>
       </View>
+      {/*View which shows offline/online button*/}
       <View
         style={{
           flexDirection: "row",
@@ -537,6 +549,7 @@ const Map = () => {
           </Text>
         </Pressable>
       </View>
+      {/*View which shows follow/center on user icon/button*/}
       <View
         style={{
           flexDirection: "row",
@@ -557,6 +570,7 @@ const Map = () => {
           <Image source={followImage} style={styles.followImage} />
         </Pressable>
       </View>
+      {/*View which shows call emergency icon/button*/}
       <View
         style={{
           position: "absolute",

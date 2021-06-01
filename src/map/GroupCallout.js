@@ -33,6 +33,7 @@ const styles = StyleSheet.create({
   },
 });
 
+// Returns a view which is used to display group ride callout in MapView
 const GroupCallout = (props) => {
   return (
     <View style={styles.calloutContainer}>

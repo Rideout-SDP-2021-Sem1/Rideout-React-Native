@@ -29,6 +29,7 @@ const styles = StyleSheet.create({
   },
 });
 
+// Returns a view which is used to display rider callout in MapView
 const RiderCallout = (props) => {
   return (
     <View style={styles.calloutContainer}>
