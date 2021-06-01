@@ -11,10 +11,31 @@ Enjoy These Beautiful images of this wonderfull app!
 ![image](https://user-images.githubusercontent.com/69503096/120293597-84877280-c319-11eb-83f2-4f40963a9076.png)
 
 ## How is the project built?
+### what did we use?
 The App is built on React native, coded in JavaScript, Using Google API's for map integration, and UI Kitten for Ui/UX development.
 
-##Dependencies
+### Dependencies
 - Xcode / Visual Studios
 - Google API
 - UI Kitten
+
+## Lets Run
+
+```
+npm install
+```
+#### Ios
+
+```
+cd ios
+pod install
+cd ..
+npm run ios
+```
+
+#### Android 
+```
+npm run android 
+ 
+ ```
 
