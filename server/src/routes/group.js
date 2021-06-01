@@ -29,7 +29,7 @@ groupRoute.route("/group")
       const insertObj = {
         ...data,
         ownerUid: headerUid,
-        usersUid: [],
+        usersUid: [headerUid],
         currentAttendant: 1
       }
       const insertResult = await (new Group(insertObj)).save()

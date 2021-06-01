@@ -38,6 +38,8 @@ export const CreateGroup = (props) => {
 
   const [title, setTitle] = useState("")
   const [meetupLocation, setMeetupLocation] = useState("")
+  const [destinationLocation, setDestinationLocation] = useState("")
+  const [currentSelection, setCurrentSelection] = useState("departure" || "arrival")
   const [maximumAttendant, setMaximumAttendant] = useState("")
   const [description, setDescription] = useState("")
   const [selectedLicenseIndex, setSelectedLicenseIndex] = useState(new IndexPath(0));
@@ -55,6 +57,7 @@ export const CreateGroup = (props) => {
   const [addressLookup, setAddressLookup] = useState("")
   const [addressAutocompleteResult, setAddressAutocompleteResult] = useState([])
   const [placeId, setPlaceId] = useState("")
+  const [destinationPlaceId, setDestinationPlaceId] = useState("")
   const [waiting, setWaiting] = useState(false)
 
   const handleDateAndTime = (inputValue, type) => {
@@ -114,8 +117,13 @@ export const CreateGroup = (props) => {
     const description = address?.description || ""
     const place_id = address?.place_id || ""
 
-    setMeetupLocation(description)
-    setPlaceId(place_id)
+    if (currentSelection === "departure") {
+      setMeetupLocation(description)
+      setPlaceId(place_id)
+    } else {
+      setDestinationLocation(description)
+      setDestinationPlaceId(place_id)
+    }
     // setAddressAutocompleteResult([])
     // setAddressLookup("")
     setShowDialog(false)
@@ -131,6 +139,9 @@ export const CreateGroup = (props) => {
     setPlaceId("")
     setAddressLookup("")
     setAddressAutocompleteResult([])
+    setDestinationPlaceId("")
+    setDestinationLocation("")
+    setCurrentSelection("departure")
   }
 
   const handleCreateEvent = async () => {
@@ -145,13 +156,26 @@ export const CreateGroup = (props) => {
         }
       })).data
 
+      const destinationPlaceData = (await axios.get("https://maps.googleapis.com/maps/api/place/details/json", {
+        params: {
+          placeid: destinationPlaceId,
+          key: "AIzaSyCKX3VD9qQtp6esG1Xe52s3vT1DAm72Wpo"
+        }
+      })).data
+
       const meetupLocation = {
         latitude: placeData?.result?.geometry?.location?.lat || "",
         longitude: placeData?.result?.geometry?.location?.lng || "",
       }
 
+      const destinationLocation = {
+        latitude: destinationPlaceData?.result?.geometry?.location?.lat || "",
+        longitude: destinationPlaceData?.result?.geometry?.location?.lng || "",
+      }
+
       const eventObj = {
         meetupLocation: meetupLocation,
+        destinationLocation: destinationLocation,
         meetupTime: moment(date).toISOString(),
         maximumAttendant: maximumAttendant,
         minimumLicenseLevel: licenseList[selectedLicenseIndex.row],
@@ -197,7 +221,7 @@ export const CreateGroup = (props) => {
           />
 
           <Text style={styles.subtitleBox} category="s1">
-            Location
+            Meetup Location
           </Text>
           <Input
             style={styles.bottomSpace}
@@ -209,7 +233,30 @@ export const CreateGroup = (props) => {
               end: 0
             }}
           />
-          <Button style={[styles.bottomSpace, styles.button]} onPress={() => setShowDialog(true)}>
+          <Button style={[styles.bottomSpace, styles.button]} onPress={() => {
+            setCurrentSelection("departure")
+            setShowDialog(true)
+          }}>
+            Search address
+          </Button>
+
+          <Text style={styles.subtitleBox} category="s1">
+            Destination Location
+          </Text>
+          <Input
+            style={styles.bottomSpace}
+            placeholder="Destination Location"
+            value={destinationLocation}
+            disabled={true}
+            selection={{
+              start: 0,
+              end: 0
+            }}
+          />
+          <Button style={[styles.bottomSpace, styles.button]} onPress={() => {
+            setCurrentSelection("arrival")
+            setShowDialog(true)
+          }}>
             Search address
           </Button>
 
