@@ -1,5 +1,12 @@
 import React, { useEffect, useState, useRef, useContext } from "react";
-import { View, Button, Image, StyleSheet, Linking, Text } from "react-native";
+import {
+  View,
+  Image,
+  StyleSheet,
+  Linking,
+  Text,
+  Pressable,
+} from "react-native";
 import MapView, {
   Circle,
   Marker,
@@ -14,9 +21,10 @@ import GroupCallout from "./GroupCallout";
 import { getDistance } from "geolib";
 import * as FS from "./FileStorage";
 import { getForecast } from "./Forecast";
-import { SocketContext } from '../context'
+import { SocketContext } from "../context";
+import RNFS from "react-native-fs";
 
-//Map style
+// Style sheet for the map, callouts, and buttons
 const styles = StyleSheet.create({
   container: {
     ...StyleSheet.absoluteFillObject,
@@ -31,25 +39,58 @@ const styles = StyleSheet.create({
     width: 250,
     backgroundColor: "white",
   },
+  groupCallout: {
+    height: 250,
+    width: 250,
+    backgroundColor: "white",
+  },
+  followButton: {
+    height: 60,
+    width: 60,
+    borderWidth: 1.6,
+    borderRadius: 15,
+    justifyContent: "center",
+  },
+  followImage: {
+    height: 40,
+    width: 40,
+    alignSelf: "center",
+  },
 });
 
+// Constants for the file location of location history and home location
+const locationHistoryPath = RNFS.DocumentDirectoryPath + "/locationHistory.txt";
+const homeLocationPath = RNFS.DocumentDirectoryPath + "/homeLocation.txt";
+const locationHistoryExportPath =
+  RNFS.DownloadDirectoryPath + "/locationHistory.txt";
+
+// Exported function to export location history into downloads directory (called from profile page)
+export const exportLocationHistory = () => {
+  FS.exportFile(RNFS, locationHistoryPath, locationHistoryExportPath);
+  console.log("***Exporting location history***");
+};
+
+// Exported function to clear location history file (called from profile page)
+export const clearLocationHistory = () => {
+  FS.clearFile(RNFS, locationHistoryPath);
+  console.log("***Clearing location history***");
+};
+
+// Main function
 const Map = () => {
+  // Referenct for the map
   const mapRef = useRef(null);
-  const { socket, socketReady } = useContext(SocketContext)
 
-  var RNFS = require("react-native-fs");
-  const locationHistoryPath =
-    RNFS.DocumentDirectoryPath + "/locationHistory.txt";
-  const homeLocationPath = RNFS.DocumentDirectoryPath + "/homeLocation.txt";
-  const locationHistoryExportPath =
-    RNFS.DownloadDirectoryPath + "/locationHistory.txt";
+  // Socket to send/recieve request rideout with other users
+  const { socket, socketReady } = useContext(SocketContext);
 
+  // Check if location history and home location files exists, if not, create one
   useEffect(() => {
     FS.checkFile(RNFS, locationHistoryPath);
     FS.checkFile(RNFS, homeLocationPath);
   }, []);
-  
-  //Map region of the user's location
+
+  // Map region of the user's location
   const [region, setRegion] = useState({
     latitude: -36.85088,
     longitude: 174.7645,
@@ -57,20 +98,23 @@ const Map = () => {
     longitudeDelta: 0.0242,
   });
 
+  // Location of home that user sets
   const [home, setHome] = useState({
     latitude: -36.85088,
     longitude: 174.7645,
   });
 
-  const [sharingLocation, setSharingStatus] = useState(false); //for button (online, offline) button only
-  const [atHome, setAtHome] = useState(true); //use this to determine if user sends location to server or not
-  useEffect(() => {
-    console.info("At home: " + atHome);
-  }, [atHome]);
+  // Boolean of the online/offline button
+  const [sharingLocation, setSharingStatus] = useState(false);
 
+  // Boolean to show if user is at home or not
+  const [atHome, setAtHome] = useState(true);
+
+  // Online/offline button style states
   const [sharingTitle, setSharingTitle] = useState("Go Online");
   const [sharingStyle, setSharingStyle] = useState("#27afe2");
 
+  // Online/offline handling
   const changeSharingStatus = () => {
     if (sharingLocation) {
       setSharingTitle("Go Online");
@@ -82,71 +126,67 @@ const Map = () => {
     setSharingStatus((sharingLocation) => !sharingLocation);
   };
 
-  useEffect(() => {
-    // console.log("Log: state sharingLocation: " + sharingLocation);
-  }, [sharingLocation]);
-
+  // Forecast state, used to display the forecast from API
   const [forecast, setForecast] = useState("Loading Forecast...");
 
+  // Function to update the forecast through OpenWeatherMap API, called using setInterval
   const updateForecast = async () => {
     var newForecast = await getForecast(region);
     setForecast(newForecast);
   };
 
-  useEffect(() => {
-    console.log("Forecast: " + forecast);
-  }, [forecast]);
-
+  // Update the forecast when app is launched
   useEffect(() => {
     updateForecast();
   }, []);
 
+  // Boolean to determine to follow/center the user on the map
   const [followUser, setFollowUser] = useState(true);
 
-  const [followTitle, setFollowTitle] = useState("Stop Following My Location");
-  const [followStyle, setFollowStyle] = useState("#4dd14d");
+  // States for follow/center user button style
+  const [followImage, setFollowImage] = useState(require("./share_white.png"));
+  const [followStyleBackground, setFollowStyleBackground] = useState("#27afe2");
+  const [followStyleBorder, setFollowStyleBorder] = useState("#ffffff");
 
+  // Follow/center button handling
   const changeFollowStatus = () => {
     if (followUser) {
-      setFollowTitle("Follow My Location");
-      setFollowStyle("#27afe2");
+      setFollowImage(require("./share_faded.png"));
+      setFollowStyleBackground("#ffffff");
+      setFollowStyleBorder("#27afe2");
     } else {
-      setFollowTitle("Stop Following");
-      setFollowStyle("#4dd14d");
+      setFollowImage(require("./share_white.png"));
+      setFollowStyleBackground("#27afe2");
+      setFollowStyleBorder("#ffffff");
     }
     setFollowUser((followUser) => !followUser);
   };
 
-  useEffect(() => {
-    // console.log("Log: state followUser: " + followUser);
-  }, [followUser]);
-
-  // Setup state variables for this component
+  // Array of riders and group ride locations that will be filled by the server
   const [riderLocations, setRiderLocations] = useState([]);
   const [groupLocations, setGroupLocations] = useState([]);
 
   // Function to send the user's location to the server
   const sendMyLocation = async (location) => {
+    console.log("sharingLocation: " + sharingLocation + ", atHome: " + atHome);
     try {
       const lat = location?.coords?.latitude;
       const lng = location?.coords?.longitude;
       if (lat === undefined || lng === undefined || lat === "" || lng === "") {
-        //put atHome here
-        // console.log("Log: sendMyLocation refused to send location to server. ");
       } else {
         await serverInstance.post("/location", {
           latitude: lat,
           longitude: lng,
           hidden: false,
         });
-        // console.log("Log: sendMyLocation sent location to server. ");
       }
     } catch (err) {
       console.error(
-        "ERROR: sendMyLocation could not send user location to server. ",
+        "sendMyLocation could not send user location to server. ",
         err
       );
     }
+    // Record location of the user locally
     FS.recordLocation(
       RNFS,
       locationHistoryPath,
@@ -155,7 +195,7 @@ const Map = () => {
     );
   };
 
-  //Function to get the current location of the user
+  // Function to get the current location of the user
   const getMyLocation = () => {
     try {
       Geolocation.getCurrentPosition(
@@ -165,14 +205,14 @@ const Map = () => {
             "ERROR: findCoordinates geolocation could not get location. ",
             error
           ),
-        { enableHighAccuracy: false, timeout: 20000, maximumAge: 1000 }
+        { enableHighAccuracy: true, timeout: 20000, maximumAge: 1000 }
       );
     } catch (error) {
       console.error("ERROR: findCoordinates could not get location. ", error);
     }
   };
 
-  // Get other rider's location
+  // Function to get riders location from server
   const getRidersLocation = async () => {
     try {
       const response = await serverInstance.get("/location");
@@ -186,7 +226,7 @@ const Map = () => {
     }
   };
 
-  // Get list of group location
+  // Get list of group location from server
   const getGroupLocation = async () => {
     try {
       const response = await serverInstance.get("/group");
@@ -197,6 +237,8 @@ const Map = () => {
     }
   };
 
+  // Useeffect with setInterval to periodically call functions to get riders, groups from server
+  // And update the weather forecast
   useEffect(() => {
     getMyLocation();
     getRidersLocation();
@@ -217,6 +259,7 @@ const Map = () => {
     };
   }, []);
 
+  // Get riders and groups when app starts
   useEffect(() => {
     const getData = async () => {
       try {
@@ -230,6 +273,7 @@ const Map = () => {
     getData();
   }, []);
 
+  // Function to animate map to region, used to center user
   const animateToRegion = () => {
     if (mapRef.current) {
       mapRef.current.animateToRegion(
@@ -244,6 +288,7 @@ const Map = () => {
     }
   };
 
+  // Function to check if the user is at home or not
   const checkIfAtHome = (latitude, longitude, isUserChange) => {
     var distance = 0;
     if (isUserChange) {
@@ -264,12 +309,7 @@ const Map = () => {
     }
   };
 
-  /* now dependent on userLocationChanged happening when app launches
-  useEffect(() => {
-    checkIfAtHome();
-  }, []);
-  */
-
+  // Function to update the region of the map if the user moves
   const userLocationChanged = (event) => {
     var lat = event.nativeEvent.coordinate.latitude;
     var long = event.nativeEvent.coordinate.longitude;
@@ -285,20 +325,24 @@ const Map = () => {
     checkIfAtHome(lat, long, true);
   };
 
+  // Function to get the location of home from local storage
   const updateHomeLocation = () => {
-    var homeLocation = FS.getHomeLocation(RNFS, homeLocationPath)
-    setHome(homeLocation)
-  }
-
-  useEffect(() => {
-    updateHomeLocation()
-  }, [])
-
-  const storeHomeLocation = (lat, long) => {
-    FS.clearFile(RNFS, homeLocationPath)
-    FS.recordLocation(RNFS, homeLocationPath, lat, long)
+    var homeLocation = FS.getHomeLocation(RNFS, homeLocationPath);
+    setHome(homeLocation);
   };
 
+  // Get home location on app startup
+  useEffect(() => {
+    updateHomeLocation();
+  }, []);
+
+  // Function to store the home location locally
+  const storeHomeLocation = (lat, long) => {
+    FS.clearFile(RNFS, homeLocationPath);
+    FS.recordLocation(RNFS, homeLocationPath, lat, long);
+  };
+
+  // Function to handle if the user's home marker has been moved
   const userHomeChanged = (event) => {
     var lat = event.nativeEvent.coordinate.latitude;
     var long = event.nativeEvent.coordinate.longitude;
@@ -313,19 +357,21 @@ const Map = () => {
     checkIfAtHome(lat, long, false);
   };
 
+  // Function to open phone app and set 111 as phone number to call
   const callEmergency = () => {
     Linking.openURL(`tel:${111}`);
   };
 
+  // Function to send request to ride to server
   const requestRide = (userId) => {
     //request
-    console.log("reqest", userId)
+    console.log("request", userId);
     socket.emit("requestServerRide", {
-      userId
-    })
+      userId,
+    });
   };
 
-  //Google map render
+  // Google map render
   return (
     <View style={styles.container}>
       <MapView
@@ -333,20 +379,20 @@ const Map = () => {
         provider={PROVIDER_GOOGLE}
         style={styles.map}
         customMapStyle={rideoutMapStyle}
-        initialRegion={region} //Change this to a function to get current location?
-        followsUserLocation={followUser} //IOS ONLY
+        initialRegion={region}
+        followsUserLocation={followUser}
         onUserLocationChange={(event) => userLocationChanged(event)}
         userLocationPriority={"high"}
         userLocationAnnotationTitle={"Me"}
         showsUserLocation={true}
-        showsMyLocationButton={false} //IOS ONLY
+        showsMyLocationButton={false}
         showsCompass={true}
         showsTraffic={false}
         loadingEnabled={true}
         loadingIndicatorColor={"#27afe2"}
         loadingBackgroundColor={"#dedede"}
       >
-        {/*Render the users' location on the map as markers*/}
+        {/*Render the riders' location on the map as markers*/}
         {riderLocations.map((currentObj) => {
           return (
             <Marker
@@ -359,16 +405,32 @@ const Map = () => {
               calloutAnchor={{ x: 0.5, y: -0.1 }}
             >
               {/*Render the marker as the custom image*/}
-              <Image
-                source={require("./rider_marker_solid.png")}
-                style={{ width: 36, height: 36 }}
-                resizeMethod="resize"
-                resizeMode="contain"
-              />
+              {currentObj.isLeader ? (
+                <Image
+                  source={require("./leader_marker_solid.png")}
+                  style={{ width: 36, height: 36 }}
+                  resizeMethod="resize"
+                  resizeMode="contain"
+                />
+              ) : (
+                <Image
+                  source={require("./rider_marker_solid.png")}
+                  style={{ width: 36, height: 36 }}
+                  resizeMethod="resize"
+                  resizeMode="contain"
+                />
+              )}
+
               {/*Popup UI when marker is clicked*/}
-              <Callout tooltip={true} style={styles.riderCallout} onPress={() => {
-                requestRide(currentObj.userId)
-              }}>
+              <Callout
+                tooltip={true}
+                style={styles.riderCallout}
+                onPress={() => {
+                  if (!currentObj.isInActiveGroupRide) {
+                    requestRide(currentObj.userId);
+                  }
+                }}
+              >
                 <RiderCallout rider={currentObj} />
               </Callout>
             </Marker>
@@ -394,13 +456,13 @@ const Map = () => {
                 resizeMode="contain"
               />
               {/*Popup UI when marker is clicked*/}
-              <Callout style={{ width: 250, height: 250 }}>
+              <Callout style={styles.groupCallout}>
                 <GroupCallout group={currentObj} />
               </Callout>
             </Marker>
           );
         })}
-
+        {/*Render the marker of home location*/}
         <Marker
           key={"home"}
           coordinate={{
@@ -417,6 +479,7 @@ const Map = () => {
             resizeMode="contain"
           />
         </Marker>
+        {/*Render the circle around home location*/}
         <Circle
           center={{
             latitude: home.latitude,
@@ -428,58 +491,104 @@ const Map = () => {
           fillColor={"rgba(39, 175, 226, 0.1)"}
         />
       </MapView>
+      {/*View which shows the weather forecast*/}
       <View
         style={{
-          position: "absolute",
-          top: "5%",
+          flexDirection: "row",
+          padding: 5,
+          width: "75%",
+          alignContent: "center",
+          justifyContent: "center",
           alignSelf: "center",
+          backgroundColor: "#ffffff",
+          borderWidth: 1.6,
+          borderColor: "#27afe2",
+          borderTopWidth: 0,
+          borderBottomRightRadius: 10,
+          borderBottomLeftRadius: 10,
         }}
       >
-        <Text>{forecast}</Text>
-        <Button
-          title={sharingTitle}
+        <Text>Weather forecast in 1 hour: </Text>
+        <Text style={{ fontWeight: "bold" }}>{forecast}</Text>
+      </View>
+      {/*View which shows offline/online button*/}
+      <View
+        style={{
+          flexDirection: "row",
+          position: "absolute",
+          top: "4.5%",
+          alignSelf: "center",
+          padding: 10,
+        }}
+      >
+        <Pressable
           onPress={changeSharingStatus}
-          color={sharingStyle}
-        />
-        <Button
-          title={followTitle}
-          onPress={changeFollowStatus}
-          color={followStyle}
-        />
+          style={{
+            backgroundColor: sharingStyle,
+            height: 50,
+            width: 200,
+            alignContent: "center",
+            justifyContent: "center",
+            borderRadius: 10,
+            borderColor: "#ffffff",
+            borderWidth: 1.6,
+          }}
+        >
+          <Text
+            style={{
+              fontWeight: "bold",
+              color: "#ffffff",
+              fontSize: 25,
+              alignSelf: "center",
+            }}
+          >
+            {sharingTitle}
+          </Text>
+        </Pressable>
       </View>
+      {/*View which shows follow/center on user icon/button*/}
       <View
         style={{
+          flexDirection: "row",
           position: "absolute",
-          bottom: "5%",
-          alignSelf: "flex-start",
-        }}
-      >
-        <Button
-          title="Export History"
-          onPress={() =>
-            FS.exportFile(RNFS, locationHistoryPath, locationHistoryExportPath)
-          }
-          color="#27afe2"
-        />
-        <Button
-          title="Clear History"
-          onPress={() => FS.clearFile(RNFS, locationHistoryPath)}
-          color="#c71432"
-        />
-        <Button
-          title="DEBUG: Print History"
-          onPress={() => FS.printFileConsole(RNFS, locationHistoryPath)}
-          color="#27afe2"
-        />
-      </View>
-      <View
-        style={{
-          position: "absolute",
-          bottom: "5%",
+          bottom: "0%",
           alignSelf: "flex-end",
+          padding: 10,
         }}
       >
-        <Button title="EMERGENCY" onPress={callEmergency} color="#c71432" />
+        <Pressable
+          onPress={changeFollowStatus}
+          style={{
+            ...styles.followButton,
+            backgroundColor: followStyleBackground,
+            borderColor: followStyleBorder,
+          }}
+        >
+          <Image source={followImage} style={styles.followImage} />
+        </Pressable>
+      </View>
+      {/*View which shows call emergency icon/button*/}
+      <View
+        style={{
+          position: "absolute",
+          bottom: "0%",
+          alignSelf: "flex-start",
+          padding: 10,
+        }}
+      >
+        <Pressable
+          onPress={callEmergency}
+          style={{
+            ...styles.followButton,
+            backgroundColor: "#c71432",
+            borderColor: "#ffffff",
+          }}
+        >
+          <Image
+            source={require("./emergency_icon.png")}
+            style={styles.followImage}
+          />
+        </Pressable>
       </View>
     </View>
   );

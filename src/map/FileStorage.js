@@ -1,3 +1,4 @@
+// Function to check if file exists, if it doesn't, create one
 export const checkFile = (RNFS, path) => {
   RNFS.exists(path)
     .then((success) => {
@@ -18,6 +19,7 @@ export const checkFile = (RNFS, path) => {
     });
 };
 
+// Function to copy a file from filePath location to exportPath location
 export const exportFile = (RNFS, filePath, exportPath) => {
   checkFile(RNFS, filePath);
 
@@ -51,6 +53,7 @@ export const exportFile = (RNFS, filePath, exportPath) => {
     });
 };
 
+// Function to delete a file, then create a new empty one
 export const clearFile = (RNFS, path) => {
   checkFile(RNFS, path);
   RNFS.unlink(path)
@@ -63,6 +66,7 @@ export const clearFile = (RNFS, path) => {
   checkFile(RNFS, path);
 };
 
+// Function to appeand a file and add the location as a JSON object
 export const recordLocation = (RNFS, path, latitude, longitude) => {
   checkFile(RNFS, path);
   const content =
@@ -82,12 +86,13 @@ export const recordLocation = (RNFS, path, latitude, longitude) => {
     });
 };
 
+// Function to read a file to get a JSON object back for home location
 export const getHomeLocation = (RNFS, path) => {
   checkFile(RNFS, path);
 
   var homeLocation = {
-    latitude: 0,
-    longitude: 0,
+    latitude: -36.85088,
+    longitude: 174.7645,
   };
 
   RNFS.readFile(path)
@@ -114,6 +119,7 @@ export const getHomeLocation = (RNFS, path) => {
   return homeLocation;
 };
 
+// Function for debugging, reads and prints the file's contents in the console
 export const printFileConsole = (RNFS, path) => {
   checkFile(RNFS, path);
   RNFS.readFile(path)
