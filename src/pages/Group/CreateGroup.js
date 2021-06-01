@@ -256,7 +256,7 @@ export const CreateGroup = (props) => {
             flex: 1,
             marginBottom: 20
           }}>
-            <Button style={[{ flex: 1 },styles.button]} onPress={() => setShowDatePicker(true)}>
+            <Button style={[{ flex: 1 }, styles.button]} onPress={() => setShowDatePicker(true)}>
               Set date
             </Button>
             <Button style={[{ flex: 1 }, styles.button]} onPress={() => setShowTimePicker(true)}>

@@ -23,11 +23,11 @@ const GroupList = (props) => {
   const renderItemAccessory = (details) => {
     return (
       <Button
-      size='tiny'
-      style={{
-        backgroundColor: '#27afe2',
-        borderColor: '#27afe2'
-      }}
+        size='tiny'
+        style={{
+          backgroundColor: '#27afe2',
+          borderColor: '#27afe2'
+        }}
         onPress={() => {
           setCurrentEventDetails(details)
           if (isAdmin) {
@@ -55,7 +55,6 @@ const GroupList = (props) => {
         const response = await serverInstance.get("/group")
         const data = response.data
 
-        console.log(data)
         setGroupList(data)
       } catch (err) {
         console.error("failed to get group list", err)
@@ -68,11 +67,10 @@ const GroupList = (props) => {
     navigation && navigation.navigate("CreateEvent")
   }
 
-  const navigateToAdminView = () =>{
-    console.log(currentEventDetails)
+  const navigateToAdminView = () => {
     navigation && navigation.navigate('AdminViewGroup', {
-      Id: `${currentEventDetails._id}`})
-      
+      Id: `${currentEventDetails._id}`
+    })
   }
 
   return (
@@ -128,29 +126,29 @@ const GroupList = (props) => {
         </Layout>
       </Modal>
       <SafeAreaView>
-      <Layout
-        level="1"
-        style={styles.container}
-      >
-        <List
-        style = {{
-          height: '100%',
-          backgroundColor: 'white'
-        }}
-          data={groupList}
-          renderItem={({ item }) => {
-            return (
-              <ListItem
-                title={item.title}
-                description={item.description}
-                accessoryLeft={renderItemIcon}
-                accessoryRight={() => renderItemAccessory(item)}
-              />
-            )
-          }}
-        />
-      </Layout>
-      <FAB buttonColor="#27afe2" iconTextColor="#FFFFFF" onClickAction={() => { navigateToCreateGroupPage() }} visible={true} />
+        <Layout
+          level="1"
+          style={styles.container}
+        >
+          <List
+            style={{
+              height: '100%',
+              backgroundColor: 'white'
+            }}
+            data={groupList}
+            renderItem={({ item }) => {
+              return (
+                <ListItem
+                  title={item.title}
+                  description={item.description}
+                  accessoryLeft={renderItemIcon}
+                  accessoryRight={() => renderItemAccessory(item)}
+                />
+              )
+            }}
+          />
+        </Layout>
+        <FAB buttonColor="#27afe2" iconTextColor="#FFFFFF" onClickAction={() => { navigateToCreateGroupPage() }} visible={true} />
       </SafeAreaView>
     </>
   );
