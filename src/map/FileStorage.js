@@ -6,12 +6,14 @@ export const checkFile = (RNFS, path) => {
         RNFS.writeFile(path, "", "utf8")
           .then((success) => {
             console.log("New file created: " + path);
+            return true
           })
           .catch((err) => {
             console.error("checkFile [write]: " + err.message);
           });
       } else {
         console.log("File already exists: " + path);
+        return false
       }
     })
     .catch((err) => {
@@ -64,6 +66,18 @@ export const clearFile = (RNFS, path) => {
       console.error("clearFile [unlink]: " + err.message);
     });
   checkFile(RNFS, path);
+};
+
+export const deleteFile = (RNFS, path) => {
+  checkFile(RNFS, path);
+  RNFS.unlink(path)
+    .then((success) => {
+      console.log("Deleted file: " + path);
+      return true
+    })
+    .catch((err) => {
+      console.error("deleteFile [unlink]: " + err.message);
+    });
 };
 
 // Function to appeand a file and add the location as a JSON object
@@ -119,7 +133,7 @@ export const getHomeLocation = (RNFS, path) => {
   return homeLocation;
 };
 
-// Function for debugging, reads and prints the file's contents in the console
+// Function for debugging, reads and prints the file's contents in the console.
 export const printFileConsole = (RNFS, path) => {
   checkFile(RNFS, path);
   RNFS.readFile(path)
