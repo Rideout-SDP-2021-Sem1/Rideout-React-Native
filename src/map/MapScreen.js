@@ -45,15 +45,15 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
   },
   followButton: {
-    height: 50,
-    width: 50,
+    height: 60,
+    width: 60,
     borderWidth: 1.6,
     borderRadius: 15,
     justifyContent: "center",
   },
   followImage: {
-    height: 35,
-    width: 35,
+    height: 40,
+    width: 40,
     alignSelf: "center",
   },
 });
@@ -392,7 +392,7 @@ const Map = () => {
         loadingIndicatorColor={"#27afe2"}
         loadingBackgroundColor={"#dedede"}
       >
-        {/*Render the users' location on the map as markers*/}
+        {/*Render the riders' location on the map as markers*/}
         {riderLocations.map((currentObj) => {
           return (
             <Marker
@@ -405,18 +405,30 @@ const Map = () => {
               calloutAnchor={{ x: 0.5, y: -0.1 }}
             >
               {/*Render the marker as the custom image*/}
-              <Image
-                source={require("./rider_marker_solid.png")}
-                style={{ width: 36, height: 36 }}
-                resizeMethod="resize"
-                resizeMode="contain"
-              />
+              {currentObj.isLeader ? (
+                <Image
+                  source={require("./leader_marker_solid.png")}
+                  style={{ width: 36, height: 36 }}
+                  resizeMethod="resize"
+                  resizeMode="contain"
+                />
+              ) : (
+                <Image
+                  source={require("./rider_marker_solid.png")}
+                  style={{ width: 36, height: 36 }}
+                  resizeMethod="resize"
+                  resizeMode="contain"
+                />
+              )}
+
               {/*Popup UI when marker is clicked*/}
               <Callout
                 tooltip={true}
                 style={styles.riderCallout}
                 onPress={() => {
-                  requestRide(currentObj.userId);
+                  if (!currentObj.isInActiveGroupRide) {
+                    requestRide(currentObj.userId);
+                  }
                 }}
               >
                 <RiderCallout rider={currentObj} />
@@ -539,7 +551,7 @@ const Map = () => {
         style={{
           flexDirection: "row",
           position: "absolute",
-          top: "4.5%",
+          bottom: "0%",
           alignSelf: "flex-end",
           padding: 10,
         }}
@@ -560,7 +572,7 @@ const Map = () => {
         style={{
           position: "absolute",
           bottom: "0%",
-          alignSelf: "flex-end",
+          alignSelf: "flex-start",
           padding: 10,
         }}
       >

@@ -31,19 +31,37 @@ const styles = StyleSheet.create({
 
 // Returns a view which is used to display rider callout in MapView
 const RiderCallout = (props) => {
-  return (
-    <View style={styles.calloutContainer}>
-      <Text style={styles.usernameTitle}>{props.rider.nickname + " "}</Text>
-      <Text>License:{" " + props.rider.license}</Text>
-      <Text>Pace: {" " + props.rider.pace}</Text>
-      <Text style={styles.bikeDetailTitle}>Bike detail: </Text>
-      <Text>
-        {props?.rider?.make ? String(props?.rider?.make).trim() + " " : ""}
-        {props?.rider?.model ? String(props?.rider?.model).trim() + " " : ""}
-      </Text>
-      <Text style={styles.request}>REQUEST RIDEOUT</Text>
-    </View>
-  );
+  if (props.rider.isInActiveGroupRide) {
+    return (
+      <View style={styles.calloutContainer}>
+        <Text style={styles.usernameTitle}>{props.rider.nickname + " "}</Text>
+        <Text>License:{" " + props.rider.license}</Text>
+        <Text>Pace: {" " + props.rider.pace}</Text>
+        <Text style={styles.bikeDetailTitle}>Bike detail: </Text>
+        <Text>
+          {props?.rider?.make ? String(props?.rider?.make).trim() + " " : ""}
+          {props?.rider?.model ? String(props?.rider?.model).trim() + " " : ""}
+        </Text>
+        <Text style={{ ...styles.request, backgroundColor: "grey" }}>
+          UNAVAILABLE
+        </Text>
+      </View>
+    );
+  } else {
+    return (
+      <View style={styles.calloutContainer}>
+        <Text style={styles.usernameTitle}>{props.rider.nickname + " "}</Text>
+        <Text>License:{" " + props.rider.license}</Text>
+        <Text>Pace: {" " + props.rider.pace}</Text>
+        <Text style={styles.bikeDetailTitle}>Bike detail: </Text>
+        <Text>
+          {props?.rider?.make ? String(props?.rider?.make).trim() + " " : ""}
+          {props?.rider?.model ? String(props?.rider?.model).trim() + " " : ""}
+        </Text>
+        <Text style={styles.request}>REQUEST RIDEOUT</Text>
+      </View>
+    );
+  }
 };
 
 export default RiderCallout;
