@@ -55,7 +55,8 @@ locationRoute.route("/location")
             make: userDoc.bike_details[0].make,
             model: userDoc.bike_details[0].model,
             size: userDoc.bike_details[0].size,
-            isLeader: c.uid === groupLeaderUid
+            isLeader: c.uid === groupLeaderUid,
+            isInActiveGroupRide: inActiveGroupRide
           }
           return userObj
         } catch (err) {
