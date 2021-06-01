@@ -1,4 +1,4 @@
-const { app } = require("../src/index")
+const { server } = require("../src/index")
 const request = require("supertest")
 const expect = require("chai").expect
 
@@ -16,7 +16,7 @@ describe("Our application", () => {
 
 describe("User endpoint", () => {
   it("Get user details of testUid", (done) => {
-    request(app)
+    request(server)
       .get("/user?uid=testUid")
       .set("Content-Type", "application/json")
       .expect("Content-Type", /json/)

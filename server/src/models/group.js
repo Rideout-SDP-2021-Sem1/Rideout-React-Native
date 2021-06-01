@@ -14,6 +14,10 @@ const groupSchema = new Schema({
     latitude: String,
     longitude: String
   },
+  destinationLocation: {
+    latitude: String,
+    longitude: String
+  },
   meetupTime: {
     type: Schema.Types.Date
   },

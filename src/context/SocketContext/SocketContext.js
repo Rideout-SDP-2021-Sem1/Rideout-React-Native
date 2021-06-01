@@ -1,6 +1,6 @@
 import React, { createContext, useState, useEffect } from 'react'
 import { StyleSheet } from 'react-native'
-import { Button, Layout, Modal, Card, Text } from '@ui-kitten/components'
+import { Button, Layout, Modal, Card, Text, Spinner } from '@ui-kitten/components'
 import { getSocket } from '../../utils'
 
 const SocketContext = createContext()
@@ -11,6 +11,7 @@ const SocketProvider = ({ children }) => {
   const [userDetails, setUserDetails] = useState({})
   const [socketReady, setSocketReady] = useState(false)
   const [socket, setSocket] = useState(null)
+  const [loading, setLoading] = useState(false)
 
   const handleSocketEvent = (socketInstance) => {
     socketInstance.on("requestClientRide", (data) => {
@@ -41,12 +42,22 @@ const SocketProvider = ({ children }) => {
 
   const contextValue = {
     socket,
-    socketReady
+    socketReady,
+    loading,
+    setLoading
   }
 
   return (
     <SocketContext.Provider value={contextValue}>
       {children}
+      <Modal
+        visible={loading}
+        backdropStyle={{
+          backgroundColor: "rgba(0, 0, 0, 0.5)"
+        }}
+      >
+        <Spinner size="giant" />
+      </Modal>
       <Modal
         visible={openRequestModal}
         backdropStyle={{

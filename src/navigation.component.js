@@ -9,15 +9,16 @@ import {
   UserProfile,
   MapScreenLayout,
   GroupListLayout,
-  GroupCreateLayout
+  GroupCreateLayout,
+  AdminViewGroup
 } from './pages'
 
 const { Navigator, Screen } = createStackNavigator();
 const Tab = createBottomTabNavigator();
 
-
 const HomeNavigator = () => {
   const [user, setUser] = useState(null)
+  const [display, setDisplay] = useState(false)
   const [selectedNavigationIndex, setSelectedNavigationIndex] = useState(0)
   const navigationRef = useRef(null)
 
@@ -51,6 +52,7 @@ const HomeNavigator = () => {
                     <Tab.Screen name='List' component={GroupListLayout} />
                     <Tab.Screen name='Profile' component={UserProfile} />
                     <Tab.Screen name="CreateEvent" component={GroupCreateLayout} />
+                    <Tab.Screen name="AdminViewGroup" component={AdminViewGroup} />
                   </Tab.Navigator>
                 </>
                 :
