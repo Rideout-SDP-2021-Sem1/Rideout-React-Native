@@ -1,18 +1,3 @@
-/**
- * TODO
- * ----Make weather bar not absolute, squish mapview down----
- * Add group rides
- * ----Change online/offline button into pressable----
- * ----Move delete/export history to profile page----
- * ----Update callout styles----
- * Make callout styles dependent on isInAnActiveGroup (remove request rideout button)
- * ~~~~Move styles to stylesheet~~~~
- * Unit testing
- * Add comments
- * Reflection
- * Documentation
- */
-
 import React, { useEffect, useState, useRef, useContext } from "react";
 import {
   View,
