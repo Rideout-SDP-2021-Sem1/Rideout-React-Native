@@ -13,6 +13,7 @@ import FAB from 'react-native-fab'
 const GroupList = (props) => {
   const navigation = props.navigation
   const [showModal, setShowModal] = useState(false)
+  const [isAdmin, setIsAdmin] = useState(true)
   const [groupList, setGroupList] = useState([])
   const [currentEventDetails, setCurrentEventDetails] = useState({})
 
@@ -21,14 +22,21 @@ const GroupList = (props) => {
   const renderItemAccessory = (details) => {
     return (
       <Button
-      size='tiny'
-      style={{
-        backgroundColor: '#27afe2',
-        borderColor: '#27afe2'
-      }}
+        size='tiny'
+        style={{
+          backgroundColor: '#27afe2',
+          borderColor: '#27afe2'
+        }}
         onPress={() => {
-          setShowModal(true)
           setCurrentEventDetails(details)
+          if (isAdmin) {
+            // Show admin's page
+            navigateToAdminView(details)
+          } else {
+            // Show event page
+            // setCurrentEventDetails(details)
+            setShowModal(true)
+          }
         }}
       >
         View
@@ -58,6 +66,12 @@ const GroupList = (props) => {
     navigation && navigation.navigate("CreateEvent")
   }
 
+  const navigateToAdminView = (details) => {
+    navigation && navigation.navigate('AdminViewGroup', {
+      Id: `${details._id}`
+    })
+  }
+
   return (
     <>
       <Modal
@@ -72,14 +86,14 @@ const GroupList = (props) => {
           style={{
             alignItems: "center",
             display: "flex",
-            alignContent: 'center'
+            alignContent: 'center',
           }}
         >
           <Card
             style={{
               alignItems: "center",
               display: "flex",
-              alignContent: 'center'
+              alignContent: 'center',
             }}
           >
             <Text
@@ -110,25 +124,31 @@ const GroupList = (props) => {
           </Card>
         </Layout>
       </Modal>
-      <Layout
-        level="1"
-        style={styles.container}
-      >
-        <List
-          data={groupList}
-          renderItem={({ item }) => {
-            return (
-              <ListItem
-                title={item.title}
-                description={item.description}
-                accessoryLeft={renderItemIcon}
-                accessoryRight={() => renderItemAccessory(item)}
-              />
-            )
-          }}
-        />
-      </Layout>
-      <FAB buttonColor="blue" iconTextColor="#FFFFFF" onClickAction={() => { navigateToCreateGroupPage() }} visible={true} />
+      <SafeAreaView>
+        <Layout
+          level="1"
+          style={styles.container}
+        >
+          <List
+            style={{
+              height: '100%',
+              backgroundColor: 'white'
+            }}
+            data={groupList}
+            renderItem={({ item }) => {
+              return (
+                <ListItem
+                  title={item.title}
+                  description={item.description}
+                  accessoryLeft={renderItemIcon}
+                  accessoryRight={() => renderItemAccessory(item)}
+                />
+              )
+            }}
+          />
+        </Layout>
+        <FAB buttonColor="#27afe2" iconTextColor="#FFFFFF" onClickAction={() => { navigateToCreateGroupPage() }} visible={true} />
+      </SafeAreaView>
     </>
   );
 };
@@ -139,7 +159,7 @@ const themedStyle = StyleService.create({
   container: {
     marginLeft: 10,
     marginRight: 10,
-    backgroundColor: "white"
+    backgroundColor: 'white'
   },
   contentContainer: {
     paddingVertical: 24,

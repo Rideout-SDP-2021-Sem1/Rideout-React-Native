@@ -13,7 +13,8 @@ import {
   Modal,
   Card,
   List,
-  ListItem
+  ListItem, 
+  Icon
 } from "@ui-kitten/components";
 import DateTimePicker from '@react-native-community/datetimepicker'
 import moment from 'moment'
@@ -37,6 +38,8 @@ export const CreateGroup = (props) => {
 
   const [title, setTitle] = useState("")
   const [meetupLocation, setMeetupLocation] = useState("")
+  const [destinationLocation, setDestinationLocation] = useState("")
+  const [currentSelection, setCurrentSelection] = useState("departure" || "arrival")
   const [maximumAttendant, setMaximumAttendant] = useState("")
   const [description, setDescription] = useState("")
   const [selectedLicenseIndex, setSelectedLicenseIndex] = useState(new IndexPath(0));
@@ -54,6 +57,7 @@ export const CreateGroup = (props) => {
   const [addressLookup, setAddressLookup] = useState("")
   const [addressAutocompleteResult, setAddressAutocompleteResult] = useState([])
   const [placeId, setPlaceId] = useState("")
+  const [destinationPlaceId, setDestinationPlaceId] = useState("")
   const [waiting, setWaiting] = useState(false)
 
   const handleDateAndTime = (inputValue, type) => {
@@ -113,8 +117,13 @@ export const CreateGroup = (props) => {
     const description = address?.description || ""
     const place_id = address?.place_id || ""
 
-    setMeetupLocation(description)
-    setPlaceId(place_id)
+    if (currentSelection === "departure") {
+      setMeetupLocation(description)
+      setPlaceId(place_id)
+    } else {
+      setDestinationLocation(description)
+      setDestinationPlaceId(place_id)
+    }
     // setAddressAutocompleteResult([])
     // setAddressLookup("")
     setShowDialog(false)
@@ -130,6 +139,9 @@ export const CreateGroup = (props) => {
     setPlaceId("")
     setAddressLookup("")
     setAddressAutocompleteResult([])
+    setDestinationPlaceId("")
+    setDestinationLocation("")
+    setCurrentSelection("departure")
   }
 
   const handleCreateEvent = async () => {
@@ -144,13 +156,26 @@ export const CreateGroup = (props) => {
         }
       })).data
 
+      const destinationPlaceData = (await axios.get("https://maps.googleapis.com/maps/api/place/details/json", {
+        params: {
+          placeid: destinationPlaceId,
+          key: "AIzaSyCKX3VD9qQtp6esG1Xe52s3vT1DAm72Wpo"
+        }
+      })).data
+
       const meetupLocation = {
         latitude: placeData?.result?.geometry?.location?.lat || "",
         longitude: placeData?.result?.geometry?.location?.lng || "",
       }
 
+      const destinationLocation = {
+        latitude: destinationPlaceData?.result?.geometry?.location?.lat || "",
+        longitude: destinationPlaceData?.result?.geometry?.location?.lng || "",
+      }
+
       const eventObj = {
         meetupLocation: meetupLocation,
+        destinationLocation: destinationLocation,
         meetupTime: moment(date).toISOString(),
         maximumAttendant: maximumAttendant,
         minimumLicenseLevel: licenseList[selectedLicenseIndex.row],
@@ -196,7 +221,7 @@ export const CreateGroup = (props) => {
           />
 
           <Text style={styles.subtitleBox} category="s1">
-            Location
+            Meetup Location
           </Text>
           <Input
             style={styles.bottomSpace}
@@ -208,7 +233,30 @@ export const CreateGroup = (props) => {
               end: 0
             }}
           />
-          <Button style={styles.bottomSpace} onPress={() => setShowDialog(true)}>
+          <Button style={[styles.bottomSpace, styles.button]} onPress={() => {
+            setCurrentSelection("departure")
+            setShowDialog(true)
+          }}>
+            Search address
+          </Button>
+
+          <Text style={styles.subtitleBox} category="s1">
+            Destination Location
+          </Text>
+          <Input
+            style={styles.bottomSpace}
+            placeholder="Destination Location"
+            value={destinationLocation}
+            disabled={true}
+            selection={{
+              start: 0,
+              end: 0
+            }}
+          />
+          <Button style={[styles.bottomSpace, styles.button]} onPress={() => {
+            setCurrentSelection("arrival")
+            setShowDialog(true)
+          }}>
             Search address
           </Button>
 
@@ -255,10 +303,10 @@ export const CreateGroup = (props) => {
             flex: 1,
             marginBottom: 20
           }}>
-            <Button style={{ flex: 1 }} onPress={() => setShowDatePicker(true)}>
+            <Button style={[{ flex: 1 }, styles.button]} onPress={() => setShowDatePicker(true)}>
               Set date
             </Button>
-            <Button style={{ flex: 1 }} onPress={() => setShowTimePicker(true)}>
+            <Button style={[{ flex: 1 }, styles.button]} onPress={() => setShowTimePicker(true)}>
               Set time
             </Button>
           </View>
@@ -372,7 +420,6 @@ const themedStyle = StyleService.create({
     marginTop: 30,
     alignSelf: "center",
   },
-
   bottomSpace: {
     marginBottom: 20,
   },
@@ -381,5 +428,6 @@ const themedStyle = StyleService.create({
   },
   button: {
     margin: 2,
+    backgroundColor: '#27afe2'
   },
 });

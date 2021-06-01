@@ -4,7 +4,7 @@ import TestProfile from './TestProfile'
 import EmptyPage from './EmptyPage'
 import UserProfileComponent from './UserProfile/UserProfile'
 import { MapScreen } from '../map'
-import { GroupList, CreateGroup } from './Group'
+import { GroupList, CreateGroup, AdminViewGroup } from './Group'
 
 const UserProfile = (props) => {
   return (
@@ -40,9 +40,18 @@ const GroupListLayout = (props) => {
   )
 }
 
+const AdminViewLayout = (props) => {
+  return(
+  <MainLayout {...props}>
+    <AdminViewGroup {...props}/>
+  </MainLayout>
+  )
+}
+
 export {
   UserProfile,
   MapScreenLayout,
   GroupListLayout,
-  GroupCreateLayout
+  GroupCreateLayout,
+  AdminViewGroup
 }

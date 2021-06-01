@@ -111,7 +111,7 @@ const Map = () => {
   const [atHome, setAtHome] = useState(true);
 
   // Online/offline button style states
-  const [SharingTitle, setSharingTitle] = useState("Go Online");
+  const [sharingTitle, setSharingTitle] = useState("Go Online");
   const [sharingStyle, setSharingStyle] = useState("#27afe2");
 
   // Online/offline handling
@@ -542,7 +542,7 @@ const Map = () => {
               alignSelf: "center",
             }}
           >
-            {SharingTitle}
+            {sharingTitle}
           </Text>
         </Pressable>
       </View>
