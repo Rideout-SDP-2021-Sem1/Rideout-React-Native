@@ -1,8 +1,8 @@
 /**
  * TODO
- * Make weather bar not absolute, squish mapview down
+ * ----Make weather bar not absolute, squish mapview down----
  * Add group rides
- * Change online/offline button into pressable
+ * ----Change online/offline button into pressable----
  * Move delete/export history to profile page
  * Update callout styles
  * Make callout styles dependent on isInAnActiveGroup (remove request rideout button)
@@ -54,10 +54,15 @@ const styles = StyleSheet.create({
     width: 250,
     backgroundColor: "white",
   },
+  groupCallout: {
+    height: 250,
+    width: 250,
+    backgroundColor: "white",
+  },
   followButton: {
     height: 50,
     width: 50,
-    borderWidth: 3,
+    borderWidth: 1.6,
     borderRadius: 15,
     justifyContent: "center",
   },
@@ -439,7 +444,7 @@ const Map = () => {
                   resizeMode="contain"
                 />
                 {/*Popup UI when marker is clicked*/}
-                <Callout style={{ width: 250, height: 250 }}>
+                <Callout style={styles.groupCallout}>
                   <GroupCallout group={currentObj} />
                 </Callout>
               </Marker>
@@ -482,7 +487,7 @@ const Map = () => {
             justifyContent: "center",
             alignSelf: "center",
             backgroundColor: "#ffffff",
-            borderWidth: 3,
+            borderWidth: 1.6,
             borderColor: "#27afe2",
             borderTopWidth: 0,
             borderBottomRightRadius: 10,
@@ -511,7 +516,7 @@ const Map = () => {
             justifyContent: "center",
             borderRadius: 10,
             borderColor: "#ffffff",
-            borderWidth: 3,
+            borderWidth: 1.6,
           }}
         >
           <Text
