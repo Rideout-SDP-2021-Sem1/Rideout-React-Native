@@ -24,7 +24,8 @@ const styles = StyleSheet.create({
     height: 55,
     textAlign: "center",
     textAlignVertical: "top",
-    paddingTop: 9,
+    paddingTop: 13,
+    borderRadius: 5,
   },
   date: {
     color: "grey",

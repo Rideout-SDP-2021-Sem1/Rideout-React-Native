@@ -25,6 +25,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
     textAlignVertical: "top",
     paddingTop: 13,
+    borderRadius: 10,
   },
 });
 
