@@ -42,7 +42,6 @@ npm run ios
 And all you have to do for Android is:
 ```
 npm run android 
- 
  ```
 
 # ISSUES
