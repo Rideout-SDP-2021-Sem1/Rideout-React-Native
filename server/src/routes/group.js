@@ -1,5 +1,5 @@
 const { Router } = require('express')
-const { Group } = require('../models/index')
+const { Group, User } = require('../models/index')
 const mongoose = require("mongoose")
 const ObjectId = mongoose.Types.ObjectId
 
@@ -55,10 +55,20 @@ groupRoute.route("/group-single")
     try {
       const doc = await Group.findOne({ _id: new ObjectId(id) }).lean().exec()
 
+      const userPromise = (doc.usersUid || []).map(async (c) => {
+        const userDoc = await User.findOne({ uid: c }).lean().exec()
+        return userDoc || {}
+      })
+
+      const userData = await Promise.all(userPromise)
+
       if (doc === null) {
         return res.status(400).json("Invalid group ride id.")
       }
-      return res.status(200).json(doc)
+      return res.status(200).json({
+        ...doc,
+        users: userData
+      })
     } catch (err) {
       return res.status(500).json(err.message)
     }

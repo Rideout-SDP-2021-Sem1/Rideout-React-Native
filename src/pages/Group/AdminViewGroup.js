@@ -5,11 +5,11 @@ import {
   SelectItem, Text, Layout, Modal, Card, Spinner, Icon, List, ListItem, Divider
 } from '@ui-kitten/components';
 import { serverInstance } from '../../instances'
-import dummy from './dummyData.json'
 import { SocketContext } from '../../context'
 
 export const AdminViewGroup = ({ route, navigation }) => {
   const [groupId, setGroupId] = useState(route.params.Id)
+  const [eventObj, setEventObj] = useState({})
 
   const socketObj = useContext(SocketContext)
 
@@ -24,7 +24,7 @@ export const AdminViewGroup = ({ route, navigation }) => {
             id: currentRouteGroupId
           }
         })
-        console.log("result", response.data)
+        setEventObj(response.data)
       } catch (err) {
         console.error("error AdminViewGroup", err)
       } finally {
@@ -47,7 +47,7 @@ export const AdminViewGroup = ({ route, navigation }) => {
   const renderItem = ({ item }) => (
     <ListItem
       title={`${item.nickname}`}
-      description={`${item.description}`}
+      description={`${item.license_level} - ${item.preferred_pace}`}
     />
   );
 
@@ -84,17 +84,17 @@ export const AdminViewGroup = ({ route, navigation }) => {
           <Text
             style={{ alignSelf: 'center' }}
             category='h2'>
-            {`${dummy.title}`}
+            {`${eventObj.title}`}
           </Text>
           <Text
             style={{ alignSelf: 'center', marginTop: 15 }}
             category='p2'>
-            {`${dummy.description}`}
+            {`${eventObj.description}`}
           </Text>
 
           <List
             style={styles.container}
-            data={dummy.users}
+            data={eventObj.users}
             ItemSeparatorComponent={Divider}
             renderItem={renderItem}
           />
