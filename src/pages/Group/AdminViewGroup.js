@@ -6,8 +6,11 @@ import {
 } from '@ui-kitten/components';
 import { serverInstance } from '../../instances'
 import { SocketContext } from '../../context'
+import Geocoder from 'react-native-geocoding';
 
 export const AdminViewGroup = ({ route, navigation }) => {
+
+  Geocoder.init("AIzaSyCKX3VD9qQtp6esG1Xe52s3vT1DAm72Wpo");
   const [groupId, setGroupId] = useState(route.params.Id)
   const [eventObj, setEventObj] = useState({})
 
@@ -25,6 +28,7 @@ export const AdminViewGroup = ({ route, navigation }) => {
           }
         })
         setEventObj(response.data)
+        setLocation(response.data)
       } catch (err) {
         console.error("error AdminViewGroup", err)
       } finally {
@@ -36,6 +40,10 @@ export const AdminViewGroup = ({ route, navigation }) => {
 
   const styles = useStyleSheet(themedStyle);
 
+  const [owner, setOwnwer] = useState(true)
+  const [area, setArea] = useState('')
+  const [isAdmin, setIsAdmin] = useState(false)
+
   const renderBackIcon = (props) => (
     <Icon {...props} name='arrow-back-outline' />
   )
@@ -44,11 +52,40 @@ export const AdminViewGroup = ({ route, navigation }) => {
     navigation && navigation.navigate("List")
   }
 
-  const renderItem = ({ item }) => (
-    <ListItem
-      title={`${item.nickname}`}
-      description={`${item.license_level} - ${item.preferred_pace}`}
-    />
+  const renderItem = ({ item }) => {
+    console.log(item)
+    return (
+      <ListItem
+        title={`${item.nickname}`}
+        description={`${item.license}`}
+        accessoryLeft={renderItemIcon}
+        accessoryRight={renderItemAccessory}
+      />
+    )
+  };
+
+  const setLocation = (eventObj) => {
+    Geocoder.from(eventObj.meetupLocation.latitude, eventObj.meetupLocation.longitude)
+      .then(json => {
+        console.log("results json", json)
+        const addressComponent = json.results[0].formatted_address;
+        console.log(addressComponent);
+        setArea(addressComponent)
+      })
+      .catch(error => console.warn(error));
+  };
+
+  const renderItemAccessory = (props) => (
+    <Button
+      size='tiny'
+      status='danger'
+    >
+      Remove
+    </Button>
+  );
+
+  const renderItemIcon = (props) => (
+    <Icon {...props} name='person' />
   );
 
   return (
@@ -81,6 +118,8 @@ export const AdminViewGroup = ({ route, navigation }) => {
               Group Ride
           </Text>
           </Layout>
+          <Divider
+            style={{ marginTop: 10 }} />
           <Text
             style={{ alignSelf: 'center' }}
             category='h2'>
@@ -91,6 +130,36 @@ export const AdminViewGroup = ({ route, navigation }) => {
             category='p2'>
             {`${eventObj.description}`}
           </Text>
+          <Divider
+            style={{ marginTop: 10 }} />
+          <Text
+            style={{ alignSelf: 'flex-start', marginTop: 15 }}
+            category='s2'>
+            Maximum Number of People: {`${eventObj.maximumAttendant}`}
+          </Text>
+
+          <Text
+            style={{ alignSelf: 'flex-start', marginTop: 10 }}
+            category='s2'>
+            Current Attendants: {`${eventObj.currentAttendant}`}
+          </Text>
+
+          <Text
+            style={{ alignSelf: 'flex-start', marginTop: 10 }}
+            category='s2'>
+
+            Meetup Location: {`${area}`}
+          </Text>
+          <Divider
+            style={{ marginTop: 10 }} />
+
+          <Text
+            style={{ alignSelf: 'center', marginTop: 10 }}
+            category='h6'>
+            Riders
+          </Text>
+          <Divider
+            style={{ marginTop: 10 }} />
 
           <List
             style={styles.container}
@@ -98,6 +167,15 @@ export const AdminViewGroup = ({ route, navigation }) => {
             ItemSeparatorComponent={Divider}
             renderItem={renderItem}
           />
+          <Button
+            visable={isAdmin}
+            style={{ marginTop: 50 }}
+            size='giant'
+            status='danger'
+            appearance='outline'
+          >
+            Ban Ride
+          </Button>
         </SafeAreaView>
       </View>
     </>
