@@ -56,6 +56,14 @@ const userSchema = new Schema({
   role: {
     type: String,
     index: true
+  },
+  isInActiveGroupRide: {
+    type: Schema.Types.Boolean,
+    index: true
+  },
+  activeGroupRideId: {
+    type: Schema.Types.ObjectId,
+    index: true
   }
 })
 

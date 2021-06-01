@@ -10,7 +10,15 @@ groupRoute.route("/group")
    * Returns a list of groups
    */
   .get(async (req, res) => {
+    const headerUid = req.header.uid
+
     try {
+      const currentUserDoc = await User.findOne({ uid: headerUid }).lean().exec()
+
+      if (currentUserDoc && currentUserDoc.isInActiveGroupRide) {
+        return res.status(200).json([])
+      }
+
       const result = await Group.find().lean().exec()
       return res.status(200).json(result)
     } catch (err) {

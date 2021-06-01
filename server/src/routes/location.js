@@ -1,5 +1,5 @@
 const { Router } = require('express')
-const { Location, User } = require('../models/index')
+const { Location, User, Group } = require('../models/index')
 
 const locationRoute = Router()
 
@@ -8,7 +8,36 @@ locationRoute.route("/location")
     const headerUid = req.header.uid
 
     try {
-      const doc = await Location.find({ hidden: false }).lean().exec()
+      const currentUserDoc = await User.findOne({ uid: headerUid }).lean().exec()
+
+      let inActiveGroupRide = false
+
+      if (currentUserDoc && currentUserDoc.isInActiveGroupRide) {
+        inActiveGroupRide = true
+      }
+
+      let groupObj
+      let listOfUsers
+      let groupLeaderUid 
+      if (inActiveGroupRide) {
+        // Get the list of users in this group ride
+        groupObj = await Group.findOne({ _id: currentUserDoc.activeGroupRideId }).lean().exec()
+        listOfUsers = groupObj.usersUid || []
+        groupLeaderUid = groupObj.ownerUid
+      }
+
+      let doc
+      if (inActiveGroupRide) {
+        doc = await Location.find({
+          hidden: false,
+          uid: {
+            $in: listOfUsers
+          }
+        }).lean().exec()
+      } else {
+        doc = await Location.find({ hidden: false }).lean().exec()
+      }
+
       const promise = doc.map(async (c) => {
         try {
           // Lookup the user's information
@@ -25,7 +54,8 @@ locationRoute.route("/location")
             license: userDoc.license_level,
             make: userDoc.bike_details[0].make,
             model: userDoc.bike_details[0].model,
-            size: userDoc.bike_details[0].size
+            size: userDoc.bike_details[0].size,
+            isLeader: c.uid === groupLeaderUid
           }
           return userObj
         } catch (err) {
