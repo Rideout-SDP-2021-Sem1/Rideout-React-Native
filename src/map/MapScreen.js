@@ -202,13 +202,13 @@ const Map = () => {
         (info) => sendMyLocation(info),
         (error) =>
           console.error(
-            "ERROR: findCoordinates geolocation could not get location. ",
+            "ERROR1: findCoordinates geolocation could not get location. ",
             error
           ),
-        { enableHighAccuracy: true, timeout: 20000, maximumAge: 1000 }
+        { enableHighAccuracy: true, timeout: 20000 }
       );
     } catch (error) {
-      console.error("ERROR: findCoordinates could not get location. ", error);
+      console.error("ERROR2: findCoordinates could not get location. ", error);
     }
   };
 

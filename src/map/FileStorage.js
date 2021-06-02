@@ -127,20 +127,8 @@ export const getHomeLocation = (RNFS, path) => {
       }
     })
     .catch((err) => {
-      console.error("printFileConsole: " + err.message);
+      console.error("getHomeLocation: " + err.message);
     });
 
   return homeLocation;
-};
-
-// Function for debugging, reads and prints the file's contents in the console.
-export const printFileConsole = (RNFS, path) => {
-  checkFile(RNFS, path);
-  RNFS.readFile(path)
-    .then((result) => {
-      console.info("Read file: ", result);
-    })
-    .catch((err) => {
-      console.error("printFileConsole: " + err.message);
-    });
 };
